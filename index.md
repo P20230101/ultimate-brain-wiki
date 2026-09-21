@@ -5,6 +5,7 @@
 ## 快速入口
 
 - [维护协议](AGENTS.md)
+- [论文写作框架](AGENTS/论文写作框架.md)
 - [工作日志](log.md)
 - [原始资料说明](raw/README.md)
 - [Wiki 总览](wiki/README.md)
@@ -29,6 +30,10 @@
 | The schema | `AGENTS.md`, `schema/` | 规定命名、页面字段、ingest/query/lint 流程 | 已初始化 |
 
 ## Wiki 页面
+
+### 长期框架
+
+- [论文写作框架](AGENTS/论文写作框架.md)：论文润色、Discussion 写作和论文结构化总结协议。
 
 ### 总览
 

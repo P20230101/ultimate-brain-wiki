@@ -29,3 +29,10 @@
 - 更新：`.obsidian/`, `raw/`, `wiki/`, `schema/`, `index.md`, `log.md`
 - 结论：已将框架配置到 Obsidian 当前打开的 `second brain` vault，并保留 Obsidian 自动生成的工作区状态。
 - 待验证：Obsidian 重新加载后能在文件浏览器、书签和模板中看到对应入口。
+
+## [2026-09-21] policy | 论文写作框架
+
+- 来源：用户指令
+- 更新：`AGENTS/论文写作框架.md`, `AGENTS.md`, `index.md`, `log.md`
+- 结论：已将论文润色、Discussion 写作和论文结构化总结要求写入长期协议。
+- 待验证：后续论文写作任务中按该框架先澄清需求，再输出方案或正文。

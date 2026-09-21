@@ -30,6 +30,11 @@ Obsidian 打开后以 `index.md` 作为工作入口。新笔记默认进入 `wik
 - `index.md`：内容索引。按主题列出 wiki 页面、原始资料和当前状态。每次 ingest 或新增分析后更新。
 - `log.md`：时间日志。追加记录每次 ingest、query、lint、experiment 和 refactor。不要改写旧日志。
 - `README.md`：GitHub 仓库说明。
+- `AGENTS/论文写作框架.md`：论文润色、Discussion 写作和论文结构化总结的长期协议。
+
+## 长期专业框架
+
+- [论文写作框架](AGENTS/论文写作框架.md)：用于论文润色、Discussion 写作、文献对照和论文 Markdown 总结。
 
 ## 页面原则
 
