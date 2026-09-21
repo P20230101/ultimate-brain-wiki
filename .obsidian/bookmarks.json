@@ -1,0 +1,34 @@
+{
+  "items": [
+    {
+      "type": "file",
+      "ctime": 1790003000000,
+      "path": "index.md",
+      "title": "终极大脑首页"
+    },
+    {
+      "type": "file",
+      "ctime": 1790003000001,
+      "path": "log.md",
+      "title": "工作日志"
+    },
+    {
+      "type": "folder",
+      "ctime": 1790003000002,
+      "path": "wiki",
+      "title": "The wiki"
+    },
+    {
+      "type": "folder",
+      "ctime": 1790003000003,
+      "path": "raw",
+      "title": "Raw sources"
+    },
+    {
+      "type": "folder",
+      "ctime": 1790003000004,
+      "path": "schema",
+      "title": "The schema"
+    }
+  ]
+}

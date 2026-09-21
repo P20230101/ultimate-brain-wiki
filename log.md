@@ -22,3 +22,10 @@
 - 更新：`.obsidian/`, `schema/obsidian-templates/`, `AGENTS.md`, `README.md`, `index.md`, `schema/README.md`, `log.md`
 - 结论：Obsidian vault 已配置默认笔记目录、附件目录、模板目录和核心插件；后续可直接在 Second Brain 中使用模板维护 wiki。
 - 待验证：打开 Obsidian 后确认模板插件识别 `schema/obsidian-templates/`。
+
+## [2026-09-21] config | 真实 Obsidian vault 同步
+
+- 来源：用户截图与 Obsidian 本地配置
+- 更新：`.obsidian/`, `raw/`, `wiki/`, `schema/`, `index.md`, `log.md`
+- 结论：已将框架配置到 Obsidian 当前打开的 `second brain` vault，并保留 Obsidian 自动生成的工作区状态。
+- 待验证：Obsidian 重新加载后能在文件浏览器、书签和模板中看到对应入口。

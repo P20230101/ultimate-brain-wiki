@@ -1,0 +1,5 @@
+{
+  "format": "YYYY-MM-DD",
+  "folder": "wiki/daily",
+  "template": "schema/obsidian-templates/日志模板.md"
+}

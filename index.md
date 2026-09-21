@@ -16,6 +16,8 @@
 - 默认新笔记位置：`wiki/`。
 - 默认附件位置：`raw/assets/`。
 - 模板目录：`schema/obsidian-templates/`。
+- 每日记录目录：`wiki/daily/`。
+- 书签入口：`index.md`、`log.md`、`wiki/`、`raw/`、`schema/`。
 - 推荐流程：资料先进入 `raw/`，再用模板编译到 `wiki/`，最后追加 `log.md`。
 
 ## 核心架构
