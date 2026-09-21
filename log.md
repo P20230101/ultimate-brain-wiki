@@ -9,3 +9,9 @@
 - 结论：采用 Raw sources / The wiki / The schema 三层架构，保留最小核心层级。
 - 待验证：GitHub Pages 启用后确认首页可访问。
 
+## [2026-09-21] policy | Obsidian Second Brain 工作区约定
+
+- 来源：用户指令
+- 更新：`AGENTS.md`, `README.md`, `log.md`
+- 结论：当前仓库即 Obsidian 连接的 Second Brain 文件夹；后续所有构建都在此目录内进行。
+- 待验证：暂无。

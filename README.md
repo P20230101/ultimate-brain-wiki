@@ -2,6 +2,8 @@
 
 这是一个从零搭建的中文 LLM Wiki / 第二大脑仓库。它把原始资料、编译后的知识页和维护协议分开，让 Obsidian 作为阅读与导航环境，让 LLM 作为维护者持续更新知识结构。
 
+当前仓库就是 Obsidian 连接的 Second Brain 文件夹。后续建设都在这里继续进行。
+
 ## 在线入口
 
 GitHub Pages 启用后，入口页为 `index.md` 渲染出的站点首页。
@@ -24,4 +26,3 @@ GitHub Pages 启用后，入口页为 `index.md` 渲染出的站点首页。
 2. 让 LLM 按 `AGENTS.md` 的 ingest 流程处理。
 3. 在 Obsidian 中阅读 `index.md`、`log.md` 和 `wiki/` 页面。
 4. 周期性运行 lint，检查矛盾、孤页、缺失来源和长期未验证问题。
-
