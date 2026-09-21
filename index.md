@@ -10,6 +10,14 @@
 - [Wiki 总览](wiki/README.md)
 - [Schema 说明](schema/README.md)
 
+## Obsidian 工作台
+
+- 默认首页：打开本文件 `index.md`。
+- 默认新笔记位置：`wiki/`。
+- 默认附件位置：`raw/assets/`。
+- 模板目录：`schema/obsidian-templates/`。
+- 推荐流程：资料先进入 `raw/`，再用模板编译到 `wiki/`，最后追加 `log.md`。
+
 ## 核心架构
 
 | 层级 | 路径 | 作用 | 当前状态 |
@@ -44,4 +52,3 @@
 - 任何新会话都能通过 `AGENTS.md` 理解维护规则。
 - `index.md` 能作为 Obsidian 和 GitHub Pages 的首页。
 - `log.md` 能追踪每次资料处理、查询和健康检查。
-

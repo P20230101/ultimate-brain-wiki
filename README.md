@@ -26,3 +26,12 @@ GitHub Pages 启用后，入口页为 `index.md` 渲染出的站点首页。
 2. 让 LLM 按 `AGENTS.md` 的 ingest 流程处理。
 3. 在 Obsidian 中阅读 `index.md`、`log.md` 和 `wiki/` 页面。
 4. 周期性运行 lint，检查矛盾、孤页、缺失来源和长期未验证问题。
+
+## Obsidian 配置
+
+本仓库已包含基础 `.obsidian` 配置：
+
+- 新笔记默认进入 `wiki/`。
+- 附件默认进入 `raw/assets/`。
+- 模板目录为 `schema/obsidian-templates/`。
+- 使用标准 Markdown 链接，兼容 GitHub Pages。

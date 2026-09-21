@@ -6,6 +6,8 @@
 
 当前仓库就是 Obsidian 连接的 Second Brain 文件夹。后续所有新增资料、wiki 页面、schema、日志和整理工作，都在这个文件夹内完成。不要另建平行知识库；除非用户明确要求迁移，否则以本目录作为唯一事实工作区。
 
+Obsidian 打开后以 `index.md` 作为工作入口。新笔记默认进入 `wiki/`，附件默认进入 `raw/assets/`，模板存放在 `schema/obsidian-templates/`。
+
 ## 三层结构
 
 1. `raw/`：Raw sources，原始资料层。

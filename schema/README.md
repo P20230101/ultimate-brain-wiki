@@ -6,8 +6,8 @@
 
 - [页面模板](page-template.md)
 - [Ingest 记录模板](ingest-template.md)
+- [Obsidian 模板目录](obsidian-templates/)
 
 ## 修改原则
 
 当同一种处理动作重复出现三次以上，且字段开始稳定时，再把它沉淀进 schema。不要为了未来可能出现的复杂性提前扩张模板。
-
