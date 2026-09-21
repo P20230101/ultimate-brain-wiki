@@ -36,3 +36,10 @@
 - 更新：`AGENTS/论文写作框架.md`, `AGENTS.md`, `index.md`, `log.md`
 - 结论：已将论文润色、Discussion 写作和论文结构化总结要求写入长期协议。
 - 待验证：后续论文写作任务中按该框架先澄清需求，再输出方案或正文。
+
+## [2026-09-21] policy | Introduction 与 Discussion 结构
+
+- 来源：用户指令
+- 更新：`AGENTS/论文写作框架.md`, `log.md`
+- 结论：已补充 Introduction 倒三角结构和 Discussion 正三角结构，用于组织论文宏观论证。
+- 待验证：后续论文引言与讨论写作中按该结构检查段落功能。
