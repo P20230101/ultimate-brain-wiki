@@ -50,3 +50,17 @@
 - 更新：`AGENTS/科研工具环境.md`, `AGENTS.md`, `index.md`, `log.md`
 - 结论：MinerU `4.0.5` 远程解析和 Semantic Scholar API 已配置并通过只读接口验证；密钥仅保存在用户级环境变量和本机工具配置中。
 - 待验证：重启 Codex 后确认新进程自动读取用户级环境变量。
+
+## [2026-09-22] schema | Skill 分类与调用协议
+
+- 来源：用户要求统一分类 skill 并规定调用顺序
+- 更新：`AGENTS/技能分类与调用协议.md`, `AGENTS.md`, `index.md`
+- 结论：已按流程控制、资料解析、文献检索、论文写作、数据分析、视觉材料和环境维护分类，并为常见科研任务指定主 skill 与辅助 skill。
+- 待验证：后续任务按路由协议调用，并在交付前执行对应验证。
+
+## [2026-09-22] config | 科研工具环境补齐
+
+- 来源：环境检测结果与用户要求
+- 更新：用户级 MinerU 后端变量、本机 Python 依赖、`AGENTS/科研工具环境.md`
+- 结论：CUDA Torch、MinerU Torch/llama-cpp、本地 managed standard 服务和远程 MinerU 均已通过验证；已有实验图片已成功完成本地 standard 解析。
+- 待验证：重启 Codex 后确认当前新进程继承后端变量；Semantic Scholar 等待服务端限流解除后复测。

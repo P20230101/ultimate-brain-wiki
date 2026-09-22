@@ -7,6 +7,7 @@
 - [维护协议](AGENTS.md)
 - [论文写作框架](AGENTS/论文写作框架.md)
 - [科研工具环境](AGENTS/科研工具环境.md)
+- [技能分类与调用协议](AGENTS/技能分类与调用协议.md)
 - [工作日志](log.md)
 - [原始资料说明](raw/README.md)
 - [Wiki 总览](wiki/README.md)
@@ -36,6 +37,7 @@
 
 - [论文写作框架](AGENTS/论文写作框架.md)：论文润色、Discussion 写作和论文结构化总结协议。
 - [科研工具环境](AGENTS/科研工具环境.md)：MinerU 论文解析和 Semantic Scholar 文献检索配置。
+- [技能分类与调用协议](AGENTS/技能分类与调用协议.md)：所有 skill 的分类、路由和执行顺序。
 
 ### 总览
 

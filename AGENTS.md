@@ -32,11 +32,21 @@ Obsidian 打开后以 `index.md` 作为工作入口。新笔记默认进入 `wik
 - `README.md`：GitHub 仓库说明。
 - `AGENTS/论文写作框架.md`：论文润色、Discussion 写作和论文结构化总结的长期协议。
 - `AGENTS/科研工具环境.md`：MinerU 和 Semantic Scholar 的本机配置、变量名和验证方式。
+- `AGENTS/技能分类与调用协议.md`：skill 分类、路由顺序和禁止混用规则。
 
 ## 长期专业框架
 
 - [论文写作框架](AGENTS/论文写作框架.md)：用于论文润色、Discussion 写作、文献对照和论文 Markdown 总结。
 - [科研工具环境](AGENTS/科研工具环境.md)：用于论文解析、OCR、表格/公式提取和 Semantic Scholar 文献检索。
+- [技能分类与调用协议](AGENTS/技能分类与调用协议.md)：用于选择主 skill、安排执行顺序和验收结果。
+
+## Skill 调用规则
+
+1. 先读[技能分类与调用协议](AGENTS/技能分类与调用协议.md)，再选择一个主 skill。
+2. 先执行主 skill 的输入和前置检查，再调用明确需要的辅助 skill。
+3. 相近能力只选其一：论文内容用 `mineru`，版式用 `pdf:pdf`，格式转换用 `markdown-converter`。
+4. 发生错误时先做根因分析；完成前必须运行对应验证，不以“命令已执行”代替验收。
+5. 每次产生可复用知识、环境变更或实验结果，都更新 `index.md` 和 `log.md`。
 
 ## 页面原则
 
