@@ -43,3 +43,10 @@
 - 更新：`AGENTS/论文写作框架.md`, `log.md`
 - 结论：已补充 Introduction 倒三角结构和 Discussion 正三角结构，用于组织论文宏观论证。
 - 待验证：后续论文引言与讨论写作中按该结构检查段落功能。
+
+## [2026-09-22] config | MinerU 与 Semantic Scholar
+
+- 来源：用户提供的 API 配置
+- 更新：`AGENTS/科研工具环境.md`, `AGENTS.md`, `index.md`, `log.md`
+- 结论：MinerU `4.0.5` 远程解析和 Semantic Scholar API 已配置并通过只读接口验证；密钥仅保存在用户级环境变量和本机工具配置中。
+- 待验证：重启 Codex 后确认新进程自动读取用户级环境变量。

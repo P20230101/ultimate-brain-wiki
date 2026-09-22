@@ -31,10 +31,12 @@ Obsidian 打开后以 `index.md` 作为工作入口。新笔记默认进入 `wik
 - `log.md`：时间日志。追加记录每次 ingest、query、lint、experiment 和 refactor。不要改写旧日志。
 - `README.md`：GitHub 仓库说明。
 - `AGENTS/论文写作框架.md`：论文润色、Discussion 写作和论文结构化总结的长期协议。
+- `AGENTS/科研工具环境.md`：MinerU 和 Semantic Scholar 的本机配置、变量名和验证方式。
 
 ## 长期专业框架
 
 - [论文写作框架](AGENTS/论文写作框架.md)：用于论文润色、Discussion 写作、文献对照和论文 Markdown 总结。
+- [科研工具环境](AGENTS/科研工具环境.md)：用于论文解析、OCR、表格/公式提取和 Semantic Scholar 文献检索。
 
 ## 页面原则
 
