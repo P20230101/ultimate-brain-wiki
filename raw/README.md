@@ -14,4 +14,4 @@
 | 文件 | 类型 | 状态 | 编译结果 |
 | --- | --- | --- | --- |
 | [karpathy-llm-wiki.md](karpathy-llm-wiki.md) | 参考文章 | 已处理 | [LLM Wiki 模式](../wiki/concepts/LLM-Wiki模式.md) |
-
+| [datasets/PA12数据源登记.md](datasets/PA12数据源登记.md) | 外部实验与几何数据登记 | 已盘点 | [PA12 双轴试样仿真与实验全流程](../AGENTS/PA12双轴试样仿真与实验全流程.md) |

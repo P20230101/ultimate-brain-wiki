@@ -90,3 +90,24 @@
 - 可复用：文献捕获、原文客观解构、分阶段人工确认、文献综述与结果合成的流程思想。
 - 不可直接复用：经济学变量、市场/政策语义、计量模型预设和宏观数据字典。
 - 力学适配边界：后续必须改写为载荷、位移、应力、应变、材料参数、边界条件、单位、误差、收敛与独立验证；在改写完成前继续使用本库现有 `mineru`、`NovaForge` 和数据分析路由。
+
+## [2026-09-22] ingest | PA12 外部数据源与双轴试样几何登记
+
+- 来源：`D:\C盘迁移\Desktop\yuan\data`
+- 更新：`raw/datasets/PA12数据源登记.md`、`AGENTS/PA12双轴试样仿真与实验全流程.md`、`wiki/methods/PA12双轴中心区均匀性筛选.md`、`AGENTS/PA12双轴试样仿真/`
+- 结论：已核对 XY/XZ 实验数据、MatchID/VFM 文件和五个中心厚度 STEP；中心厚度为 3.0/2.5/2.0/1.5/1.0 mm，总厚度均为 3.0 mm。
+- 待验证：材料参数、力值单位、实际加载比、XZ 数据的 Z 向标定含义，以及备用形状和长宽尺寸来源。
+
+## [2026-09-22] experiment | Abaqus 与数据接入可执行性检查
+
+- 来源：Abaqus 2025、MinerU 4.0.5、本地数据目录和 `verification.json`
+- 更新：`AGENTS/PA12双轴试样仿真/pa12_biaxial_scan.py`、`postprocess_uniformity.py`、`run_scan.ps1`
+- 结论：Abaqus 2025 可执行；MinerU 本地 `standard` 服务健康；五个 STEP 均登记为单一实体且包围盒为 150.4 × 150.4 × 3.0 mm。已建立导入、网格、四臂耦合、位移加载和中心区 ODB 指标提取入口。
+- 待验证：本次先验证输入文件生成链路；脚本中的 PA12 材料卡明确为流程临时值，不能作为正式科学结论，正式提交需替换为实验标定参数。
+
+## [2026-09-22] experiment | PA12 Abaqus 前处理、求解与 ODB 后处理验证
+
+- 来源：五个真实 STEP、`pa12_biaxial_scan.py`、`postprocess_uniformity.py`、Abaqus 2025。
+- 更新：`AGENTS/PA12双轴试样仿真/runs/`、`AGENTS/PA12双轴试样仿真/验证/2026-09-22_流程验证报告.md`、`index.md`、`AGENTS/PA12双轴试样仿真与实验全流程.md`。
+- 结论：五个 STEP 均生成 `.inp/.cae`；`a=3.0 mm` 粗网格临时材料值作业成功完成，ODB 中心区后处理输出 `primary_score=0.0353768`。
+- 限制：材料卡为流程临时值，不能用于论文或正式设计排序；正式任务仍需材料标定、网格收敛、五模型求解和实验留出验证。

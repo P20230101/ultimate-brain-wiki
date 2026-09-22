@@ -3,4 +3,5 @@
 .trash/
 Thumbs.db
 Desktop.ini
-
+AGENTS/PA12双轴试样仿真/runs/
+AGENTS/PA12双轴试样仿真/__pycache__/

@@ -38,6 +38,7 @@
 - [论文写作框架](AGENTS/论文写作框架.md)：论文润色、Discussion 写作和论文结构化总结协议。
 - [科研工具环境](AGENTS/科研工具环境.md)：MinerU 论文解析和 Semantic Scholar 文献检索配置。
 - [技能分类与调用协议](AGENTS/技能分类与调用协议.md)：所有 skill 的分类、路由和执行顺序。
+- [PA12 双轴试样仿真与实验全流程](AGENTS/PA12双轴试样仿真与实验全流程.md)：当前 SLS PA12 双轴试样课题的执行协议。
 
 ### 总览
 
@@ -56,12 +57,15 @@
 ### 文献
 
 - [检索增强生成：面向知识密集型自然语言处理任务](wiki/literature/rag-2020-knowledge-intensive-nlp.md)：以一篇新论文验证“官方来源 → Raw source → MinerU → 中文 Wiki”的完整流程。
+- [PA12 双轴中心区均匀性筛选](wiki/methods/PA12双轴中心区均匀性筛选.md)：用 Abaqus、DIC 和 VFM 比较中心区均匀性的力学方法页。
+- [PA12 流程验证报告](AGENTS/PA12双轴试样仿真/验证/2026-09-22_流程验证报告.md)：五个 STEP 前处理、Abaqus smoke solve 和 ODB 指标提取的证据。
 
 ## 原始资料
 
 - [Karpathy LLM Wiki gist](raw/karpathy-llm-wiki.md)：本仓库的初始参考资料。
 - [RAG 论文 PDF](raw/papers/lewis2020-rag-knowledge-intensive-nlp-v4.pdf)：Lewis 等，arXiv:2005.11401v4。
 - [RAG 原始文献登记卡](raw/papers/lewis2020-rag-knowledge-intensive-nlp-v4.md)：来源、哈希、解析范围和定位记录。
+- [PA12 数据源登记](raw/datasets/PA12数据源登记.md)：外部实验、DIC、MatchID、VFM 与 STEP 数据的来源和边界。
 
 ## 当前成功标准
 
@@ -70,3 +74,4 @@
 - `index.md` 能作为 Obsidian 和 GitHub Pages 的首页。
 - `log.md` 能追踪每次资料处理、查询和健康检查。
 - 新论文可由 MinerU 解析并编译为带 locator 引用的中文文献页。
+- PA12 原始数据可被定位到，五个已核实厚度模型可进入 Abaqus 输入文件生成和中心区均匀性后处理流程。

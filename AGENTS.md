@@ -33,12 +33,14 @@ Obsidian 打开后以 `index.md` 作为工作入口。新笔记默认进入 `wik
 - `AGENTS/论文写作框架.md`：论文润色、Discussion 写作和论文结构化总结的长期协议。
 - `AGENTS/科研工具环境.md`：MinerU 和 Semantic Scholar 的本机配置、变量名和验证方式。
 - `AGENTS/技能分类与调用协议.md`：skill 分类、路由顺序和禁止混用规则。
+- `AGENTS/PA12双轴试样仿真与实验全流程.md`：PA12 双轴试样的 Abaqus、DIC、VFM 和论文证据闭环。
 
 ## 长期专业框架
 
 - [论文写作框架](AGENTS/论文写作框架.md)：用于论文润色、Discussion 写作、文献对照和论文 Markdown 总结。
 - [科研工具环境](AGENTS/科研工具环境.md)：用于论文解析、OCR、表格/公式提取和 Semantic Scholar 文献检索。
 - [技能分类与调用协议](AGENTS/技能分类与调用协议.md)：用于选择主 skill、安排执行顺序和验收结果。
+- [PA12 双轴试样仿真与实验全流程](AGENTS/PA12双轴试样仿真与实验全流程.md)：用于当前力学课题的数据、仿真、筛选和验证。
 
 ## Skill 调用规则
 
