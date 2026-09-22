@@ -64,3 +64,10 @@
 - 更新：用户级 MinerU 后端变量、本机 Python 依赖、`AGENTS/科研工具环境.md`
 - 结论：CUDA Torch、MinerU Torch/llama-cpp、本地 managed standard 服务和远程 MinerU 均已通过验证；已有实验图片已成功完成本地 standard 解析。
 - 待验证：重启 Codex 后确认当前新进程继承后端变量；Semantic Scholar 等待服务端限流解除后复测。
+
+## [2026-09-22] experiment | MinerU 新文件可用性验证
+
+- 来源：`AGENTS/PA12实验数据处理/VFM专用力值/X方向/X-0.1-258.csv`
+- 更新：MinerU 本地文档库解析缓存
+- 结论：此前未解析过的 CSV 文件首次解析完成，`cache_hit=false`、`status=done`、`tier=flash`，返回非空 Markdown 表格内容。
+- 待验证：后续如需继续读取，使用 `doc:8152268/tier:flash/page:1/block:1` 及其 continuation locator。
