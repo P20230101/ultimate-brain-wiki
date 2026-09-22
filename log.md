@@ -71,3 +71,13 @@
 - 更新：MinerU 本地文档库解析缓存
 - 结论：此前未解析过的 CSV 文件首次解析完成，`cache_hit=false`、`status=done`、`tier=flash`，返回非空 Markdown 表格内容。
 - 待验证：后续如需继续读取，使用 `doc:8152268/tier:flash/page:1/block:1` 及其 continuation locator。
+
+## [2026-09-22] ingest | Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks
+
+- 来源：`raw/papers/lewis2020-rag-knowledge-intensive-nlp-v4.pdf`、`raw/papers/lewis2020-rag-knowledge-intensive-nlp-v4.md`
+- 更新：`wiki/literature/rag-2020-knowledge-intensive-nlp.md`、`wiki/README.md`、`index.md`
+- 核心问题：检索器与生成器能否通过端到端训练组合参数化记忆和可更新的非参数化记忆，并在多类知识密集型任务上获得收益？
+- 关键结论：RAG 在文中报告的开放域问答、生成和事实核验任务上取得竞争力；消融、人工评价和索引热替换实验共同支持检索增强、事实性和知识更新的论证。
+- 证据：本地 MinerU 4.0.5 `standard` 解析完成，文档标识为 `doc:23e3249`，覆盖 19 页；关键证据位于第 2、6–8、17、19 页及对应 block locator。
+- 冲突：Semantic Scholar 本次元数据请求返回 HTTP 429；因此元数据以 arXiv 官方页面核对，未将限流误判为解析故障。
+- 待验证：本页尚未独立复现实验数值；后续若要验证模型效果，应固定数据切分、检索数量、索引版本、解码策略和评估指标。

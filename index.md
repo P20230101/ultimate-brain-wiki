@@ -53,9 +53,15 @@
 - [资料摄取流程](wiki/methods/资料摄取流程.md)：新资料进入 wiki 的最小处理流程。
 - [Wiki 健康检查](wiki/methods/Wiki健康检查.md)：周期性检查矛盾、孤页和缺失证据。
 
+### 文献
+
+- [检索增强生成：面向知识密集型自然语言处理任务](wiki/literature/rag-2020-knowledge-intensive-nlp.md)：以一篇新论文验证“官方来源 → Raw source → MinerU → 中文 Wiki”的完整流程。
+
 ## 原始资料
 
 - [Karpathy LLM Wiki gist](raw/karpathy-llm-wiki.md)：本仓库的初始参考资料。
+- [RAG 论文 PDF](raw/papers/lewis2020-rag-knowledge-intensive-nlp-v4.pdf)：Lewis 等，arXiv:2005.11401v4。
+- [RAG 原始文献登记卡](raw/papers/lewis2020-rag-knowledge-intensive-nlp-v4.md)：来源、哈希、解析范围和定位记录。
 
 ## 当前成功标准
 
@@ -63,3 +69,4 @@
 - 任何新会话都能通过 `AGENTS.md` 理解维护规则。
 - `index.md` 能作为 Obsidian 和 GitHub Pages 的首页。
 - `log.md` 能追踪每次资料处理、查询和健康检查。
+- 新论文可由 MinerU 解析并编译为带 locator 引用的中文文献页。
