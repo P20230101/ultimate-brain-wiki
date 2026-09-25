@@ -341,6 +341,13 @@ def _safe_float(value: float | None) -> float | None:
     return None if value is None else float(value)
 
 
+def _usable_modulus(elastic_fit: dict | None) -> float | None:
+    if elastic_fit is None:
+        return None
+    value = float(elastic_fit["modulus_mpa"])
+    return value if math.isfinite(value) and value > 0.0 else None
+
+
 def _fit_progressive_elastic(records: list[dict], indices: list[int], active_axes: list[str]) -> list[dict]:
     output: list[dict] = []
     for end in range(2, len(indices) + 1):
@@ -635,9 +642,16 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
                 coefficients.append(coefficient)
                 forces.append(force)
     elastic_fit = fit_elastic_modulus(coefficients=coefficients, external_forces=forces) if len(coefficients) >= 2 else None
-    modulus = None if elastic_fit is None else float(elastic_fit["modulus_mpa"])
+    raw_modulus = None if elastic_fit is None else float(elastic_fit["modulus_mpa"])
+    modulus = _usable_modulus(elastic_fit)
     if elastic_fit is None:
         stage1_quality = {"status": "NOT_COMPUTED"}
+    elif modulus is None:
+        stage1_quality = {
+            "status": "REVIEW_REQUIRED",
+            "reason": "阶段1虚功拟合得到非正或非有限 E；不进入阶段2塑性应变计算。",
+            "fitted_modulus_mpa": raw_modulus,
+        }
     else:
         maximum_active_force = max(
             frame_data[index][f"force_{axis.lower()}"]
@@ -819,7 +833,7 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
                 and geometry_quality["status"] == "PASS"
             )
             else "SELF_VFM_REVIEW_REQUIRED"
-            if modulus is not None
+            if modulus is not None or elastic_fit is not None
             else "SELF_VFM_PARTIAL"
         ),
         "方法": {
@@ -842,6 +856,7 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
             "拟合帧数": len(elastic_indices),
             "首末拟合帧": None if not elastic_indices else [frame_data[elastic_indices[0]]["照片"], frame_data[elastic_indices[-1]]["照片"]],
             "E_MPa": modulus,
+            "拟合候选E_MPa": raw_modulus,
             "nu": nu,
             "质量": stage1_quality,
             "虚功拟合": elastic_fit,
