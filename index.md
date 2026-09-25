@@ -96,6 +96,8 @@
 - [PA12 自建 VFM 阶段 D：双口径残差与稳定性比较](Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段D双口径残差与稳定性比较.md)：比较完整 Job ROI 与 DIC subset 内缩有效域的虚功残差、固定窗口稳定性和严格留出；两种口径均未达到最终参数发布门槛。
 - [PA12 自建 VFM 阶段 E：S19 单轴准入复核](Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段E S19单轴准入复核.md)：独立核对 S19 Polygon、帧—力索引、DIC 点域和 VFM 标签；单轴厚度、标距、积分域及外功边界仍未确认。
 - [PA12 自建 VFM 阶段 F：E–ν 可辨识性审计](Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段F泊松比可辨识性.md)：对两种积分域计算 E–ν 虚功残差剖面；当前 ν 不能作为正式识别值，E/Y/H 仅为固定 ν 条件候选。
+- [PA12 自建 VFM 阶段 G：S22 单轴横向应变诊断](Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段G S22单轴横向应变诊断.md)：S22 早期表观横向/轴向应变比约为 0.40，但随拟合窗口变化；单轴轴向映射和弹性窗口未确认，不构成正式 ν 识别。
+- [PA12 自建 VFM 阶段 H：双轴 ROI 与厚度几何门槛](Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段H双轴ROI与厚度几何门槛.md)：归档五个厚度 STEP；确认 `tc1000` 平坦区 `28.01×28.01 mm`，S16 Job ROI 尺寸在严格居中假设下可容纳但仅余约 `0.59 px`，试样身份/亚像素位置未证实，门槛继续复核。
 - [MatchID 闭环状态](Agents/PA12实验数据处理/MatchID_VFM准备/PA12_MatchID_VFM闭环状态.md)：区分同步力值、DAT 全场记录、Job 覆盖、缺导出、无效导出和已合并状态。
 - [PA12 等双轴 VFM 当前检查结果](Agents/PA12实验数据处理/MatchID_VFM准备/PA12等双轴VFM当前检查结果.md) / [CSV](Agents/PA12实验数据处理/MatchID_VFM准备/PA12等双轴VFM当前检查结果.csv)：按 0.2、2、20 mm/s 汇总四组实验检查项；S15有效帧为284。检查器定向测试和全量回归结果以 GPT 交接状态及最新日志为准；当前 Markdown/CSV 与 builder 全字段一致，并分别表达预处理/VFM同步状态。
 - [VFM 边界载荷说明](Agents/PA12实验数据处理/MatchID_VFM准备/PA12_VFM边界载荷说明.md)：保留机器通道到旋转后边界映射、外围力作为 ROI 边界合力、S15 四边力蓝图 CSV/JSON，以及 S16 完整 `.vfm` 格式审计；当前自建 VFM 为主流程，S16 `3try` 载荷不同步、`4try_step3` 的 `Forces count=0` 和第 16 轮数值均仅为历史 GUI 审计，不是最终参数。
