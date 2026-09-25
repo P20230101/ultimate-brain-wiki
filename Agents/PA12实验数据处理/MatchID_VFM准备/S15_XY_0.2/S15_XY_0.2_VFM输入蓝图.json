@@ -1,0 +1,82 @@
+{
+  "document_type": "PA12_S15_MATCHID_VFM_INPUT_BLUEPRINT",
+  "generated_date": "2026-09-24",
+  "experiment_id": "S15_XY_0.2",
+  "status": "READY_FOR_MATCHID_VFM_ENGINE_CREATION_AFTER_MANUAL_ROI_GATE",
+  "method": "MatchID built-in VFM",
+  "dic": {
+    "job_file": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER/biaxal/S15_XY_0.2/Job.m2inp",
+    "mti_file": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER/biaxal/S15_XY_0.2/S15_XY_0.2.mti",
+    "reference_image": "000000.jpg",
+    "valid_mti_entries_including_reference": 285,
+    "effective_nonreference_frames": 284,
+    "effective_frame_range": "000001.jpg-000284.jpg",
+    "excluded_frame": "000285.jpg",
+    "roi_origin_px": "395,413",
+    "roi_size_px": "329 x 329",
+    "conversion_mm_per_pixel": 0.087464,
+    "merged_directory": "Agents/PA12实验数据处理/MatchID_VFM准备/S15_XY_0.2/merged",
+    "merged_index": "Agents/PA12实验数据处理/MatchID_VFM准备/S15_XY_0.2/S15_XY_0.2_DIC全场—力索引.csv",
+    "merged_frame_count": 284,
+    "dic_source": "DAT_RECONSTRUCTED",
+    "excluded_invalid_point_count": 568,
+    "field_map": {
+      "x": "X[mm]",
+      "y": "Y[mm]",
+      "u": "U[mm]",
+      "v": "V[mm]",
+      "exx": "Exx",
+      "eyy": "Eyy",
+      "exy": "Exy"
+    },
+    "units": {
+      "x": "mm",
+      "y": "mm",
+      "u": "mm",
+      "v": "mm",
+      "exx": "dimensionless",
+      "eyy": "dimensionless",
+      "exy": "dimensionless"
+    }
+  },
+  "geometry": {
+    "center_roi_thickness_mm": 1.0,
+    "overall_thickness_mm": 3.0,
+    "job_roi_size_mm": "28.775656 x 28.775656",
+    "nominal_flat_zone_mm": "28 x 28",
+    "nominal_reduced_outer_boundary_mm": "30 x 30",
+    "roi_containment_status": "REVIEW_REQUIRED"
+  },
+  "boundary_forces": {
+    "blueprint_csv": "Agents/PA12实验数据处理/MatchID_VFM准备/S15_XY_0.2/S15_XY_0.2_BoundaryForces_blueprint.csv",
+    "series_count": 4,
+    "values_per_series": 285,
+    "frame_order": "000000 reference zero, then 000001-000284",
+    "excluded_frame": "000285",
+    "mapping": {
+      "Boundary0": "X2_Press",
+      "Boundary1": "Y2_Press",
+      "Boundary2": "Y1_Press",
+      "Boundary3": "X1_Press"
+    },
+    "source_press_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/xy-1-0.1_state_20250529102303_20250529102339.xls",
+    "source_press_columns": ["X1_Press", "X2_Press", "Y1_Press", "Y2_Press"],
+    "sync_start_index": 105,
+    "sync_end_index": 28463,
+    "baseline_sample_count": 50,
+    "average_csv_reconstruction_max_difference_n": {
+      "X": 0.000000500,
+      "Y": 0.000000500
+    },
+    "status": "DATA_READY"
+  },
+  "gates": {
+    "roi_and_thickness_manual_review": "REVIEW_REQUIRED",
+    "reference_frame_and_zero_force_review": "REVIEW_REQUIRED",
+    "boundary_force_data": "READY",
+    "vfm_file_present": false,
+    "virtual_work_check": "NOT_STARTED",
+    "residual_check": "NOT_STARTED",
+    "parameter_identification": "LOCKED"
+  }
+}

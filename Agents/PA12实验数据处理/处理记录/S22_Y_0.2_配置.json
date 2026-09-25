@@ -1,0 +1,79 @@
+{
+  "press_sheet": "Press",
+  "position_sheet": "Pos",
+  "time_column": "T",
+  "x_press_columns": [
+    "X1_Press",
+    "X2_Press"
+  ],
+  "y_press_columns": [
+    "Y1_Press",
+    "Y2_Press"
+  ],
+  "force_sign": -1.0,
+  "loading_speed_definition": "two_grip_relative_speed",
+  "include_time": true,
+  "frame_selection_mode": "paired_jpg_dat",
+  "plot_smoothing_window": 5,
+  "displacement_definition": "two_grip_relative_sum",
+  "monotonic_displacement_envelope": true,
+  "zero_inactive_force_axes": true,
+  "axis_position_columns": {
+    "X": [
+      "X1_Pos",
+      "X2_Pos"
+    ],
+    "Y": [
+      "Y1_Pos",
+      "Y2_Pos"
+    ]
+  },
+  "geometry": {
+    "specimen_width_mm": 30.0,
+    "thickness_mm": 1.0,
+    "overall_thickness_mm": 3.0,
+    "gauge_length_mm": 30.0
+  },
+  "detector": {
+    "baseline_window_s": 0.05,
+    "start_threshold_n": 5.0,
+    "persistence_s": 0.05,
+    "fracture_fraction": 0.2,
+    "smoothing_window_s": 0.05
+  },
+  "experiment_id": "S22_Y_0.2",
+  "specimen_id": "S22",
+  "orientation": "Y",
+  "loading_mode": "单轴 Y",
+  "loading_speed": 0.2,
+  "speed_label": "0.2",
+  "loading_speed_source": "旋转目录速度按两侧相对加载速度；力文件名中的 0.1 为单个执行通道速度，Pos 斜率支持该口径",
+  "camera_setting_fps": 10.0,
+  "camera_setting_source": "历史批次候选值；原始相机元数据未找到",
+  "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER/unixal/S22_Y_0.2",
+  "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/y-9-0.1_state_20250529140828_20250529141127.xls",
+  "position_columns": [
+    "Y1_Pos",
+    "Y2_Pos"
+  ],
+  "displacement_mode": "device",
+  "dic_job_file": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER/unixal/S22_Y_0.2/Job.m2inp",
+  "dic_scale_mm_per_pixel": 0.083333,
+  "formal_vfm_allowed": true,
+  "stress_strain_axes": [
+    "Y"
+  ],
+  "excluded_frame_numbers": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    9,
+    10
+  ],
+  "excluded_frame_reason": "DAT 质量审计确认这些帧含 <18> 位移记录但没有 <53> 应变记录，不能进入完整 DIC/VFM 场；原始 JPG/DAT 保留不改。",
+  "notes": "单轴 Y；X 为非加载方向，正式输出中置零，Y 保留校正后真实力。DAT 为稀疏帧，只使用实际同名 JPG/DAT 配对帧，不构造连续帧号。",
+  "output_root": "D:\\2026.9.21_finally"
+}

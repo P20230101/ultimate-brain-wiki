@@ -1,0 +1,30 @@
+{
+  "experiment_id": "S18_XY_2",
+  "status": "MATCHID_VFM_INPUT_READY",
+  "frame_count": 126,
+  "merged_index": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\MatchID_VFM准备\\S18_XY_2\\S18_XY_2_DIC全场—力索引.csv",
+  "merged_directory": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\MatchID_VFM准备\\S18_XY_2\\merged",
+  "field_map": {
+    "x": "X[mm]",
+    "y": "Y[mm]",
+    "u": "U[mm]",
+    "v": "V[mm]",
+    "exx": "Exx",
+    "eyy": "Eyy",
+    "exy": "Exy"
+  },
+  "units": {
+    "x": "mm",
+    "y": "mm",
+    "u": "mm",
+    "v": "mm",
+    "exx": "dimensionless",
+    "eyy": "dimensionless",
+    "exy": "dimensionless"
+  },
+  "source_counts": {
+    "DAT_RECONSTRUCTED": 126
+  },
+  "reconstructed_frame_count": 126,
+  "excluded_invalid_point_count": 252
+}

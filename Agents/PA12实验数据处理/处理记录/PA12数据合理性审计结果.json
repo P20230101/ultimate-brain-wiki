@@ -1,0 +1,120 @@
+{
+  "audit_passed": true,
+  "formal_vfm_ready": false,
+  "config": "configs\\pa12_rotated_batch.json",
+  "output_root": "D:\\2026.9.21_finally",
+  "experiment_count": 10,
+  "overview_count": 10,
+  "matchid_index_count": 10,
+  "experiments": [
+    {
+      "experiment_id": "S15_XY_0.2",
+      "status": "VFM_READY",
+      "failures": [],
+      "vfm": {
+        "formal_vfm_ready": true,
+        "match_count": 284,
+        "x_count": 284,
+        "y_count": 284,
+        "failures": []
+      }
+    },
+    {
+      "experiment_id": "S16_XY_0.2",
+      "status": "VFM_READY",
+      "failures": [],
+      "vfm": {
+        "formal_vfm_ready": true,
+        "match_count": 257,
+        "x_count": 257,
+        "y_count": 257,
+        "failures": []
+      }
+    },
+    {
+      "experiment_id": "S17_XY_20",
+      "status": "VFM_READY",
+      "failures": [],
+      "vfm": {
+        "formal_vfm_ready": true,
+        "match_count": 12,
+        "x_count": 12,
+        "y_count": 12,
+        "failures": []
+      }
+    },
+    {
+      "experiment_id": "S18_XY_2",
+      "status": "VFM_READY",
+      "failures": [],
+      "vfm": {
+        "formal_vfm_ready": true,
+        "match_count": 126,
+        "x_count": 126,
+        "y_count": 126,
+        "failures": []
+      }
+    },
+    {
+      "experiment_id": "S19_X_0.2",
+      "status": "VFM_READY",
+      "failures": [],
+      "vfm": {
+        "formal_vfm_ready": true,
+        "match_count": 126,
+        "x_count": 126,
+        "y_count": 126,
+        "failures": []
+      }
+    },
+    {
+      "experiment_id": "S20_X_2",
+      "status": "VFM_READY",
+      "failures": [],
+      "vfm": {
+        "formal_vfm_ready": true,
+        "match_count": 63,
+        "x_count": 63,
+        "y_count": 63,
+        "failures": []
+      }
+    },
+    {
+      "experiment_id": "S21_X_20",
+      "status": "VFM_READY",
+      "failures": [],
+      "vfm": {
+        "formal_vfm_ready": true,
+        "match_count": 36,
+        "x_count": 36,
+        "y_count": 36,
+        "failures": []
+      }
+    },
+    {
+      "experiment_id": "S22_Y_0.2",
+      "status": "VFM_READY",
+      "failures": [],
+      "vfm": {
+        "formal_vfm_ready": true,
+        "match_count": 223,
+        "x_count": 223,
+        "y_count": 223,
+        "failures": []
+      }
+    },
+    {
+      "experiment_id": "S23_Y_2",
+      "status": "DATA_LIMITED",
+      "failures": [],
+      "vfm": null
+    },
+    {
+      "experiment_id": "S24_Y_20",
+      "status": "PRELOAD_RELEASE_ONLY",
+      "failures": [],
+      "vfm": null
+    }
+  ],
+  "failures": []
+}

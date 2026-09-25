@@ -1,0 +1,109 @@
+{
+  "config": "configs\\pa12_rotated_batch.json",
+  "python_dependencies": {
+    "numpy": true,
+    "pandas": true,
+    "matplotlib": true,
+    "Pillow": true,
+    "openpyxl": true
+  },
+  "python_dependencies_ok": true,
+  "input_paths": [
+    {
+      "experiment_id": "S15_XY_0.2",
+      "image_folder": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\biaxal\\S15_XY_0.2",
+      "image_folder_exists": true,
+      "force_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\data-20250529\\20250529\\xy-1-0.1_state_20250529102303_20250529102339.xls",
+      "force_file_exists": true,
+      "job_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\biaxal\\S15_XY_0.2\\Job.m2inp",
+      "job_file_exists": true
+    },
+    {
+      "experiment_id": "S16_XY_0.2",
+      "image_folder": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\biaxal\\S16_XY_0.2",
+      "image_folder_exists": true,
+      "force_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\data-20250529\\20250529\\xy-2-0.1_state_20250529104919_20250529104947.xls",
+      "force_file_exists": true,
+      "job_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\biaxal\\S16_XY_0.2\\Job.m2inp",
+      "job_file_exists": true
+    },
+    {
+      "experiment_id": "S17_XY_20",
+      "image_folder": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\biaxal\\S17_XY_20",
+      "image_folder_exists": true,
+      "force_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\data-20250529\\20250529\\xy-3-10_state_20250529111421_20250529111422.xls",
+      "force_file_exists": true,
+      "job_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\biaxal\\S17_XY_20\\Job.m2inp",
+      "job_file_exists": true
+    },
+    {
+      "experiment_id": "S18_XY_2",
+      "image_folder": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\biaxal\\S18_XY_2",
+      "image_folder_exists": true,
+      "force_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\data-20250529\\20250529\\xy-04-1_state_20250529112959_20250529113217.xls",
+      "force_file_exists": true,
+      "job_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\biaxal\\S18_XY_2\\Job.m2inp",
+      "job_file_exists": true
+    },
+    {
+      "experiment_id": "S19_X_0.2",
+      "image_folder": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\unixal\\S19_X_0.2",
+      "image_folder_exists": true,
+      "force_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\data-20250529\\20250529\\x-05-0.1_state_20250529133138_20250529133153.xls",
+      "force_file_exists": true,
+      "job_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\unixal\\S19_X_0.2\\Job.m2inp",
+      "job_file_exists": true
+    },
+    {
+      "experiment_id": "S20_X_2",
+      "image_folder": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\unixal\\S20_X_2",
+      "image_folder_exists": true,
+      "force_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\data-20250529\\20250529\\x-6-1_state_20250529133928_20250529133930.xls",
+      "force_file_exists": true,
+      "job_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\unixal\\S20_X_2\\Job.m2inp",
+      "job_file_exists": true
+    },
+    {
+      "experiment_id": "S21_X_20",
+      "image_folder": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\unixal\\S21_X_20",
+      "image_folder_exists": true,
+      "force_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\data-20250529\\20250529\\x-7-10_state_20250529134610_20250529134611.xls",
+      "force_file_exists": true,
+      "job_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\unixal\\S21_X_20\\Job.m2inp",
+      "job_file_exists": true
+    },
+    {
+      "experiment_id": "S22_Y_0.2",
+      "image_folder": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\unixal\\S22_Y_0.2",
+      "image_folder_exists": true,
+      "force_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\data-20250529\\20250529\\y-9-0.1_state_20250529140828_20250529141127.xls",
+      "force_file_exists": true,
+      "job_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\unixal\\S22_Y_0.2\\Job.m2inp",
+      "job_file_exists": true
+    },
+    {
+      "experiment_id": "S23_Y_2",
+      "image_folder": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\unixal\\S23_Y_2",
+      "image_folder_exists": true,
+      "force_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\data-20250529\\20250529\\y-10-1_state_20250529141618_20250529141633.xls",
+      "force_file_exists": true,
+      "job_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\unixal\\S23_Y_2\\Job.m2inp",
+      "job_file_exists": true
+    },
+    {
+      "experiment_id": "S24_Y_20",
+      "image_folder": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\unixal\\S24_Y_20",
+      "image_folder_exists": true,
+      "force_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\data-20250529\\20250529\\y-11-10_state_20250529142519_20250529142520.xls",
+      "force_file_exists": true,
+      "job_file": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\unixal\\S24_Y_20\\Job.m2inp",
+      "job_file_exists": true
+    }
+  ],
+  "input_paths_ok": true,
+  "matchid": {
+    "status": "AVAILABLE",
+    "path": "D:\\DIC\\MATCH_DIC\\2019\\MatchID 2D\\MatchID.exe"
+  },
+  "overall_status": "READY_FOR_MATCHID_EXPORT"
+}

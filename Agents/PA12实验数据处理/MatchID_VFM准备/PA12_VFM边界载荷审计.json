@@ -1,0 +1,52 @@
+{
+  "config": "configs\\pa12_vfm_boundary.json",
+  "vfm_path": "D:\\C盘迁移\\Desktop\\yuan\\data\\XY\\picture-20250529\\vertical_all_45°\\PAPER\\biaxal\\S16_XY_0.2\\S16_XY_0.2_258.vfm",
+  "audit_passed": true,
+  "failures": [],
+  "center_roi_thickness_mm": 1.0,
+  "overall_thickness_mm": 3.0,
+  "boundary_count": 4,
+  "force_series_count": 4,
+  "force_frame_counts": [
+    258
+  ],
+  "force_values_nonnegative": true,
+  "first_force_samples_zero": true,
+  "later_force_values_positive": true,
+  "boundary_mapping": [
+    {
+      "boundary_id": 0,
+      "side": "顶部",
+      "machine_channel": "X2",
+      "force_axis": "X"
+    },
+    {
+      "boundary_id": 1,
+      "side": "左侧",
+      "machine_channel": "Y2",
+      "force_axis": "Y"
+    },
+    {
+      "boundary_id": 2,
+      "side": "右侧",
+      "machine_channel": "Y1",
+      "force_axis": "Y"
+    },
+    {
+      "boundary_id": 3,
+      "side": "底部",
+      "machine_channel": "X1",
+      "force_axis": "X"
+    }
+  ],
+  "metadata": {
+    "thickness_mm": 1.0,
+    "conversion_mm_per_pixel": 0.086455,
+    "boundary_ids": [
+      0,
+      1,
+      2,
+      3
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "press_sheet": "Press",
+  "position_sheet": "Pos",
+  "time_column": "T",
+  "x_press_columns": [
+    "X1_Press",
+    "X2_Press"
+  ],
+  "y_press_columns": [
+    "Y1_Press",
+    "Y2_Press"
+  ],
+  "position_columns": [
+    "X1_Pos",
+    "X2_Pos",
+    "Y1_Pos",
+    "Y2_Pos"
+  ],
+  "displacement_mode": "velocity",
+  "force_sign": -1.0,
+  "include_time": true,
+  "detector": {
+    "baseline_window_s": 0.05,
+    "start_threshold_n": 5.0,
+    "persistence_s": 0.05,
+    "fracture_fraction": 0.2,
+    "smoothing_window_s": 0.05
+  },
+  "experiment_id": "X-07-10-01",
+  "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/orginal_all/X-07-10-01/Test1/33061_1_21",
+  "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/x-7-10_state_20250529134610_20250529134611.xls",
+  "camera_setting_fps": 200.0,
+  "camera_setting_source": "候选值：由图像编号跨度和控制器总时长估计；未在原始目录确认",
+  "loading_speed": 10.0,
+  "speed_label": "10",
+  "formal_vfm_allowed": false,
+  "notes": "相机设置频率未从原始元数据确认；当前只生成诊断结果。",
+  "output_root": "D:\\2026.9.21_finally"
+}

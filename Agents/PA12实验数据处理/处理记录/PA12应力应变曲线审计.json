@@ -1,0 +1,514 @@
+{
+  "config": "configs\\pa12_rotated_batch.json",
+  "experiments": [
+    {
+      "status": "REVIEW_REQUIRED",
+      "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S15_XY_0.2_应力应变.csv",
+      "row_count": 284,
+      "active_axes": [
+        "X",
+        "Y"
+      ],
+      "axes": {
+        "X": {
+          "status": "REVIEW_REQUIRED",
+          "strain_column": "X向应变",
+          "stress_column": "X向应力/MPa",
+          "point_count": 284,
+          "strain_missing_count": 0,
+          "strain_invalid_count": 0,
+          "stress_missing_count": 0,
+          "stress_invalid_count": 0,
+          "finite": true,
+          "strain_monotonic": true,
+          "force_nonnegative_after_first": true,
+          "first_force_near_zero": true,
+          "has_peak_and_drop": false,
+          "peak_index": 283,
+          "peak_stress_mpa": 53.606,
+          "post_peak_min_ratio": null,
+          "min_strain_step": 0.0005204694835680215,
+          "linear_r2": 0.9990768947412054,
+          "yield_index": 93,
+          "yield_strain": 0.06211000000000002,
+          "yield_stress_mpa": 39.022666666666666
+        },
+        "Y": {
+          "status": "REVIEW_REQUIRED",
+          "strain_column": "Y向应变",
+          "stress_column": "Y向应力/MPa",
+          "point_count": 284,
+          "strain_missing_count": 0,
+          "strain_invalid_count": 0,
+          "stress_missing_count": 0,
+          "stress_invalid_count": 0,
+          "finite": true,
+          "strain_monotonic": true,
+          "force_nonnegative_after_first": true,
+          "first_force_near_zero": true,
+          "has_peak_and_drop": false,
+          "peak_index": 282,
+          "peak_stress_mpa": 53.461,
+          "post_peak_min_ratio": 0.9996882462605139,
+          "min_strain_step": 0.0005689671361502335,
+          "linear_r2": 0.9991573422544963,
+          "yield_index": 94,
+          "yield_strain": 0.06275999999999998,
+          "yield_stress_mpa": 39.671798122065724
+        }
+      },
+      "plot": {
+        "exists": true,
+        "valid": true,
+        "width": 1280,
+        "height": 960
+      },
+      "report_exists": true,
+      "experiment_id": "S15_XY_0.2"
+    },
+    {
+      "status": "PASS",
+      "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S16_XY_0.2_应力应变.csv",
+      "row_count": 257,
+      "active_axes": [
+        "X",
+        "Y"
+      ],
+      "axes": {
+        "X": {
+          "status": "PASS",
+          "strain_column": "X向应变",
+          "stress_column": "X向应力/MPa",
+          "point_count": 257,
+          "strain_missing_count": 0,
+          "strain_invalid_count": 0,
+          "stress_missing_count": 0,
+          "stress_invalid_count": 0,
+          "finite": true,
+          "strain_monotonic": true,
+          "force_nonnegative_after_first": true,
+          "first_force_near_zero": true,
+          "has_peak_and_drop": true,
+          "peak_index": 255,
+          "peak_stress_mpa": 54.410666666666664,
+          "post_peak_min_ratio": 0.09331503626739854,
+          "min_strain_step": 0.0005533333333332807,
+          "linear_r2": 0.9991312226539856,
+          "yield_index": 86,
+          "yield_strain": 0.057680000000000044,
+          "yield_stress_mpa": 38.844
+        },
+        "Y": {
+          "status": "PASS",
+          "strain_column": "Y向应变",
+          "stress_column": "Y向应力/MPa",
+          "point_count": 257,
+          "strain_missing_count": 0,
+          "strain_invalid_count": 0,
+          "stress_missing_count": 0,
+          "stress_invalid_count": 0,
+          "finite": true,
+          "strain_monotonic": true,
+          "force_nonnegative_after_first": true,
+          "first_force_near_zero": true,
+          "has_peak_and_drop": true,
+          "peak_index": 255,
+          "peak_stress_mpa": 53.775333333333336,
+          "post_peak_min_ratio": 0.07826388802796821,
+          "min_strain_step": 0.0005388020833333867,
+          "linear_r2": 0.9990022829075486,
+          "yield_index": 89,
+          "yield_strain": 0.059666666666666694,
+          "yield_stress_mpa": 39.25866666666666
+        }
+      },
+      "plot": {
+        "exists": true,
+        "valid": true,
+        "width": 1280,
+        "height": 960
+      },
+      "report_exists": true,
+      "experiment_id": "S16_XY_0.2"
+    },
+    {
+      "status": "PASS",
+      "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S17_XY_20_应力应变.csv",
+      "row_count": 12,
+      "active_axes": [
+        "X",
+        "Y"
+      ],
+      "axes": {
+        "X": {
+          "status": "PASS",
+          "strain_column": "X向应变",
+          "stress_column": "X向应力/MPa",
+          "point_count": 12,
+          "strain_missing_count": 0,
+          "strain_invalid_count": 0,
+          "stress_missing_count": 0,
+          "stress_invalid_count": 0,
+          "finite": true,
+          "strain_monotonic": true,
+          "force_nonnegative_after_first": true,
+          "first_force_near_zero": true,
+          "has_peak_and_drop": true,
+          "peak_index": 8,
+          "peak_stress_mpa": 56.61954545454549,
+          "post_peak_min_ratio": 0.11241700986649318,
+          "min_strain_step": 0.006135454545454472,
+          "linear_r2": 0.9437087854124382,
+          "yield_index": 8,
+          "yield_strain": 0.11691303030303045,
+          "yield_stress_mpa": 56.61954545454549
+        },
+        "Y": {
+          "status": "PASS",
+          "strain_column": "Y向应变",
+          "stress_column": "Y向应力/MPa",
+          "point_count": 12,
+          "strain_missing_count": 0,
+          "strain_invalid_count": 0,
+          "stress_missing_count": 0,
+          "stress_invalid_count": 0,
+          "finite": true,
+          "strain_monotonic": true,
+          "force_nonnegative_after_first": true,
+          "first_force_near_zero": true,
+          "has_peak_and_drop": true,
+          "peak_index": 8,
+          "peak_stress_mpa": 55.27712121212125,
+          "post_peak_min_ratio": 0.0961518958196853,
+          "min_strain_step": 0.011701515151515214,
+          "linear_r2": 0.9515731734640678,
+          "yield_index": 8,
+          "yield_strain": 0.11534727272727292,
+          "yield_stress_mpa": 55.27712121212125
+        }
+      },
+      "plot": {
+        "exists": true,
+        "valid": true,
+        "width": 1280,
+        "height": 960
+      },
+      "report_exists": true,
+      "experiment_id": "S17_XY_20"
+    },
+    {
+      "status": "PASS",
+      "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S18_XY_2_应力应变.csv",
+      "row_count": 126,
+      "active_axes": [
+        "X",
+        "Y"
+      ],
+      "axes": {
+        "X": {
+          "status": "PASS",
+          "strain_column": "X向应变",
+          "stress_column": "X向应力/MPa",
+          "point_count": 126,
+          "strain_missing_count": 0,
+          "strain_invalid_count": 0,
+          "stress_missing_count": 0,
+          "stress_invalid_count": 0,
+          "finite": true,
+          "strain_monotonic": true,
+          "force_nonnegative_after_first": true,
+          "first_force_near_zero": true,
+          "has_peak_and_drop": true,
+          "peak_index": 122,
+          "peak_stress_mpa": 50.418,
+          "post_peak_min_ratio": 0.11142845809036454,
+          "min_strain_step": 0.0011423999999999879,
+          "linear_r2": 0.999361853011114,
+          "yield_index": 44,
+          "yield_strain": 0.05824040000000004,
+          "yield_stress_mpa": 36.48466666666666
+        },
+        "Y": {
+          "status": "PASS",
+          "strain_column": "Y向应变",
+          "stress_column": "Y向应力/MPa",
+          "point_count": 126,
+          "strain_missing_count": 0,
+          "strain_invalid_count": 0,
+          "stress_missing_count": 0,
+          "stress_invalid_count": 0,
+          "finite": true,
+          "strain_monotonic": true,
+          "force_nonnegative_after_first": true,
+          "first_force_near_zero": true,
+          "has_peak_and_drop": true,
+          "peak_index": 122,
+          "peak_stress_mpa": 50.61233333333333,
+          "post_peak_min_ratio": 0.09277712283567247,
+          "min_strain_step": 0.0,
+          "linear_r2": 0.9993588441960564,
+          "yield_index": 44,
+          "yield_strain": 0.0577854133333334,
+          "yield_stress_mpa": 36.528999999999996
+        }
+      },
+      "plot": {
+        "exists": true,
+        "valid": true,
+        "width": 1280,
+        "height": 960
+      },
+      "report_exists": true,
+      "experiment_id": "S18_XY_2"
+    },
+    {
+      "status": "PASS",
+      "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S19_X_0.2_应力应变.csv",
+      "row_count": 126,
+      "active_axes": [
+        "X"
+      ],
+      "axes": {
+        "X": {
+          "status": "PASS",
+          "strain_column": "X向应变",
+          "stress_column": "X向应力/MPa",
+          "point_count": 126,
+          "strain_missing_count": 0,
+          "strain_invalid_count": 0,
+          "stress_missing_count": 0,
+          "stress_invalid_count": 0,
+          "finite": true,
+          "strain_monotonic": true,
+          "force_nonnegative_after_first": true,
+          "first_force_near_zero": true,
+          "has_peak_and_drop": true,
+          "peak_index": 124,
+          "peak_stress_mpa": 38.05333333333333,
+          "post_peak_min_ratio": 0.1564470918009811,
+          "min_strain_step": 0.0005482666666667968,
+          "linear_r2": 0.9994817927800381,
+          "yield_index": 85,
+          "yield_strain": 0.05752333333333333,
+          "yield_stress_mpa": 28.086666666666666
+        },
+        "Y": {
+          "status": "NOT_APPLICABLE",
+          "populated_rows": 0,
+          "strain_column": "Y向应变",
+          "stress_column": "Y向应力/MPa"
+        }
+      },
+      "plot": {
+        "exists": true,
+        "valid": true,
+        "width": 1280,
+        "height": 960
+      },
+      "report_exists": true,
+      "experiment_id": "S19_X_0.2"
+    },
+    {
+      "status": "PASS",
+      "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S20_X_2_应力应变.csv",
+      "row_count": 63,
+      "active_axes": [
+        "X"
+      ],
+      "axes": {
+        "X": {
+          "status": "PASS",
+          "strain_column": "X向应变",
+          "stress_column": "X向应力/MPa",
+          "point_count": 63,
+          "strain_missing_count": 0,
+          "strain_invalid_count": 0,
+          "stress_missing_count": 0,
+          "stress_invalid_count": 0,
+          "finite": true,
+          "strain_monotonic": true,
+          "force_nonnegative_after_first": true,
+          "first_force_near_zero": true,
+          "has_peak_and_drop": true,
+          "peak_index": 59,
+          "peak_stress_mpa": 39.47166666666667,
+          "post_peak_min_ratio": 0.11455474390913312,
+          "min_strain_step": 0.0,
+          "linear_r2": 0.9724814309955275,
+          "yield_index": 28,
+          "yield_strain": 0.03715290322580647,
+          "yield_stress_mpa": 21.921666666666667
+        },
+        "Y": {
+          "status": "NOT_APPLICABLE",
+          "populated_rows": 0,
+          "strain_column": "Y向应变",
+          "stress_column": "Y向应力/MPa"
+        }
+      },
+      "plot": {
+        "exists": true,
+        "valid": true,
+        "width": 1280,
+        "height": 960
+      },
+      "report_exists": true,
+      "experiment_id": "S20_X_2"
+    },
+    {
+      "status": "PASS",
+      "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S21_X_20_应力应变.csv",
+      "row_count": 36,
+      "active_axes": [
+        "X"
+      ],
+      "axes": {
+        "X": {
+          "status": "PASS",
+          "strain_column": "X向应变",
+          "stress_column": "X向应力/MPa",
+          "point_count": 36,
+          "strain_missing_count": 0,
+          "strain_invalid_count": 0,
+          "stress_missing_count": 0,
+          "stress_invalid_count": 0,
+          "finite": true,
+          "strain_monotonic": true,
+          "force_nonnegative_after_first": true,
+          "first_force_near_zero": true,
+          "has_peak_and_drop": true,
+          "peak_index": 24,
+          "peak_stress_mpa": 30.965,
+          "post_peak_min_ratio": 0.055385112223478125,
+          "min_strain_step": 0.0,
+          "linear_r2": 0.9421740320488647,
+          "yield_index": 23,
+          "yield_strain": 0.09014009523809537,
+          "yield_stress_mpa": 30.315
+        },
+        "Y": {
+          "status": "NOT_APPLICABLE",
+          "populated_rows": 0,
+          "strain_column": "Y向应变",
+          "stress_column": "Y向应力/MPa"
+        }
+      },
+      "plot": {
+        "exists": true,
+        "valid": true,
+        "width": 1280,
+        "height": 960
+      },
+      "report_exists": true,
+      "experiment_id": "S21_X_20"
+    },
+    {
+      "status": "REVIEW_REQUIRED",
+      "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S22_Y_0.2_应力应变.csv",
+      "row_count": 223,
+      "active_axes": [
+        "Y"
+      ],
+      "axes": {
+        "X": {
+          "status": "NOT_APPLICABLE",
+          "populated_rows": 0,
+          "strain_column": "X向应变",
+          "stress_column": "X向应力/MPa"
+        },
+        "Y": {
+          "status": "REVIEW_REQUIRED",
+          "strain_column": "Y向应变",
+          "stress_column": "Y向应力/MPa",
+          "point_count": 223,
+          "strain_missing_count": 0,
+          "strain_invalid_count": 0,
+          "stress_missing_count": 0,
+          "stress_invalid_count": 0,
+          "finite": true,
+          "strain_monotonic": true,
+          "force_nonnegative_after_first": true,
+          "first_force_near_zero": true,
+          "has_peak_and_drop": false,
+          "peak_index": 127,
+          "peak_stress_mpa": 50.343333333333334,
+          "post_peak_min_ratio": 0.20744223002052573,
+          "min_strain_step": 0.005206666666666665,
+          "linear_r2": 0.8228861848324991,
+          "yield_index": 33,
+          "yield_strain": 0.17681969696969702,
+          "yield_stress_mpa": 45.92666666666666
+        }
+      },
+      "plot": {
+        "exists": true,
+        "valid": true,
+        "width": 1280,
+        "height": 960
+      },
+      "report_exists": true,
+      "experiment_id": "S22_Y_0.2"
+    },
+    {
+      "status": "REVIEW_REQUIRED",
+      "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S23_Y_2_应力应变.csv",
+      "row_count": 191,
+      "active_axes": [
+        "Y"
+      ],
+      "axes": {
+        "X": {
+          "status": "NOT_APPLICABLE",
+          "populated_rows": 0,
+          "strain_column": "X向应变",
+          "stress_column": "X向应力/MPa"
+        },
+        "Y": {
+          "status": "REVIEW_REQUIRED",
+          "strain_column": "Y向应变",
+          "stress_column": "Y向应力/MPa",
+          "point_count": 191,
+          "strain_missing_count": 0,
+          "strain_invalid_count": 0,
+          "stress_missing_count": 0,
+          "stress_invalid_count": 0,
+          "finite": true,
+          "strain_monotonic": true,
+          "force_nonnegative_after_first": true,
+          "first_force_near_zero": true,
+          "has_peak_and_drop": false,
+          "peak_index": 109,
+          "peak_stress_mpa": 49.16233333333333,
+          "post_peak_min_ratio": 0.8538854271901931,
+          "min_strain_step": 0.004885333333333334,
+          "linear_r2": 0.935626816937982,
+          "yield_index": 28,
+          "yield_strain": 0.15135091228070177,
+          "yield_stress_mpa": 47.79566666666666
+        }
+      },
+      "plot": {
+        "exists": true,
+        "valid": true,
+        "width": 1280,
+        "height": 960
+      },
+      "report_exists": true,
+      "experiment_id": "S23_Y_2"
+    },
+    {
+      "experiment_id": "S24_Y_20",
+      "status": "PRELOAD_RELEASE_ONLY",
+      "active_axes": [
+        "Y"
+      ],
+      "reason": "已确认是预载释放记录，不生成拉伸应力—应变结果。"
+    }
+  ],
+  "status_counts": {
+    "PASS": 6,
+    "PRELOAD_RELEASE_ONLY": 1,
+    "REVIEW_REQUIRED": 3
+  },
+  "formal_curve_audit_ready": false
+}

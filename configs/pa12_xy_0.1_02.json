@@ -1,0 +1,38 @@
+{
+  "experiment_id": "XY-0.1-02",
+  "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/orginal_all/XY-0.1-02/Test1/33061_1_16",
+  "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/xy-2-0.1_state_20250529104919_20250529104947.xls",
+  "output_root": "D:/2026.9.21_finally",
+  "press_sheet": "Press",
+  "position_sheet": "Pos",
+  "time_column": "T",
+  "x_press_columns": [
+    "X1_Press",
+    "X2_Press"
+  ],
+  "y_press_columns": [
+    "Y1_Press",
+    "Y2_Press"
+  ],
+  "position_columns": [
+    "X1_Pos",
+    "X2_Pos",
+    "Y1_Pos",
+    "Y2_Pos"
+  ],
+  "camera_setting_fps": 10.0,
+  "loading_speed": 0.1,
+  "speed_label": "0.1",
+  "displacement_mode": "velocity",
+  "force_sign": -1.0,
+  "formal_vfm_allowed": true,
+  "include_time": true,
+  "detector": {
+    "baseline_window_s": 0.05,
+    "start_threshold_n": 5.0,
+    "persistence_s": 0.05,
+    "fracture_fraction": 0.2,
+    "smoothing_window_s": 0.05
+  },
+  "manual": {}
+}

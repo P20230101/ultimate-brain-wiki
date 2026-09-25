@@ -3,4 +3,32 @@
 .trash/
 Thumbs.db
 Desktop.ini
+__pycache__/
+*.pyc
 
+# PA12 的 MatchID 原始导出与逐帧全场合并文件体积过大。
+# 它们保留在本机 Vault，GitHub 提交索引、状态、审计摘要和处理程序。
+_matchid_export/
+Agents/PA12实验数据处理/MatchID_VFM准备/*/merged/
+
+# 本地检查过程产生的临时文件。
+blobs/
+.codex-*.png
+temp_screenshot.png
+_s24_force_pos.png
+_stress_montage.png
+abaqus.rpy
+
+# 本地 GUI/构建过程的临时产物。
+.cruciform-db-build*/
+.cruciform-db-verify/
+.ppt-build*/
+ppt-output/
+desktop_full.png
+matchid_*.png
+vfm_*.png
+vfm_check_run.json
+
+# 旧版自建 VFM 在单轴几何门槛锁定前产生的诊断目录，不作为正式输出。
+Agents/PA12实验数据处理/VFM自建/实验结果/S19_X_0.2/
+Agents/PA12实验数据处理/VFM自建/实验结果/S20_X_2/

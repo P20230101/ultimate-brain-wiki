@@ -1,0 +1,72 @@
+{
+  "press_sheet": "Press",
+  "position_sheet": "Pos",
+  "time_column": "T",
+  "x_press_columns": [
+    "X1_Press",
+    "X2_Press"
+  ],
+  "y_press_columns": [
+    "Y1_Press",
+    "Y2_Press"
+  ],
+  "force_sign": -1.0,
+  "loading_speed_definition": "two_grip_relative_speed",
+  "include_time": true,
+  "frame_selection_mode": "paired_jpg_dat",
+  "plot_smoothing_window": 5,
+  "displacement_definition": "two_grip_relative_sum",
+  "monotonic_displacement_envelope": true,
+  "zero_inactive_force_axes": true,
+  "axis_position_columns": {
+    "X": [
+      "X1_Pos",
+      "X2_Pos"
+    ],
+    "Y": [
+      "Y1_Pos",
+      "Y2_Pos"
+    ]
+  },
+  "geometry": {
+    "specimen_width_mm": 30.0,
+    "thickness_mm": 1.0,
+    "overall_thickness_mm": 3.0,
+    "gauge_length_mm": 30.0
+  },
+  "detector": {
+    "baseline_window_s": 0.05,
+    "start_threshold_n": 5.0,
+    "persistence_s": 0.05,
+    "fracture_fraction": 0.2,
+    "smoothing_window_s": 0.05
+  },
+  "experiment_id": "S23_Y_2",
+  "status": "DATA_LIMITED",
+  "specimen_id": "S23",
+  "orientation": "Y",
+  "loading_mode": "单轴 Y",
+  "loading_speed": 2.0,
+  "speed_label": "2",
+  "loading_speed_source": "旋转目录速度按两侧相对加载速度；力文件名中的 1 为单个执行通道速度，Pos 斜率支持该口径",
+  "camera_setting_fps": 100.0,
+  "camera_setting_source": "历史批次候选值；原始相机元数据未找到",
+  "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER/unixal/S23_Y_2",
+  "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/y-10-1_state_20250529141618_20250529141633.xls",
+  "formal_vfm_allowed": false,
+  "visual_fracture_confirmed": true,
+  "visual_fracture_frame": "001547.jpg",
+  "last_force_supported_photo": "001528.jpg",
+  "force_missing_at_visual_fracture": true,
+  "manual": {
+    "force_start_index": 51,
+    "force_analysis_end_index": 15327
+  },
+  "manual_fracture_confirmed": false,
+  "end_event_label": "力文件记录终点（视觉断裂前）",
+  "stress_strain_axes": [
+    "Y"
+  ],
+  "notes": "检查原始连续照片，001545–001546.jpg 仍连续，001547.jpg 首次显示试样断开；力文件最后支持到 001528.jpg，采集在视觉断裂前结束。只生成诊断曲线，不发布正式 VFM。",
+  "output_root": "D:\\2026.9.21_finally"
+}

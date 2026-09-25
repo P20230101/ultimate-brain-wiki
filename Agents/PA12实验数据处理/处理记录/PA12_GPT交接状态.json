@@ -1,0 +1,930 @@
+{
+  "document_type": "PA12_GPT_HANDOFF_STATE",
+  "generated_date": "2026-09-25",
+  "vault": "D:/2026.9.21_finally",
+  "raw_source_root": "D:/C盘迁移/Desktop/yuan",
+  "user_intent": {
+    "summary": "以 MatchID 自带 VFM 为基准，将同步 DIC 全场与外围机器力、几何和 ROI 边界合力接入分析，并按阶段识别单轴/双轴弹塑性参数。",
+    "default_equal_biaxial_force": {
+      "X": "(X1_Press + X2_Press) / 2",
+      "Y": "(Y1_Press + Y2_Press) / 2"
+    },
+    "press_means_force": true,
+    "vfm_method": "MatchID built-in VFM",
+    "machine_sensor_force_is_roi_boundary_resultant": true,
+    "rebuild_roi_edge_traction_distribution": false,
+    "thickness_mm": {
+      "outer_structure": 3.0,
+      "center_roi": 1.0
+    },
+    "equal_biaxial_experiments_fit_separately": [
+      "S15_XY_0.2",
+      "S16_XY_0.2",
+      "S18_XY_2",
+      "S17_XY_20"
+    ],
+    "identification_strategy": {
+      "stage_1": "Fix nu=0.375; identify E.",
+      "stage_2": "Fix stage-1 E and nu=0.375; identify Y and H."
+    },
+    "raw_inputs_are_read_only": true
+  },
+  "completed": [
+    {
+      "item": "照片—力同步",
+      "details": "使用同一有效照片时间轴插值 X/Y 力，完成基线校正、有效区间、VFM 单列 CSV、照片—力表、检查图和实验概览。",
+      "paths": [
+        "Agents/PA12实验数据处理/实验概览/",
+        "Agents/PA12实验数据处理/照片力匹配/",
+        "Agents/PA12实验数据处理/VFM专用力值/",
+        "Agents/PA12实验数据处理/检查图/"
+      ]
+    },
+    {
+      "item": "DAT 逐帧审计",
+      "details": "已审计 1319 个当前选定照片对应 DAT，全部为 DIC_FIELDS_AVAILABLE；S22 原先的 8 个 NO_STRAIN_RECORDS 帧已按审计结果排除，不删除或修改原始 JPG/DAT。",
+      "paths": [
+        "Agents/PA12实验数据处理/MatchID_VFM准备/PA12_DIC_DAT质量审计.md",
+        "Agents/PA12实验数据处理/MatchID_VFM准备/PA12_DIC_DAT质量审计.json",
+        "Agents/PA12实验数据处理/MatchID_VFM准备/PA12_DIC_DAT质量审计.csv"
+      ]
+    },
+    {
+      "item": "MatchID CSV 格式确认",
+      "details": "已由 MatchID 2D 19.2.2.0 Results Viewer 确认分号分隔、X/Y/U/V 单位为 mm，Exx/Eyy/Exy 为无量纲。",
+      "path": "configs/matchid_export_example.json"
+    },
+    {
+      "item": "DIC 全场—同步力合并",
+      "details": "S15、S16、S17、S18、S19、S20、S21、S22 的每一有效照片帧已附加同一时间点 X/Y 力并生成逐点合并文件；S15/S18/S20/S21/S22 使用已验证 DAT 映射重构，并记录 valid=False 排除点数。",
+      "experiments": {
+        "S15_XY_0.2": 284,
+        "S16_XY_0.2": 257,
+        "S17_XY_20": 12,
+        "S18_XY_2": 126,
+        "S19_X_0.2": 126,
+        "S20_X_2": 63,
+        "S21_X_20": 36,
+        "S22_Y_0.2": 223
+      },
+      "path": "Agents/PA12实验数据处理/MatchID_VFM准备/<实验编号>/merged/"
+    },
+    {
+      "item": "旋转方向与 VFM 边界格式审计",
+      "details": "已登记用户提供的原始方向/旋转标定图片；用完整 S16_XY_0.2_258.vfm 确认 Boundary 顺序 0=顶部、1=左侧、2=右侧、3=底部，旋转后映射为顶部=X2、底部=X1、左侧=Y2、右侧=Y1；中心 ROI 厚度 1 mm、整体厚度 3 mm、4 组 Forces 各 258 帧，首帧归零且后续力值为正。此项为历史文件格式/方向审计，不代替后续 GUI 试算同步检查。用户确认机器力直接作为 MatchID 自带 VFM 所需 ROI 边界合力，不恢复四边牵引分布。",
+      "paths": [
+        "raw/assets/PA12原始方向与旋转标定方向.jpg",
+        "configs/pa12_vfm_boundary.json",
+        "Agents/PA12实验数据处理/MatchID_VFM准备/PA12_VFM边界载荷审计.json",
+        "Agents/PA12实验数据处理/MatchID_VFM准备/PA12_VFM边界载荷说明.md"
+      ]
+    },
+    {
+      "item": "自动门禁和回归验证",
+      "details": "缺导出、字段缺失、非数值、NaN/无穷值、点数不一致和单位未声明时优先使用已验证 DAT 重构；DAT 无应变记录或无法解析时仍阻断。",
+      "tests": "当前回归测试已覆盖同步、DIC 排除、预载分类和审计语义；最终数量以本轮 fresh test 为准",
+      "commands": [
+        "python -m unittest discover -s tests -v",
+        "python -m compileall -q tools tests",
+        "python tools/audit_pa12_outputs.py --config configs/pa12_rotated_batch.json",
+        "python tools/audit_matchid_dic.py --config configs/pa12_rotated_batch.json",
+        "python tools/audit_pa12_vfm_boundary.py --config configs/pa12_vfm_boundary.json"
+      ]
+    }
+  ],
+  "latest_verification": {
+    "verified_date": "2026-09-24",
+    "unit_tests": "83/83 passed",
+    "compileall": "2026-09-24 fresh passed",
+    "scope_note": "83/83 为当前同步、DIC、边界、检查器和自建 VFM 测试的全量结果；compileall 当前通过。自建 VFM 输出级审计允许模型比较中的空白预测列，但禁止 NaN/无穷值。",
+    "force_output_contract": {
+      "status": "passed",
+      "experiment_count": 10,
+      "overview_count": 10,
+      "matchid_index_count": 10,
+      "formal_force_triplet_count": 8,
+      "blocked_or_manual_count": 2
+    },
+    "output_audit": {
+      "audit_passed": true,
+      "formal_vfm_ready": false,
+      "experiment_count": 10,
+      "overview_count": 10,
+      "matchid_index_count": 10,
+      "formal_force_triplet_count": 8,
+      "blocked_or_manual_count": 2
+    },
+    "stress_strain_audit": {
+      "formal_curve_audit_ready": false,
+      "pass_count": 4,
+      "review_required_count": 5,
+      "preload_release_only_count": 1,
+      "note": "审计保留应变回退和未确认掉载，不静默平滑或补点。"
+    },
+    "matchid_closure": {
+      "formal_matchid_vfm_ready": false,
+      "matchid_vfm_input_ready_count": 8,
+      "dic_dat_review_required_count": 0,
+      "force_review_required_count": 1,
+      "preload_release_only_count": 1
+    }
+  },
+  "legacy_status_semantics_audit": {
+    "verified_date": "2026-09-24",
+    "legacy_files": [
+      "Agents/PA12实验数据处理/处理记录/PA12数据合理性审计结果.json",
+      "Agents/PA12实验数据处理/处理记录/PA12批量处理报告.md"
+    ],
+    "legacy_labels": ["VFM_READY", "formal_vfm_ready:true", "正式 VFM 已完成"],
+    "legacy_meaning": "同步力值/照片-X-Y 数量与输出契约通过；不是 MatchID .vfm 工程、Boundary/Forces 导入、虚功或参数识别通过。",
+    "authoritative_current_sources": [
+      "Agents/PA12实验数据处理/MatchID_VFM准备/PA12_MatchID_VFM闭环状态.json",
+      "Agents/PA12实验数据处理/处理记录/PA12_GPT交接状态.json",
+      "实际实验目录中的 .vfm 文件审计"
+    ],
+    "current_formal_matchid_vfm_ready": false,
+    "action": "不改写历史生成产物；在交接与索引中明确区分同步力输出门禁和 MatchID VFM 工程门禁。"
+  },
+  "vfm_check_automation_audit": {
+    "audit_date": "2026-09-23",
+    "scope": "只读审计并行维护的检查器、配置、测试及现有 Markdown/CSV；未调用会重写结果文件的检查器入口。",
+    "targeted_tests": {
+      "status": "PASSED",
+      "passed": 4,
+      "errors": 0,
+      "scope": "test_pa12_vfm_check.py 的 4 项 summarize/ROI 单元测试；不覆盖批次配置到相邻 VFM 状态配置的完整构建或报告文件一致性。",
+      "previous_failure_resolved": "当前代码将生产候选快照字段映射为 summarize_check 使用的内部字段，4 项定向测试现已通过。",
+      "latest_rerun": {
+        "verified_date": "2026-09-24",
+        "command": "python -m unittest discover -s tests -p 'test_pa12_vfm_check.py' -v",
+        "result": "4/4 passed",
+        "read_only_build": "build_current_check(pa12_rotated_batch.json) 成功返回 S15/S16/S17/S18 四行，包含 S16 候选快照和 ROI 状态。",
+        "console_note": "默认 GBK 无法直接编码下标字符；以 ensure_ascii 转义输出后读取内存结果成功。构建本身未报错。",
+        "writer_invoked": false
+      },
+      "config_entry_contract": {
+        "status": "READ_ONLY_BUILD_SUCCEEDED",
+        "builder_requires": [
+          "experiments",
+          "defaults.geometry"
+        ],
+        "boundary_config": {
+          "path": "configs/pa12_vfm_boundary.json",
+          "has_experiments": false,
+          "has_geometry": true,
+          "has_candidate_snapshot": true,
+          "role": "batch config 的相邻 VFM 状态快照；不是构建器主入口"
+        },
+        "batch_config": {
+          "path": "configs/pa12_rotated_batch.json",
+          "has_experiments": true,
+          "has_geometry": true,
+          "has_candidate_snapshot": "读取相邻 configs/pa12_vfm_boundary.json",
+          "has_roi_location_status": "读取相邻 configs/pa12_vfm_boundary.json",
+          "read_only_builder_result": "成功构建 S15/S16/S17/S18 四行并带入 S16 候选快照和 ROI 状态"
+        },
+        "writer_invoked": false
+      }
+    },
+    "report_consistency": {
+      "status": "CURRENT_OUTPUTS_MATCH_BUILDER",
+      "markdown_and_csv_row_count": 4,
+      "S15": "当前 Markdown 和 CSV 均将视觉断裂帧 000285.jpg 与最后有效 DIC/VFM 帧 000284.jpg 分开记录；同步末帧力值为 X=1608.18 N、Y=1603.33 N。",
+      "S16": "当前 Markdown 和 CSV 均显示预处理照片—力同步通过、VFM Forces 序列未闭合；两类同步状态分开表达。",
+      "S15_last_force": {
+        "photo": "000284.jpg",
+        "X_N": 1608.18,
+        "Y_N": 1603.33,
+        "source": "照片—力对应表及 X/Y 单列力 CSV 末行；与 CSV/Markdown 报告所列 Y 峰值 1603.83 N 是不同统计量。"
+      },
+      "other_differences": "当前 Markdown/CSV 已与同一版本 builder 的内存结果逐字段比对，无差异。",
+      "current_read_only_build_rows": 4,
+      "current_output_comparison": {
+        "verified_date": "2026-09-24",
+        "csv_rows": 4,
+        "markdown_rows": 4,
+        "field_diff_count": 0,
+        "comparison_scope": "REPORT_FIELDS 全字段；CSV 与 Markdown 均与 build_current_check(pa12_rotated_batch.json) 内存结果比较。",
+        "writer_invoked_by_this_turn": false
+      },
+      "sync_semantics": "summarize_check 只按照片—力表与同步 X/Y CSV 生成‘时间同步’字段；vfm_force_status 仅写入结论备注，不会阻断/改变该字段。因此‘时间同步：通过’可与 VFM Forces 未闭合同报，需将预处理同步与 VFM Forces 同步分开呈现。",
+      "generated_outputs_modified": true
+    },
+    "S15_frame_count_audit": {
+      "photo_force_data_rows": 284,
+      "x_force_rows": 284,
+      "y_force_rows": 284,
+      "dic_force_merged_frames": 284,
+      "dic_force_merged_invalid_point_exclusions": 568,
+      "last_valid_dic_photo": "000284.jpg",
+      "visual_fracture_photo_excluded_from_vfm": "000285.jpg",
+      "excluded_photo_dat_point_count_approx": 5277,
+      "preceding_complete_field_point_count_approx": 98000,
+      "sources": [
+        "configs/pa12_rotated_batch.json",
+        "Agents/PA12实验数据处理/MatchID_VFM准备/S15_XY_0.2/S15_XY_0.2_DIC全场—力状态.json",
+        "Agents/PA12实验数据处理/MatchID_VFM准备/S15_XY_0.2/S15_XY_0.2_DIC全场—力索引.csv",
+        "Agents/PA12实验数据处理/照片力匹配/S15_XY_0.2_照片-力对应表.csv",
+        "Agents/PA12实验数据处理/VFM专用力值/X方向/X-0.2-284.csv",
+        "Agents/PA12实验数据处理/VFM专用力值/Y方向/Y-0.2-284.csv"
+      ]
+    }
+  },
+  "experiment_status": [
+    {
+      "experiment_id": "S15_XY_0.2",
+      "force_status": "VFM_READY",
+      "selected_frames": 284,
+      "matchid_status": "MATCHID_VFM_INPUT_READY",
+      "dic_source": "DAT_RECONSTRUCTED",
+      "excluded_invalid_point_count": 568,
+      "visual_fracture_frame_excluded": "000285.jpg",
+      "last_valid_dic_frame": "000284.jpg",
+      "blocking_reason": "000285.jpg 为视觉断裂帧；同名 DAT 虽存在但仅约 5,277 点，低于前序约 98,000 点完整场，因此不进入正式 DIC/VFM 合并。当前 284 帧合并仅排除这些帧内明确标记 valid=False 的点。"
+    },
+    {
+      "experiment_id": "S16_XY_0.2",
+      "force_status": "VFM_READY",
+      "selected_frames": 257,
+      "matchid_status": "MATCHID_VFM_INPUT_READY"
+    },
+    {
+      "experiment_id": "S17_XY_20",
+      "force_status": "VFM_READY",
+      "selected_frames": 12,
+      "matchid_status": "MATCHID_VFM_INPUT_READY"
+    },
+    {
+      "experiment_id": "S18_XY_2",
+      "force_status": "VFM_READY",
+      "selected_frames": 126,
+      "matchid_status": "MATCHID_VFM_INPUT_READY",
+      "dic_source": "DAT_RECONSTRUCTED",
+      "excluded_invalid_point_count": 252,
+      "blocking_reason": "Results Viewer 导出含非有限 Exx/Eyy/Exy；已按 DAT 映射重构并排除 valid=False 点。"
+    },
+    {
+      "experiment_id": "S19_X_0.2",
+      "force_status": "VFM_READY",
+      "selected_frames": 126,
+      "matchid_status": "MATCHID_VFM_INPUT_READY"
+    },
+    {
+      "experiment_id": "S20_X_2",
+      "force_status": "VFM_READY",
+      "selected_frames": 63,
+      "matchid_status": "MATCHID_VFM_INPUT_READY",
+      "dic_source": "DAT_RECONSTRUCTED",
+      "excluded_invalid_point_count": 126,
+      "blocking_reason": "Results Viewer 导出含非有限 Exx/Eyy/Exy 或点数不一致；已按 DAT 映射重构并排除 valid=False 点。"
+    },
+    {
+      "experiment_id": "S21_X_20",
+      "force_status": "VFM_READY",
+      "selected_frames": 36,
+      "matchid_status": "MATCHID_VFM_INPUT_READY",
+      "dic_source": "DAT_RECONSTRUCTED",
+      "excluded_invalid_point_count": 72,
+      "blocking_reason": "Results Viewer 导出含非有限 Exx/Eyy/Exy；已按 DAT 映射重构并排除 valid=False 点。"
+    },
+    {
+      "experiment_id": "S22_Y_0.2",
+      "force_status": "VFM_READY",
+      "selected_frames": 223,
+      "matchid_status": "MATCHID_VFM_INPUT_READY",
+      "dic_source": "DAT_RECONSTRUCTED",
+      "excluded_invalid_point_count": 446,
+      "blocking_reason": "已排除 8 个无 <53> DAT 帧；剩余 223 帧全部有可用 DIC 字段并已完成合并。"
+    },
+    {
+      "experiment_id": "S23_Y_2",
+      "force_status": "FORCE_SYNC_DIAGNOSTIC",
+      "selected_frames": 191,
+      "matchid_status": "FORCE_REVIEW_REQUIRED",
+      "blocking_reason": "没有确认峰值后的明显持续掉载，终点不能称为断裂点。"
+    },
+    {
+      "experiment_id": "S24_Y_20",
+      "force_status": "FORCE_SYNC_PRELOAD_RELEASE_ONLY",
+      "selected_frames": 0,
+      "matchid_status": "PRELOAD_RELEASE_ONLY",
+      "blocking_reason": "已确认文件从约 1555 N Y 向预载开始，是预载释放记录；没有加载前零点，不代表完整拉伸加载。"
+    }
+  ],
+  "vfm_identification_status": {
+    "method": "MatchID 自带 VFM",
+    "boundary_force_rule": "外围机器力传感器值直接作为 ROI 边界合力；不恢复四边牵引分布，不假设均布边界应力。",
+    "thickness_mm": {
+      "outer_structure": 3.0,
+      "center_roi": 1.0
+    },
+    "equal_biaxial_experiments_fit_separately": [
+      "S15_XY_0.2",
+      "S16_XY_0.2",
+      "S18_XY_2",
+      "S17_XY_20"
+    ],
+    "staged_strategy": [
+      "阶段1：固定 nu=0.375，识别 E。",
+      "阶段2：固定阶段1得到的 E 和 nu=0.375，识别 Y、H。"
+    ],
+    "s16_gui_trials": [
+      {
+        "trial": "3try",
+        "status": "FORCE_DIC_TIME_MISMATCH",
+        "force_mae_n": {
+          "X": 26.1206,
+          "Y": 23.4119
+        },
+        "last_frame_absolute_difference_n": {
+          "X": 1452.79,
+          "Y": 1478.85
+        },
+        "usable_for_identification": false
+      },
+      {
+        "trial": "4try_step3",
+        "status": "FORCES_COUNT_ZERO",
+        "forces_count": 0,
+        "usable_for_identification": false
+      }
+    ],
+    "s16_complete_vfm_force_numeric_audit": {
+      "vfm_path": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER/biaxal/S16_XY_0.2/S16_XY_0.2_258.vfm",
+      "comparison_basis": "当前 S16 原始 Press 表、当前处理报告的 0.102 s 起点/25.834 s 终点、257 个有效照片帧；参考帧补零。",
+      "status": "FORMAT_AND_BOUNDARY_ORDER_ONLY_NOT_CURRENT_SYNC_SEQUENCE",
+      "boundary_results": {
+        "Boundary0_X2": {"mae_n": 24.711777, "max_abs_difference_n": 1485.43802, "vfm_last_n": 1608.19802, "current_sync_last_n": 122.76},
+        "Boundary1_Y2": {"mae_n": 29.801333, "max_abs_difference_n": 1484.259802, "vfm_last_n": 1602.019802, "current_sync_last_n": 117.76},
+        "Boundary2_Y1": {"mae_n": 24.647506, "max_abs_difference_n": 1467.259802, "vfm_last_n": 1602.019802, "current_sync_last_n": 134.76},
+        "Boundary3_X1": {"mae_n": 25.771051, "max_abs_difference_n": 1426.31802, "vfm_last_n": 1608.19802, "current_sync_last_n": 181.88}
+      },
+      "interpretation": "完整 S16 .vfm 的四组 Forces 与当前原始 Press 按现有同步规则重算的序列不一致；不能把该文件当作当前同步力真值，也不能直接复制其 Forces 到 S15。"
+    },
+    "s16_complete_vfm_endpoint_sensitivity": {
+      "peak_time_s": 25.751,
+      "drop_endpoint_time_s": 25.834,
+      "peak_endpoint_comparison": {
+        "Boundary0_X2": {"mae_n": 19.396605, "max_abs_difference_n": 38.242914},
+        "Boundary1_Y2": {"mae_n": 25.374159, "max_abs_difference_n": 67.400853},
+        "Boundary2_Y1": {"mae_n": 19.593788, "max_abs_difference_n": 51.759802},
+        "Boundary3_X1": {"mae_n": 20.757937, "max_abs_difference_n": 40.68198}
+      },
+      "interpretation": "把当前原始 Press 按峰值终点而非掉载终点映射时，S16 .vfm 末帧差显著缩小且不再出现 kN 级掉载差，但仍未完全吻合；支持旧 .vfm 采用峰值截断或另一时间映射的诊断，不构成同步通过。"
+    },
+    "s16_complete_vfm_affine_time_fit": {
+      "method": "纯 NumPy 网格搜索；四通道共用起止时间，对齐 257 个有效照片帧；不改原始文件。",
+      "best_start_time_s": 0.2044,
+      "best_end_time_s": 25.787,
+      "boundary_mae_n": {
+        "Boundary0_X2": 17.556849,
+        "Boundary1_Y2": 21.517746,
+        "Boundary2_Y1": 16.720887,
+        "Boundary3_X1": 18.441986
+      },
+      "boundary_max_abs_difference_n": {
+        "Boundary0_X2": 39.06198,
+        "Boundary1_Y2": 58.259802,
+        "Boundary2_Y1": 43.259802,
+        "Boundary3_X1": 42.322289
+      },
+      "interpretation": "共同仿射时间映射仍不能使四组 Forces 与当前原始 Press 完全吻合；旧 .vfm 还可能存在力源版本、通道映射或偏置差异。该拟合仅为诊断，不构成同步通过。"
+    },
+    "s16_iteration_16_parameters": {
+      "status": "GUI_INTERMEDIATE_CANDIDATE_NOT_FINAL",
+      "iteration": 16,
+      "progress_percent_displayed": 70,
+      "displayed_values": {
+        "Y_mpa": 63.93,
+        "H_mpa": 41.55,
+        "residual_displayed": 1214
+      },
+      "not_displayed_parameters": [
+        "E",
+        "nu"
+      ],
+      "residual_definition_or_unit": "UNKNOWN",
+      "evidence": "2026-09-24 GUI 截图 matchid_dialog.png",
+      "parameter_values_recorded": true,
+      "usable_as_identification_result": false
+    },
+    "s16_parallel_config_report_snapshot": {
+      "status": "SECOND_GUI_INTERMEDIATE_SNAPSHOT_NOT_FINAL",
+      "source": [
+        "configs/pa12_vfm_boundary.json",
+        "Agents/PA12实验数据处理/MatchID_VFM准备/PA12等双轴VFM当前检查结果.md",
+        "Agents/PA12实验数据处理/MatchID_VFM准备/PA12等双轴VFM当前检查结果.csv"
+      ],
+      "captured_date": "2026-09-24",
+      "iteration": 28,
+      "displayed_values": {
+        "Y_mpa": 61.94,
+        "H_mpa": 139.6,
+        "residual_displayed": 1655
+      },
+      "not_displayed_parameters": [
+        "E"
+      ],
+      "residual_definition_or_unit": "UNKNOWN",
+      "relation_to_iteration_16": "这是受保护并行配置/报告中记录的另一份较后 GUI 中间快照；不覆盖用户要求保留的第16轮记录。第16轮和第28轮均未通过同步、虚功、残差定义和参数稳定性门槛，均不得写成最终识别结果。",
+      "usable_as_identification_result": false
+    }
+  },
+  "literature_experiment_path_audit": {
+    "verified_date": "2026-09-24",
+    "source": "D:/C盘迁移/Desktop/yuan/3D打印尼龙材料的双轴拉伸测试方法与力学性能(1).pdf",
+    "mineru_locators": [
+      "doc:b39265e/tier:standard/page:28",
+      "doc:b39265e/tier:standard/page:31",
+      "doc:b39265e/tier:standard/page:37",
+      "doc:b39265e/tier:standard/page:38"
+    ],
+    "paper_experiment_paths": [
+      "uniaxial tension",
+      "equal biaxial tension"
+    ],
+    "paper_rate_labels_mm_per_s": [0.1, 1.0, 10.0],
+    "current_data_rate_labels_mm_per_s": [0.2, 2.0, 20.0],
+    "current_label_mapping_evidence": "configs/pa12_rotated_batch.json 的 loading_speed_source：目录值为两侧相对加载速度，力文件名中的 0.1/1/10 为单个执行通道速度；S19 处理报告的照片位移与 Pos 位移按该口径计算。",
+    "paper_single_axis_geometry_evidence": "NOT_FOUND_IN_READ_PAGES",
+    "current_s19_to_s22_geometry_evidence": "long_strip_uniaxial_reference_images_and_job_polygon;_s19_vfm_file_present_but_missing_boundary_forces",
+    "raw_single_axis_geometry_search": {
+      "verified_date": "2026-09-25",
+      "searched_sources": [
+        "D:/C盘迁移/Desktop/yuan/yuan_analysis_20260912/mineru/3D打印尼龙材料的双轴拉伸测试方法与力学性能(1)/txt/3D打印尼龙材料的双轴拉伸测试方法与力学性能(1).md",
+        "D:/C盘迁移/Desktop/yuan/PA12_biaxial_project/05_output/manifests/file_inventory.csv",
+        "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER/unixal/S19_X_0.2/Job.m2inp",
+        "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER/unixal/S19_X_0.2/000000.jpg"
+      ],
+      "paper_result": "解析稿的几何/实验内容仍只给十字形双轴试样；未找到 S19/S20/S21/S22 长条单轴试样的独立厚度、有效宽度、标距或外功边界。",
+      "existing_2d_job_evidence": {
+        "shape_type": "5-control-point Polygon",
+        "bounds_px": "x=461-597, y=184-961",
+        "conversion_mm_per_pixel": 0.084746,
+        "bbox_mm": "11.525456 x 65.847642",
+        "interpretation": "仅为参考照片中的二维 DIC/Job 分析区域推定尺寸，不等于实物厚度、有效标距、完整积分域或外功边界。"
+      },
+      "missing_geometry": [
+        "single_axis_thickness",
+        "physical_effective_width",
+        "gauge_length",
+        "VFM_integration_domain_definition",
+        "external_virtual_work_boundary_definition"
+      ],
+      "project_text_scan": {
+        "verified_date": "2026-09-25",
+        "scope": "PA12_biaxial_project 内排除 PAPER/CHECK 图像目录后的文本型说明、配置、清单和 MatchID 文本文件",
+        "text_files_scanned": 65,
+        "result": "NO_INDEPENDENT_SINGLE_AXIS_GEOMETRY_OR_EXTERNAL_WORK_BOUNDARY",
+        "found_context": "仅发现项目级单轴/双轴目标描述和双轴十字试样厚度模型说明；未发现 S19/S20/S21/S22 的独立厚度、有效宽度、标距、积分域或外功边界。"
+      },
+      "status": "SEARCH_EXTENDED_NO_UNLOCK",
+      "vfm_identification_unlocked": false
+    },
+    "raw_single_axis_vfm_audit": {
+      "verified_date": "2026-09-25",
+      "source": "D:/C盘迁移/Desktop/yuan/PA12_biaxial_project/03_DIC/vertical_all_45deg/PAPER/unixal/S19_X_0.2/X_0.2.vfm",
+      "file_exists": true,
+      "parser": "tools/vfm_boundary.py::parse_matchid_vfm_metadata",
+      "status": "MISSING_BOUNDARY_AND_FORCES",
+      "parser_result": "文件可读取，但未发现 Boundary 和 Forces 记录",
+      "interpretation": "S19 的 X_0.2.vfm 不是可直接用于 MatchID 单轴 VFM 的完整边界输入；文件存在不等于 Boundary/Forces 已建立。",
+      "vfm_identification_unlocked": false
+    },
+    "four_force_sensor_layout_confirmed": true,
+    "interpretation": "论文单轴目前只能确认是加载路径；不能证明它对应当前 S19/S20/S21/S22 长条试样。当前数据内部的速率标签倍增关系已有配置/位移证据解释，但论文加载速率术语口径仍待核对；不重命名或混合拟合。",
+    "identification_gate": "在实验记录、单轴几何、路径对应关系和论文速率术语口径核实前，不启动 S19 阶段1 E。"
+  },
+  "constitutive_model_audit": {
+    "status": "SIGN_CONVENTION_REQUIRES_CONFIRMATION",
+    "source": "D:/C盘迁移/Desktop/yuan/3D打印尼龙材料的双轴拉伸测试方法与力学性能(1).pdf",
+    "locator": "第2.3.2节，印刷第11-12页，式(2.19)和参数段；MinerU doc:b39265e/tier:standard/page:19-20",
+    "printed_law": "sigma_y = sigma_y0 - H * equivalent_plastic_strain",
+    "listed_optimization_values": {
+      "sigma_y0_mpa": 21.0,
+      "H_mpa": 180.0
+    },
+    "literal_implication": "若 H=+180 MPa 且按式(2.19)使用，则屈服应力随等效塑性应变下降，线性外推在等效塑性应变约0.1167时降至零。",
+    "interpretation": "软化/硬化术语或公式符号待核实；Abaqus允许等向塑性屈服应力随塑性应变增加或降低，因此不能仅据正负号称输入无效。",
+    "available_deck_evidence": "当前可查六份 PA12 几何扫描 .inp 只有 provisional *Elastic 材料卡，无 *Plastic 表；不能由这些文件确认论文实际求解时的塑性输入。",
+    "do_not": [
+      "不修改或替换用户原始论文。",
+      "不把 H=180 MPa 当作本实验识别值。",
+      "不推定 MatchID 内 H 参数定义与论文式(2.19)相同。",
+      "在核实模型公式/原始材料卡前，不据此生成弹塑性参数标签或解释 GUI 的 H 值。"
+    ],
+    "reference": "https://docs.software.vt.edu/abaqusv2025/English/SIMACAEMATRefMap/simamat-c-metalplastic.htm"
+  },
+  "single_axis_candidate_assessment": {
+    "verified_date": "2026-09-24",
+    "status": "PROVISIONAL_CANDIDATE_ONLY",
+    "selected_first_trial": "S19_X_0.2",
+    "selection_basis": {
+      "matchid_status": "MATCHID_VFM_INPUT_READY",
+      "effective_merged_frames": 126,
+      "linear_fit_r2": 0.999482,
+      "direction": "X",
+      "speed_mm_s": 0.2,
+      "dic_reconstruction_block": false,
+      "geometry_gate": "REVIEW_REQUIRED",
+      "roi_gate": "REVIEW_REQUIRED",
+      "reference_frame_gate": "REVIEW_REQUIRED",
+      "endpoint_gate": "REVIEW_REQUIRED"
+    },
+    "s19_gate_evidence": {
+      "uniaxial_reference_images": "S19/S22参考图直接显示竖直长条单轴试样；S20/S21属于同一unixal单轴数据组；S15参考图显示十字双轴试样，确认两类试样不同",
+      "job_shape_type": "5-control-point Polygon",
+      "shape_bounds_px": "x=461-597, y=184-961",
+      "shape_center_px": "529.0,572.5",
+      "conversion_mm_per_pixel": 0.084746,
+      "shape_bbox_mm": "11.53 x 65.85",
+      "reference_image_size_px": "1120 x 1120",
+      "shape_bbox_px": "136 x 777",
+      "shape_bbox_mm_precise": "11.525456 x 65.847642",
+      "shape_size_interpretation": "图像/Job Polygon长条区域推定尺寸；不是厚度、有效标距或VFM积分域实测值。",
+      "interpretation": "单轴Job Polygon覆盖长标距/相关区域，不等于双轴中心28x28 mm ROI；需核对单轴VFM积分域、厚度、有效宽度和边界外功。",
+      "vfm_identification_unlocked": false,
+      "reference_image": "000000.jpg",
+      "first_force_supported_photo": "000002.jpg",
+      "last_force_supported_photo": "000127.jpg",
+      "last_force_x_n": 178.6,
+      "processing_report_peak_index": 12749,
+      "processing_report_auto_drop_index": 12827,
+      "vfm_file_audit": {
+        "path": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER/unixal/S19_X_0.2/X_0.2.vfm",
+        "status": "DIC_SETTINGS_ONLY_NO_BOUNDARY_FORCES",
+        "tags_found": ["Thickness", "Conversion", "ReferenceFile", "DataFile", "Horizontalmesh", "Verticalmesh", "SubsetSize"],
+        "boundary_count": 0,
+        "forces_count": 0,
+        "interpretation": "不是单轴VFM边界载荷文件；Thickness=1仅为DIC工程设置，不证明单轴实际厚度或外虚功定义。"
+      },
+      "manual_review_required": true
+    },
+    "field_precheck": {
+      "status": "PRECHECK_ONLY_NOT_IDENTIFICATION",
+      "verified_date": "2026-09-24",
+      "frame_count": 126,
+      "points_per_frame": 9144,
+      "nonfinite_frame_count": 0,
+      "mean_spatial_std": {
+        "exx": 0.00318806,
+        "eyy": 0.00172527,
+        "exy": 0.0016214
+      },
+      "mean_spatial_range": {
+        "exx": 0.0569143,
+        "eyy": 0.0287308,
+        "exy": 0.0243529
+      },
+      "interpretation": "加载后存在空间离散，但初始帧也有离散；可进入灵敏度矩阵/秩/条件数和帧子集稳定性分析，不能直接声称Y/H可辨识。",
+      "artifact": "Agents/PA12实验数据处理/处理记录/PA12_S19全场应变预审.md"
+    },
+    "comparison": {
+      "S20_X_2": {
+        "effective_frames": 63,
+        "linear_fit_r2": 0.972481,
+        "dic_status": "DAT_RECONSTRUCTED; excluded_invalid_point_count=126",
+        "role": "same-direction higher-rate follow-up"
+      },
+      "S21_X_20": {
+        "effective_frames": 36,
+        "linear_fit_r2": 0.942174,
+        "dic_status": "DAT_RECONSTRUCTED; excluded_invalid_point_count=72",
+        "role": "high-rate holdout/follow-up"
+      },
+      "S22_Y_0.2": {
+        "effective_frames": 223,
+        "linear_fit_r2": 0.822886,
+        "dic_status": "DAT_RECONSTRUCTED; excluded_invalid_point_count=446; 8 no-strain frames excluded",
+        "role": "not first trial; Y-direction candidate requires strain/large-deformation review"
+      }
+    },
+    "not_identification_result": true,
+    "unlock_conditions": [
+      "Single-axis specimen geometry and Polygon/integration-domain meaning confirmed; do not reuse biaxial 28x28 mm ROI assumptions without evidence.",
+      "Single-axis thickness, effective width, gauge length and boundary external-work definition confirmed.",
+      "Single-axis full-field heterogeneity and sensitivity/rank are sufficient for the intended parameters; if Y/H are not identifiable, restrict S19 to curve/E validation.",
+      "ROI/1 mm reduced-zone and reference-frame mapping manually confirmed in MatchID.",
+      "DIC strain measure, Exy convention, integration domain and machine-force boundary-resultant use confirmed.",
+      "Stage 1 fixed nu=0.375 identifies E from early elastic frames.",
+      "Stage 2 fixes E and nu, then identifies Y/H only after H formula/sign convention is verified.",
+      "Internal/external virtual work, residual, parameter bounds and frame-subset stability are recorded."
+    ]
+  },
+  "biaxial_candidate_assessment": {
+    "verified_date": "2026-09-25",
+    "status": "INPUT_VERIFICATION_CANDIDATE_ONLY",
+    "selected_first_trial": "S15_XY_0.2",
+    "purpose": "MatchID自带VFM输入和内外虚功闭合人工核验；不启动E/Y/H参数识别。",
+    "selection_basis": {
+      "effective_merged_frames": 284,
+      "matchid_status": "MATCHID_VFM_INPUT_READY",
+      "roi_size_mm": "28.78 x 28.78",
+      "center_roi_thickness_mm": 1.0,
+      "dic_source": "DAT_RECONSTRUCTED",
+      "excluded_invalid_point_count": 568,
+      "last_valid_dic_frame": "000284.jpg",
+      "visual_fracture_frame_excluded": "000285.jpg"
+    },
+    "geometry_evidence": {
+      "scope": "双轴十字试样；不用于解锁 S19/S20/S21/S22 单轴 VFM。",
+      "source_documents": [
+        {
+          "path": "D:/C盘迁移/Desktop/yuan/PA12_biaxial_project/04_geometry/drawings/moxing/moxing.pdf",
+          "mineru_locators": [
+            "doc:7535ee9/tier:standard/page:1",
+            "doc:7535ee9/tier:standard/page:2",
+            "doc:7535ee9/tier:standard/page:3",
+            "doc:7535ee9/tier:standard/page:4"
+          ]
+        },
+        {
+          "path": "D:/C盘迁移/Desktop/yuan/PA12_biaxial_project/04_geometry/drawings/moxing/简易版.pdf",
+          "mineru_locators": ["doc:953d05c/tier:standard/page:1"]
+        }
+      ],
+      "nominal_step_scope_audit": {
+        "status": "NOMINAL_CAD_GEOMETRY_MATCHED; SPECIMEN_MEASUREMENT_PENDING",
+        "step_path": "D:/C盘迁移/Desktop/yuan/PA12_biaxial_project/04_geometry/drawings/moxing/05_a1p1.00mm.step",
+        "readme_path": "D:/C盘迁移/Desktop/yuan/PA12_biaxial_project/04_geometry/drawings/moxing/README_厚度模型顺序.txt",
+        "step_length_unit": "mm",
+        "parsed_cartesian_point_count": 1483,
+        "step_cartesian_point_envelope_mm": {
+          "x": [-75.2, 75.2],
+          "y": [-75.2, 75.2],
+          "z": [-5.0, 5.0]
+        },
+        "center_local_plane_corner_coordinates": "x/y=±14.005 mm at z=-0.5 and z=+0.5 mm",
+        "center_nominal_plane_size_mm": "28.01 x 28.01",
+        "center_nominal_thickness_mm": 1.0,
+        "readme_total_thickness_mm": 3.0,
+        "interpretation": "全局 Cartesian 点坐标包络、中心局部平面和 README 总厚度不是同一证据范围；不能把 z=-5…5 mm 直接解释为试样整体厚度，也不能据此覆盖当前中心1 mm/外围3 mm工作口径。",
+        "action": "保持当前工作口径，取得实际截面/厚度或 MatchID 几何证据后再确认真实厚度过渡边界。"
+      },
+      "direct_step_topology_audit": {
+        "status": "PASSED_NOMINAL_GEOMETRY",
+        "source_step": "D:/C盘迁移/Desktop/yuan/PA12_biaxial_project/04_geometry/drawings/moxing/05_a1p1.00mm.step",
+        "step_length_unit": "mm",
+        "manifold_solid_brep_count": 1,
+        "closed_shell_count": 1,
+        "vertex_point_count": 280,
+        "vertex_bbox_mm": [150.4, 150.4, 3.0],
+        "vertex_coordinate_ranges_mm": {
+          "x": [-75.2, 75.2],
+          "y": [-75.2, 75.2],
+          "z": [-1.5, 1.5]
+        },
+        "center_plane_vertex_z_mm": [-0.5, 0.5],
+        "center_plane_corner_abs_xy_mm": 14.005,
+        "center_plane_nominal_size_mm": "28.01 x 28.01",
+        "center_nominal_thickness_mm": 1.0,
+        "cylindrical_surface_radius_0_995_present": true,
+        "interpretation": "按 STEP 拓扑顶点而非全部几何控制点计算，当前短文件名 STEP 与 verification.json 的150.4×150.4×3.0 mm名义包络、中心1 mm平面和约0.995 mm过渡半径相符；文件名血缘仍未对应，但名义几何不再是当前阻塞。实物厚度和照片坐标中的过渡边界仍未验证。"
+      },
+      "verification_metadata_provenance": {
+        "status": "NOMINAL_GEOMETRY_MATCHED; FILENAME_ALIAS_UNRESOLVED; SPECIMEN_MEASUREMENT_PENDING",
+        "paths": [
+          "D:/C盘迁移/Desktop/yuan/PA12_biaxial_project/04_geometry/drawings/moxing/verification.json",
+          "D:/C盘迁移/Desktop/yuan/PA12_biaxial_project/03_DIC/vertical_all_45deg/moxing/verification.json"
+        ],
+        "duplicate_content_observation": "两份 verification.json 的只读文本内容一致。",
+        "reported_center_thickness_mm": 1.0,
+        "reported_total_thickness_mm": 3.0,
+        "reported_transition_radius_model_mm": 0.995,
+        "reported_bbox_mm": [150.4, 150.4, 3.0],
+        "reported_step_basename": "05_PA12_cruciform_center_thickness_a1p0mm.step",
+        "reported_step_exists_in_both_directories": false,
+        "actual_step_basename_found_in_both_directories": "05_a1p1.00mm.step",
+        "raw_root_search": {
+          "root": "D:/C盘迁移/Desktop/yuan",
+          "reported_step_found": false,
+          "long_name_model_family_found": false,
+          "search_date": "2026-09-25"
+        },
+        "known_information_path": "D:/C盘迁移/Desktop/yuan/PA12_biaxial_project/00_README/known_information.md",
+        "known_information_statement": "a=1 mm；当前整体厚度暂按3 mm建模，但仍需实验实测确认。",
+        "interpretation": "虽然 verification.json 引用的长文件名及同族模型在原始资料根目录均未找到，但当前 05_a1p1.00mm.step 的实体拓扑独立复核了相同名义包络、中心平面和0.995 mm过渡半径；因此元数据与当前 STEP 的名义几何相互支持。文件名映射仍需补充来源记录，实际试样测厚仍不能由 CAD 替代。"
+      },
+      "nominal_dimensions_mm": {
+        "overall_size": "150.4 x 150.4",
+        "arm_width": 30.0,
+        "center_reduced_zone": "30.0 x 30.0",
+        "center_flat_measurement_zone": "28.0 x 28.0",
+        "center_thickness": 1.0,
+        "overall_thickness": 3.0
+      },
+      "overall_thickness_evidence_grade": "MODEL_VALUE_WITH_SECTION_PROPORTION_INFERENCE; NOT_DIRECTLY_MEASURED_BY_DAT_OR_PHOTO",
+      "dat_photo_roi_mm": "27.64 x 28.08",
+      "current_s15_matchid_roi_mm": "approximately 28.78 x 28.78",
+      "s15_job_shape_pixels": "329 x 329",
+      "s15_job_shape_mm": "28.775656 x 28.775656",
+      "s15_job_conversion_mm_per_pixel": 0.087464,
+      "s15_job_coordinate_records": {
+        "roi_origin_px": "395,413",
+        "roi_lower_right_px": "724,742",
+        "roi_center_px": "559.5,577.5",
+        "initial_subset_px": "531,591",
+        "extensometer_marker_1_px": "575,483",
+        "extensometer_marker_2_px": "573,711",
+        "thickness_transition_boundary_coordinates": "UNKNOWN",
+        "interpretation": "Job控制点不等于实体厚度边界中心，不能据此解除ROI containment人工门槛。"
+      },
+      "dimension_difference_interpretation": "Job ROI 矩形与 DAT 有效点外接框的不同统计口径；不构成尺寸冲突。",
+      "s15_geometry_screening": {
+        "margin_to_30mm_reduced_outer_boundary_each_side_mm": 0.612172,
+        "excess_over_28mm_flat_zone_each_side_mm": 0.387828,
+        "direct_step_center_plane_size_mm": "28.01 x 28.01",
+        "excess_over_direct_step_center_plane_each_side_mm": 0.382828,
+        "status": "OUTER_REDUCED_BOUNDARY_CONTAINED; POSSIBLE_FLAT_ZONE_OVERLAP",
+        "interpretation": "若Job ROI与当前 STEP 名义中心同心，则尺寸上位于名义30 mm减薄区外边界内，但相对直接拓扑得到的28.01 mm中心平面每侧超出约0.382828 mm；这支持潜在过渡区重叠判断，真实试样厚度边界和中心偏移仍未实测。",
+        "reference_image_support": "S15 000000.jpg仅支持中心位置二维目视，不证明厚度均匀性。",
+        "manual_matchid_review_required": true
+      },
+      "roi_difference_requires_matchid_review": true,
+      "actual_roi_boundary_review_required": true
+    },
+    "s15_force_channel_audit": {
+      "source": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/xy-1-0.1_state_20250529102303_20250529102339.xls",
+      "press_columns": ["X1_Press", "X2_Press", "Y1_Press", "Y2_Press"],
+      "raw_press_row_count": 36244,
+      "sampling_interval_s": 0.001,
+      "sync_start_index": 105,
+      "sync_start_time_s": 0.105,
+      "sync_end_index": 28463,
+      "sync_end_time_s": 28.509,
+      "baseline_sample_count": 50,
+      "effective_photo_count": 284,
+      "max_abs_difference_reconstructed_average_x_n": 0.000000493,
+      "max_abs_difference_reconstructed_average_y_n": 0.000000479,
+      "last_frame_channel_forces_n": {
+        "X1": 1601.36,
+        "X2": 1615.0,
+        "Y1": 1607.7,
+        "Y2": 1598.96
+      },
+      "boundary_series_data_ready": true,
+      "vfm_file_written": false,
+      "interpretation": "四个原始力通道可按现有照片时间轴复用；当前仅有平均 X/Y 输出，尚未写入 S15 .vfm。"
+    },
+    "s15_vfm_input_blueprint": {
+      "boundary_force_series_count": 4,
+      "values_per_series": 285,
+      "frame_range": "000000-000284",
+      "reference_frame": "000000.jpg",
+      "reference_force_values": {"Boundary0": 0.0, "Boundary1": 0.0, "Boundary2": 0.0, "Boundary3": 0.0},
+      "nonreference_force_frame_range": "000001.jpg-000284.jpg",
+      "excluded_frame": "000285.jpg",
+      "boundary_mapping": {"Boundary0": "X2", "Boundary1": "Y2", "Boundary2": "Y1", "Boundary3": "X1"},
+      "source_series": {"Boundary0": "X2_Press", "Boundary1": "Y2_Press", "Boundary2": "Y1_Press", "Boundary3": "X1_Press"},
+      "blueprint_csv_path": "Agents/PA12实验数据处理/MatchID_VFM准备/S15_XY_0.2/S15_XY_0.2_BoundaryForces_blueprint.csv",
+      "blueprint_csv_written": true,
+      "blueprint_csv_rows": 285,
+      "blueprint_csv_frame_index_range": "0-284",
+      "blueprint_csv_contains_excluded_frame_000285": false,
+      "blueprint_csv_average_difference_to_existing_x_y_n": {"X": 0.000000500, "Y": 0.000000500},
+      "status": "DATA_BLUEPRINT_CSV_WRITTEN_VFM_FILE_NOT_WRITTEN",
+      "do_not_use": "不要把 284 行平均 X/Y CSV 直接作为完整四组 Forces；不要把 000285 加入序列。"
+    },
+    "s15_matchid_artifact_audit": {
+      "experiment_directory": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER/biaxal/S15_XY_0.2",
+      "job_file_present": true,
+      "mti_file_present": true,
+      "vfm_files_present": false,
+      "vfm_file_names": [],
+      "mti_metadata": {
+        "reference_image": "000000.jpg",
+        "true_frame_entry_count_including_reference": 285,
+        "true_frame_range": "000000.jpg-000284.jpg",
+        "false_frame_entries": ["000285.jpg"],
+        "conversion_mm_per_pixel": 0.087464,
+        "roi_origin_px": "395,413",
+        "roi_size_px": "329 x 329",
+        "effective_nonreference_frames_for_vfm": 284
+      },
+      "mti_metadata_matches_merged_state": true,
+      "interpretation": "S15 已有 DIC Job 和 mti，但尚未建立 MatchID VFM 工程；MATCHID_VFM_INPUT_READY 仅表示 DIC—同步力数据达到闭环输入状态。",
+      "parameter_identification_allowed": false
+    },
+    "s15_reference_frame_audit": {
+      "status": "REVIEW_REQUIRED",
+      "reference_image": "000000.jpg",
+      "first_effective_image": "000001.jpg",
+      "reference_dat_point_count": 100491,
+      "first_effective_force_n": {
+        "X": 0.0,
+        "Y": 0.0
+      },
+      "reference_field_summary": "000000 DIC u/v/Exx/Eyy/Exy接近零",
+      "first_effective_field_spatial_std": {
+        "Exx": 0.00570515,
+        "Eyy": 0.00564645,
+        "Exy": 0.0039352
+      },
+      "second_effective_image": "000002.jpg",
+      "second_effective_force_n": {
+        "X": 17.18,
+        "Y": 17.83
+      },
+      "interpretation": "000001零力照片已有明显DIC场离散；需区分相关噪声、起始运动、力/图像延迟与真实加载响应。未完成前不把该帧直接用于参数识别。"
+      ,"image_diagnostic": {
+        "method": "中心裁剪相位相关与平均灰度比较，只读，不改图像",
+        "reference_to_000001": {
+          "phase_shift_px": [
+            -0.00538676,
+            0.00545774
+          ],
+          "mean_gray_delta": -7.85717,
+          "phase_response": 0.96639
+        },
+        "reference_to_000002": {
+          "phase_shift_px": [
+            0.0139671,
+            0.00181657
+          ],
+          "mean_gray_delta": -3.39997,
+          "phase_response": 0.96607
+        },
+        "interpretation": "未见明显整体相机平移；000001亮度基线变化较大，支持先排查照明/采集基线与力延迟。"
+      }
+    },
+    "gui_reference_audit": {
+      "verified_date": "2026-09-24",
+      "status": "S15_GUI_REVIEW_NOT_COMPLETED",
+      "virtual_fields_module_open_project": "S16_XY_0.2 4try_step3",
+      "target_project": "S15_XY_0.2",
+      "matchid_2d_window_observation": "反复显示 000000.jpg: Not a TIFF or MDI file；不是可用的 S15 Results Viewer 观察状态。",
+      "save_export_or_identification_action": false,
+      "temporary_screenshots_removed": false,
+      "last_observed_screenshot": "matchid_dialog.png",
+      "environment_recheck": {
+        "verified_date": "2026-09-25",
+        "matchid_executable": "D:/DIC/MATCH_DIC/2019/MatchID 2D/MatchID.exe",
+        "executable_present": true,
+        "process_window_enumerated": true,
+        "window_state_capture": "UNAVAILABLE",
+        "capture_reason": "Windows desktop state capture returned SetIsBorderRequired unsupported-interface error.",
+        "new_gui_evidence_obtained": false,
+        "manual_review_unblocked": false,
+        "interpretation": "MatchID 安装和窗口进程存在，但当前桌面控制无法取得可信的窗口画面/控件状态；不据此更新 S15 ROI、参考帧、虚功或参数识别结论。"
+      }
+    },
+    "deferred_candidates": {
+      "S16_XY_0.2": "暂不首试；3try Forces与同步表不一致，4try_step3 Forces=0。",
+      "S18_XY_2": "后续候选；126帧，DAT_RECONSTRUCTED。",
+      "S17_XY_20": "不作首试；仅12帧，适合流程/高速率状态检查。"
+    },
+    "not_identification_result": true,
+    "do_not": [
+      "不把S16第16轮Y/H候选迁移到S15。",
+      "不把论文工作参数写成识别结果。",
+      "不把S16历史.vfm格式证据当成S15当前力序列。",
+      "不混合S15/S16同速率数据。"
+    ]
+  },
+  "self_vfm_status": {
+    "formal_matchid_replacement": false,
+    "method": "自建两阶段平面应力虚功识别；阶段1固定 nu=0.375 识别 E，阶段2固定 E/nu 识别 Linear Y/H，并比较通用 Ludwik、Swift、Voce I、Voce II。",
+    "geometry_scope": "仅等双轴十字试样；中心 ROI 厚度 1 mm，外围整体厚度 3 mm。",
+    "experiments": {
+      "S15_XY_0.2": {"status": "SELF_VFM_REVIEW_REQUIRED", "E_MPa": 3273.8409999601095, "Y_MPa": 34.006867768150386, "H_MPa": 156.45119742268645},
+      "S16_XY_0.2": {"status": "SELF_VFM_CANDIDATE", "E_MPa": 3048.813928400544, "Y_MPa": 42.461864253133214, "H_MPa": 131.6271228715904},
+      "S17_XY_20": {"status": "SELF_VFM_REVIEW_REQUIRED", "E_MPa": 4519.5294056991725, "Y_MPa": null, "H_MPa": null},
+      "S18_XY_2": {"status": "SELF_VFM_CANDIDATE", "E_MPa": 4111.393073671239, "Y_MPa": 50.43790275515913, "H_MPa": 313.31494205059926}
+    },
+    "single_axis_status": "S19–S24 跳过；单轴实测厚度、有效积分域和边界外功尚未有独立证据。",
+    "output_audit": "四组结果的内外虚功和模型对比 CSV 行数与帧数一致；非空数值无 NaN/无穷值。"
+  },
+  "not_done_before_vfm_identification": [
+    "为 S23 寻找独立的断裂时刻证据；在没有证据前保持诊断状态。",
+    "将 S24 作为预载释放记录排除出完整拉伸 VFM。",
+    "复核 S16 3try 的照片—力时间对应，并修正/确认 4try_step3 的 Forces 输入；当前两种试算均不可用于参数识别。",
+    "S15 当前目录尚无 .vfm 工程文件；先完成 ROI/参考帧/零力场人工核验，再建立 S15 MatchID VFM 工程并核对 Boundary/Forces。",
+    "按 MatchID 自带 VFM 和用户确认的机器力—ROI 边界合力规则工作；不得重建四边牵引分布。中心 ROI 1 mm 与外围整体 3 mm 分开记录。",
+    "按四组等双轴实验逐组执行固定 nu=0.375 识别 E、再固定 E/nu 识别 Y/H 的两阶段策略。",
+    "核实 MatchID 识别模型的 H 符号/公式，并确认项目优化论文式(2.19)负号与 H=+180 MPa 是公式笔误还是有意软化；不要将论文工作参数直接称为识别结果。",
+    "核对论文单轴加载路径与当前 S19/S20/S21/S22 长条试样的对应关系，并解释论文速率 0.1/1/10 mm/s 与当前真实标签 0.2/2/20 mm/s 的来源差异；完成前不启动 S19 阶段1 E。",
+    "保留 verification.json 长文件名缺失的文件血缘问题；当前 STEP 拓扑已提供同名义几何的独立证据，但实际试样测厚和照片坐标中的厚度过渡边界仍需确认。",
+    "在 MatchID 中人工核对 S15 Job ROI 与名义 30 mm 减薄区/28 mm 平坦区的真实厚度边界叠合、中心偏移和参考帧；当前仅判定外边界内、平坦区潜在重叠，未通过 ROI containment 门槛。",
+    "完成逐帧同步复核、内外虚功、残差和参数边界审查；GUI 第 16 轮参数仅为中间候选。"
+  ],
+  "machine_entrypoints": {
+    "method_protocol": "Agents/PA12实验数据处理/处理记录/PA12实验总体方法与防跑偏协议.md",
+    "closure_status": "Agents/PA12实验数据处理/MatchID_VFM准备/PA12_MatchID_VFM闭环状态.json",
+    "dic_audit": "Agents/PA12实验数据处理/MatchID_VFM准备/PA12_DIC_DAT质量审计.json",
+    "force_manifest": "Agents/PA12实验数据处理/处理记录/PA12批量处理清单.json",
+    "force_audit": "Agents/PA12实验数据处理/处理记录/PA12数据合理性审计结果.json",
+    "human_readable_handoff": "Agents/PA12实验数据处理/处理记录/PA12_GPT交接文档.md",
+    "direction_evidence": "raw/assets/PA12原始方向与旋转标定方向.jpg",
+    "vfm_boundary_config": "configs/pa12_vfm_boundary.json",
+    "vfm_boundary_audit": "Agents/PA12实验数据处理/MatchID_VFM准备/PA12_VFM边界载荷审计.json",
+    "s15_vfm_input_blueprint": "Agents/PA12实验数据处理/MatchID_VFM准备/S15_XY_0.2/S15_XY_0.2_VFM输入蓝图.json",
+    "self_vfm_config": "configs/pa12_self_vfm.json",
+    "self_vfm_runner": "tools/run_pa12_self_vfm.py",
+    "self_vfm_formulas": "tools/pa12_self_vfm.py",
+    "self_vfm_report": "Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段报告.md",
+    "self_vfm_summary": "Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM结果.csv",
+    "self_vfm_readme": "Agents/PA12实验数据处理/VFM自建/README.md"
+  },
+  "formal_matchid_vfm_ready": false,
+  "next_action": "MatchID 路径继续保留 S15 ROI/参考帧和 S16 Forces 的人工核验门槛；自建 VFM 路径已可复现输出四组等双轴实验的内外虚功、应力空间、E/Y/H 和通用硬化模型比较。当前 S16、S18 为候选，S15 需复核，S17 帧数不足；单轴 S19–S22 在独立几何、厚度、积分域和外功边界证据补齐前不启动参数识别；S23 断裂力缺失，S24 为预载释放。下一步是人工复核候选曲线和几何，再决定是否将某组结果作为 MatchID 或论文参数输入。"
+}

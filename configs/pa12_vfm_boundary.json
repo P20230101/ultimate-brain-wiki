@@ -1,0 +1,117 @@
+{
+  "description": "PA12 旋转 DIC 图像进入 MatchID 自带 VFM 的 ROI、厚度、方向和机器力合力约定。",
+  "output_root": "D:/2026.9.21_finally",
+  "source": {
+    "raw_data_root": "D:/C盘迁移/Desktop/yuan",
+    "formal_dic_root": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER",
+    "direction_evidence": "raw/assets/PA12原始方向与旋转标定方向.jpg",
+    "vfm_format_evidence": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER/biaxal/S16_XY_0.2/S16_XY_0.2_258.vfm"
+  },
+  "coordinate_system": {
+    "original_machine": "四个加载头按对角方向布置；右上/左下为 Y1/Y2，右下/左上为 X1/X2。",
+    "rotated_dic": "正式 DIC 使用 vertical_all_45°/PAPER；旋转后的 ROI 以图像顶部、底部、左侧、右侧定义边界。",
+    "mapping_basis": "用户提供的原始方向照片、旋转目录名称以及现有 MatchID VFM Boundary/Forces 顺序共同确认。"
+  },
+  "geometry": {
+    "center_roi_thickness_mm": 1.0,
+    "overall_thickness_mm": 3.0,
+    "roi_must_be_inside_center_reduced_thickness_zone": true,
+    "effective_width_mm": 30.0,
+    "gauge_length_mm": 30.0
+  },
+  "force_convention": {
+    "press_means": "力",
+    "unit": "N",
+    "equal_biaxial_default": "X=(X1_Press+X2_Press)/2; Y=(Y1_Press+Y2_Press)/2",
+    "biaxial_ratio": "1:1 for every current biaxial experiment",
+    "machine_force_is_roi_boundary_resultant": true,
+    "reference_vfm_implementation": "MatchID built-in VFM",
+    "fit_speeds_separately_mm_s": [0.2, 2.0, 20.0],
+    "identification_stages": [
+      "fix nu=0.375 and identify E from early elastic loading",
+      "fix the identified E and nu=0.375, then identify yield stress Y and hardening H"
+    ],
+    "tension_force_sign": "正值",
+    "vfm_force_rule": "用户确认外围传感器机器力直接作为 ROI 边界合力输入 MatchID 自带 VFM；X/Y 使用同一照片时间轴。"
+  },
+  "current_matchid_state_snapshot": {
+    "captured_date": "2026-09-24",
+    "S16_XY_0.2": {
+      "status": "INTERMEDIATE_ITERATION_NOT_FINAL",
+      "iteration": 28,
+      "progress_percent_approx": null,
+      "E": "阶段1值未显示",
+      "nu": 0.375,
+      "yield_candidate_mpa": 61.94,
+      "hardening_candidate_mpa": 139.6,
+      "residual_label": "剩余的",
+      "residual_display_value": 1655,
+      "residual_unit_and_definition": "未核实",
+      "internal_virtual_work": "界面曲线可见；数值未导出",
+      "external_virtual_work": "界面曲线可见；数值未导出",
+      "parameter_boundary_status": "未核实",
+      "force_sequence_status": "3try结构完整，标定0.086705与当前Job 0.087209 mm/pixel不同，258帧含参考图；Forces与当前同步表257帧逐帧平均绝对差X=26.12 N/Y=23.41 N，末帧旧值约1605/1605 N而同步表152.32/126.26 N；4try_step3保存时Forces帧数为0",
+      "previous_observations": [
+        {
+          "iteration": 16,
+          "progress_percent_approx": 70,
+          "yield_candidate_mpa": 63.93,
+          "hardening_candidate_mpa": 41.55,
+          "residual_label": "剩余的",
+          "residual_display_value": 1214,
+          "status": "INTERMEDIATE_ITERATION_NOT_FINAL"
+        }
+      ]
+    }
+  },
+  "roi_location_status": {
+    "S15_XY_0.2": "用户确认在中心1 mm区；Job Shape外接尺寸28.78×28.78 mm；末DAT场异常，不进入有效场",
+    "S16_XY_0.2": "当前MatchID视图ROI网格位于中心斑点区；物理减薄边界重合按用户确认的中心ROI定义",
+    "S17_XY_20": "按速度逐步导入核验；Job Shape外接尺寸27.64×28.08 mm",
+    "S18_XY_2": "按速度逐步导入核验；Job Shape外接尺寸小于名义30×30 mm"
+  },
+  "vfm_input_status": {
+    "S15_XY_0.2": "MatchID .vfm 工程尚未创建；284帧有效DIC与同步力表一致；000285视觉断裂帧DAT场不完整，最后有效DIC帧000284",
+    "S16_XY_0.2": "3try旧Forces与当前257帧同步表不一致；4try_step3保存Forces帧数为0，当前力序列未闭合",
+    "S17_XY_20": "按速度逐步实现；当前检查器未发现可比对的已保存完整VFM力序列",
+    "S18_XY_2": "现有xy_2.vfm压缩流截断；当前检查器未发现可比对的完整VFM力序列；按2 mm/s逐步实现"
+  },
+  "rotated_boundary_mapping": {
+    "顶部": "X2",
+    "底部": "X1",
+    "左侧": "Y2",
+    "右侧": "Y1"
+  },
+  "matchid_boundary_order": ["顶部", "左侧", "右侧", "底部"],
+  "loading_modes": {
+    "双轴": {
+      "positive_sides": {
+        "X": ["顶部", "底部"],
+        "Y": ["左侧", "右侧"]
+      },
+      "force_csv_axes": ["X", "Y"]
+    },
+    "单轴 X": {
+      "positive_sides": {
+        "X": ["顶部", "底部"]
+      },
+      "force_csv_axes": ["X"]
+    },
+    "单轴 Y": {
+      "positive_sides": {
+        "Y": ["左侧", "右侧"]
+      },
+      "force_csv_axes": ["Y"]
+    }
+  },
+  "data_rules": [
+    "正式 DIC 只使用旋转后的 PAPER JPG/DAT；原始 JPG、DAT、XLS 和 VFM 不修改。",
+    "照片是主索引；X/Y 力必须使用同一照片时间轴插值。",
+    "数量、时间单调性、NaN、零点和终点事件未通过时，不生成正式 VFM 输入。",
+    "外围夹持/加载结构厚度记录为 3 mm；中心 ROI 必须完全位于 1 mm 减薄区，MatchID 工程厚度使用 1 mm。",
+    "当前所有双轴实验均为等双轴；不存在非等双轴试验，也不把缺少非等双轴数据列作阻塞。",
+    "双轴按 0.2、2、20 mm/s 分速率识别，不混合拟合一套参数。",
+    "阶段 1 固定 nu=0.375 识别 E；阶段 2 固定已识别 E 和 nu=0.375，再识别屈服 Y 与硬化 H。",
+    "基准使用 MatchID 自带 VFM；不自行恢复四边牵引分布或假设均布边界应力。"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "press_sheet": "Press",
+  "position_sheet": "Pos",
+  "time_column": "T",
+  "x_press_columns": [
+    "X1_Press",
+    "X2_Press"
+  ],
+  "y_press_columns": [
+    "Y1_Press",
+    "Y2_Press"
+  ],
+  "force_sign": -1.0,
+  "loading_speed_definition": "two_grip_relative_speed",
+  "include_time": true,
+  "frame_selection_mode": "paired_jpg_dat",
+  "plot_smoothing_window": 5,
+  "displacement_definition": "two_grip_relative_sum",
+  "monotonic_displacement_envelope": true,
+  "zero_inactive_force_axes": false,
+  "axis_position_columns": {
+    "X": [
+      "X1_Pos",
+      "X2_Pos"
+    ],
+    "Y": [
+      "Y1_Pos",
+      "Y2_Pos"
+    ]
+  },
+  "geometry": {
+    "specimen_width_mm": 30.0,
+    "thickness_mm": 1.0,
+    "overall_thickness_mm": 3.0,
+    "gauge_length_mm": 30.0
+  },
+  "detector": {
+    "baseline_window_s": 0.05,
+    "start_threshold_n": 5.0,
+    "persistence_s": 0.05,
+    "fracture_fraction": 0.2,
+    "smoothing_window_s": 0.05
+  },
+  "experiment_id": "S18_XY_2",
+  "specimen_id": "S18",
+  "orientation": "XY",
+  "loading_mode": "双轴",
+  "loading_speed": 2.0,
+  "speed_label": "2",
+  "loading_speed_source": "旋转目录 2 为两侧相对加载速度；力文件名 xy-04-1 中 1 为单个执行通道速度，Pos 斜率支持该口径",
+  "camera_setting_fps": 50.0,
+  "camera_setting_source": "历史批次候选值；原始相机元数据未找到",
+  "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER/biaxal/S18_XY_2",
+  "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/xy-04-1_state_20250529112959_20250529113217.xls",
+  "position_columns": [
+    "X1_Pos",
+    "X2_Pos"
+  ],
+  "displacement_mode": "device",
+  "dic_job_file": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/vertical_all_45°/PAPER/biaxal/S18_XY_2/Job.m2inp",
+  "dic_scale_mm_per_pixel": 0.087464,
+  "formal_vfm_allowed": true,
+  "notes": "两个候选状态文件中选择 Press 行数更多且覆盖更完整的 113217 导出。",
+  "output_root": "D:\\2026.9.21_finally"
+}

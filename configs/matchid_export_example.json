@@ -1,0 +1,34 @@
+{
+  "description": "已用 MatchID 2D 19.2.2.0 对 S16_XY_0.2 的 Results Viewer 导出确认。导出变量为 mm 坐标/位移和无量纲应变；后续实验必须使用相同导出设置。",
+  "field_map": {
+    "x": "X[mm]",
+    "y": "Y[mm]",
+    "u": "U[mm]",
+    "v": "V[mm]",
+    "exx": "Exx",
+    "eyy": "Eyy",
+    "exy": "Exy"
+  },
+  "units": {
+    "x": "mm",
+    "y": "mm",
+    "u": "mm",
+    "v": "mm",
+    "exx": "dimensionless",
+    "eyy": "dimensionless",
+    "exy": "dimensionless"
+  },
+  "delimiter": ";",
+  "pattern": "{photo_name}.csv",
+  "export_root": "D:/2026.9.21_finally/_matchid_export/S16_XY_0.2",
+  "confirmed_from": {
+    "experiment_id": "S16_XY_0.2",
+    "software": "MatchID 2D 19.2.2.0",
+    "exported_frame_count": 258,
+    "formal_index_frame_count": 257,
+    "reference_frame_excluded": "000000.jpg",
+    "raw_header": "X[Pixels];Y[Pixels];X[mm];Y[mm];U[mm];V[mm];R;Sigma;Exx;Eyy;Exy;E1;E2;Gamma;VonMises;",
+    "coordinate_and_displacement_unit": "mm",
+    "strain_unit": "dimensionless"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "batch_config": "configs/pa12_rotated_batch.json",
+  "output_directory": "Agents/PA12实验数据处理/VFM自建",
+  "eligible_loading_modes": ["双轴"],
+  "ineligible_mode_reason": "单轴 Job Shape 与双轴中心ROI/厚度口径不同；在单轴实测厚度、虚场边界和几何确认前不输出自建VFM参数。",
+  "nu": 0.375,
+  "elastic_strain_limit": 0.005,
+  "minimum_force_n": 5.0,
+  "minimum_plastic_strain": 0.001,
+  "minimum_hardening_points": 20,
+  "exclude_after_equivalent_force_peak": true,
+  "stage1_acceptance": {
+    "max_relative_rmse": 0.1,
+    "definition": "阶段1虚功RMSE除以参与拟合帧的最大活动方向外力；超过此值必须人工复核。"
+  },
+  "stage2_acceptance": {
+    "minimum_points": 20,
+    "max_relative_rmse": 0.25,
+    "definition": "阶段2至少有20个峰值前塑性点，且Linear等效应力拟合RMSE不超过拟合应力范围的25%。"
+  },
+  "geometry": {
+    "roi_thickness_mm": 1.0,
+    "overall_thickness_mm": 3.0,
+    "force_rule": "用户确认的外围机器力直接作为中心ROI四周边界合力；不重建均布牵引。"
+  },
+  "virtual_fields": {
+    "x": "旋转后机器X（顶部/底部）：u*=0, v*=y/Ly",
+    "y": "旋转后机器Y（左右）：u*=x/Lx, v*=0",
+    "area_rule": "使用旋转Job Shape矩形外接尺寸；DIC点均值乘ROI面积和中心厚度。"
+  },
+  "stage_rules": {
+    "stage_1": "固定ν=0.375；只用修正后平均应变不超过elastic_strain_limit且外力大于minimum_force_n的加载帧识别E。",
+    "stage_2": "固定阶段1 E和ν；使用峰值前的边界等效应力与DIC平面应力塑性应变估计识别线性Y/H。",
+    "model_scope": "当前只实现Linear等向硬化；Voce I/II、Ludwik、Swift需先核实与MatchID界面一致的公式后再加入。"
+  }
+}

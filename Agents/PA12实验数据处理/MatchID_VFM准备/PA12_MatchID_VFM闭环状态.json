@@ -1,0 +1,159 @@
+{
+  "config": "configs\\pa12_rotated_batch.json",
+  "experiments": [
+    {
+      "experiment_id": "S15_XY_0.2",
+      "force_status": "FORCE_SYNC_READY",
+      "dic_status": "DIC_DAT_READY",
+      "job_status": "JOB_COVERAGE_COMPLETE",
+      "export_status": "MATCHID_VFM_INPUT_READY",
+      "overall_status": "MATCHID_VFM_INPUT_READY",
+      "selected_frame_count": 284,
+      "dic_usable_frame_count": 284,
+      "dic_unusable_frame_count": 0,
+      "dic_status_counts": {
+        "DIC_FIELDS_AVAILABLE": 284
+      },
+      "job_missing_frame_count": 0
+    },
+    {
+      "experiment_id": "S16_XY_0.2",
+      "force_status": "FORCE_SYNC_READY",
+      "dic_status": "DIC_DAT_READY",
+      "job_status": "JOB_COVERAGE_COMPLETE",
+      "export_status": "MATCHID_VFM_INPUT_READY",
+      "overall_status": "MATCHID_VFM_INPUT_READY",
+      "selected_frame_count": 257,
+      "dic_usable_frame_count": 257,
+      "dic_unusable_frame_count": 0,
+      "dic_status_counts": {
+        "DIC_FIELDS_AVAILABLE": 257
+      },
+      "job_missing_frame_count": 0
+    },
+    {
+      "experiment_id": "S17_XY_20",
+      "force_status": "FORCE_SYNC_READY",
+      "dic_status": "DIC_DAT_READY",
+      "job_status": "JOB_COVERAGE_COMPLETE",
+      "export_status": "MATCHID_VFM_INPUT_READY",
+      "overall_status": "MATCHID_VFM_INPUT_READY",
+      "selected_frame_count": 12,
+      "dic_usable_frame_count": 12,
+      "dic_unusable_frame_count": 0,
+      "dic_status_counts": {
+        "DIC_FIELDS_AVAILABLE": 12
+      },
+      "job_missing_frame_count": 0
+    },
+    {
+      "experiment_id": "S18_XY_2",
+      "force_status": "FORCE_SYNC_READY",
+      "dic_status": "DIC_DAT_READY",
+      "job_status": "JOB_COVERAGE_COMPLETE",
+      "export_status": "MATCHID_VFM_INPUT_READY",
+      "overall_status": "MATCHID_VFM_INPUT_READY",
+      "selected_frame_count": 126,
+      "dic_usable_frame_count": 126,
+      "dic_unusable_frame_count": 0,
+      "dic_status_counts": {
+        "DIC_FIELDS_AVAILABLE": 126
+      },
+      "job_missing_frame_count": 0
+    },
+    {
+      "experiment_id": "S19_X_0.2",
+      "force_status": "FORCE_SYNC_READY",
+      "dic_status": "DIC_DAT_READY",
+      "job_status": "JOB_COVERAGE_COMPLETE",
+      "export_status": "MATCHID_VFM_INPUT_READY",
+      "overall_status": "MATCHID_VFM_INPUT_READY",
+      "selected_frame_count": 126,
+      "dic_usable_frame_count": 126,
+      "dic_unusable_frame_count": 0,
+      "dic_status_counts": {
+        "DIC_FIELDS_AVAILABLE": 126
+      },
+      "job_missing_frame_count": 0
+    },
+    {
+      "experiment_id": "S20_X_2",
+      "force_status": "FORCE_SYNC_READY",
+      "dic_status": "DIC_DAT_READY",
+      "job_status": "JOB_COVERAGE_COMPLETE",
+      "export_status": "MATCHID_VFM_INPUT_READY",
+      "overall_status": "MATCHID_VFM_INPUT_READY",
+      "selected_frame_count": 63,
+      "dic_usable_frame_count": 63,
+      "dic_unusable_frame_count": 0,
+      "dic_status_counts": {
+        "DIC_FIELDS_AVAILABLE": 63
+      },
+      "job_missing_frame_count": 0
+    },
+    {
+      "experiment_id": "S21_X_20",
+      "force_status": "FORCE_SYNC_READY",
+      "dic_status": "DIC_DAT_READY",
+      "job_status": "JOB_COVERAGE_COMPLETE",
+      "export_status": "MATCHID_VFM_INPUT_READY",
+      "overall_status": "MATCHID_VFM_INPUT_READY",
+      "selected_frame_count": 36,
+      "dic_usable_frame_count": 36,
+      "dic_unusable_frame_count": 0,
+      "dic_status_counts": {
+        "DIC_FIELDS_AVAILABLE": 36
+      },
+      "job_missing_frame_count": 0
+    },
+    {
+      "experiment_id": "S22_Y_0.2",
+      "force_status": "FORCE_SYNC_READY",
+      "dic_status": "DIC_DAT_READY",
+      "job_status": "JOB_COVERAGE_COMPLETE",
+      "export_status": "MATCHID_VFM_INPUT_READY",
+      "overall_status": "MATCHID_VFM_INPUT_READY",
+      "selected_frame_count": 223,
+      "dic_usable_frame_count": 223,
+      "dic_unusable_frame_count": 0,
+      "dic_status_counts": {
+        "DIC_FIELDS_AVAILABLE": 223
+      },
+      "job_missing_frame_count": 0
+    },
+    {
+      "experiment_id": "S23_Y_2",
+      "force_status": "FORCE_SYNC_VISUAL_FRACTURE_FORCE_MISSING",
+      "dic_status": "DIC_DAT_READY",
+      "job_status": "JOB_COVERAGE_COMPLETE",
+      "export_status": "EXPORT_NOT_RUN",
+      "overall_status": "FORCE_REVIEW_REQUIRED",
+      "selected_frame_count": 191,
+      "dic_usable_frame_count": 191,
+      "dic_unusable_frame_count": 0,
+      "dic_status_counts": {
+        "DIC_FIELDS_AVAILABLE": 191
+      },
+      "job_missing_frame_count": 0
+    },
+    {
+      "experiment_id": "S24_Y_20",
+      "force_status": "FORCE_SYNC_PRELOAD_RELEASE_ONLY",
+      "dic_status": "DIC_NOT_INDEXED",
+      "job_status": "JOB_COVERAGE_COMPLETE",
+      "export_status": "EXPORT_NOT_RUN",
+      "overall_status": "PRELOAD_RELEASE_ONLY",
+      "selected_frame_count": 0,
+      "dic_usable_frame_count": 0,
+      "dic_unusable_frame_count": 0,
+      "dic_status_counts": {},
+      "job_missing_frame_count": 0
+    }
+  ],
+  "status_counts": {
+    "MATCHID_VFM_INPUT_READY": 8,
+    "FORCE_REVIEW_REQUIRED": 1,
+    "PRELOAD_RELEASE_ONLY": 1
+  },
+  "formal_matchid_vfm_ready": false
+}

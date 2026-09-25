@@ -1,0 +1,138 @@
+{
+  "output_root": "D:/2026.9.21_finally",
+  "defaults": {
+    "press_sheet": "Press",
+    "position_sheet": "Pos",
+    "time_column": "T",
+    "x_press_columns": ["X1_Press", "X2_Press"],
+    "y_press_columns": ["Y1_Press", "Y2_Press"],
+    "position_columns": ["X1_Pos", "X2_Pos", "Y1_Pos", "Y2_Pos"],
+    "displacement_mode": "velocity",
+    "force_sign": -1.0,
+    "include_time": true,
+    "detector": {
+      "baseline_window_s": 0.05,
+      "start_threshold_n": 5.0,
+      "persistence_s": 0.05,
+      "fracture_fraction": 0.2,
+      "smoothing_window_s": 0.05
+    }
+  },
+  "experiments": [
+    {
+      "experiment_id": "X-05-0.1-01",
+      "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/orginal_all/X-05-0.1-01/Test1/33061_1_19",
+      "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/x-05-0.1_state_20250529133138_20250529133153.xls",
+      "camera_setting_fps": 10.0,
+      "camera_setting_source": "候选值：由图像编号跨度和控制器总时长估计；未在原始目录确认",
+      "loading_speed": 0.1,
+      "speed_label": "0.1",
+      "formal_vfm_allowed": false,
+      "notes": "主目录在有效区间外仍有图像编号缺口，excluded_frames 中只有 JPG 没有 DAT；先生成诊断，不发布正式 VFM。"
+    },
+    {
+      "experiment_id": "X-06-1.0-01",
+      "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/orginal_all/X-06-1.0-01/Test1/33061_1_20",
+      "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/x-6-1_state_20250529133928_20250529133930.xls",
+      "camera_setting_fps": 50.0,
+      "camera_setting_source": "候选值：由图像编号跨度和控制器总时长估计；未在原始目录确认",
+      "loading_speed": 1.0,
+      "speed_label": "1",
+      "formal_vfm_allowed": false,
+      "notes": "相机设置频率未从原始元数据确认；当前只生成诊断结果。"
+    },
+    {
+      "experiment_id": "X-07-10-01",
+      "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/orginal_all/X-07-10-01/Test1/33061_1_21",
+      "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/x-7-10_state_20250529134610_20250529134611.xls",
+      "camera_setting_fps": 200.0,
+      "camera_setting_source": "候选值：由图像编号跨度和控制器总时长估计；未在原始目录确认",
+      "loading_speed": 10.0,
+      "speed_label": "10",
+      "formal_vfm_allowed": false,
+      "notes": "相机设置频率未从原始元数据确认；当前只生成诊断结果。"
+    },
+    {
+      "experiment_id": "Xy-0.1-01",
+      "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/orginal_all/Xy-0.1-01/Test1/33061_1_15",
+      "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/xy-1-0.1_state_20250529102303_20250529102339.xls",
+      "camera_setting_fps": 10.0,
+      "camera_setting_source": "候选值：与用户给出的 10 Hz 实验频率范围一致，但原始目录未提供设置记录",
+      "loading_speed": 0.1,
+      "speed_label": "0.1",
+      "formal_vfm_allowed": false,
+      "notes": "实际频率可由有效区间估计；相机设置和触发时间仍待确认。"
+    },
+    {
+      "experiment_id": "XY-0.1-02",
+      "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/orginal_all/XY-0.1-02/Test1/33061_1_16",
+      "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/xy-2-0.1_state_20250529104919_20250529104947.xls",
+      "camera_setting_fps": 10.0,
+      "camera_setting_source": "用户提供的当前样例配置",
+      "loading_speed": 0.1,
+      "speed_label": "0.1",
+      "formal_vfm_allowed": true,
+      "notes": "当前已验证样例；可作为 MatchID VFM 的第一份正式力输入。"
+    },
+    {
+      "experiment_id": "Xy-03-10-01",
+      "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/orginal_all/Xy-03-10-01/Test1/33061_1_17",
+      "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/xy-3-10_state_20250529111421_20250529111422.xls",
+      "camera_setting_fps": 50.0,
+      "camera_setting_source": "候选值：由图像编号跨度和控制器总时长估计；未在原始目录确认",
+      "loading_speed": 10.0,
+      "speed_label": "10",
+      "formal_vfm_allowed": false,
+      "notes": "相机设置频率未从原始元数据确认；当前只生成诊断结果。"
+    },
+    {
+      "experiment_id": "Xy-04-1-01",
+      "status": "UNRESOLVED",
+      "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/orginal_all/Xy-04-1-01/Test1/33061_1_18",
+      "force_file": "xy-04-1_state_20250529112959_20250529113003.xls；xy-04-1_state_20250529112959_20250529113217.xls",
+      "camera_setting_source": "UNKNOWN",
+      "notes": "同一图像目录对应两个状态导出文件，且主目录与 excluded_frames 存在编号/文件配对问题；未擅自选择或合并。"
+    },
+    {
+      "experiment_id": "Y-09-0.1-02",
+      "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/orginal_all/Y-09-0.1-02/Test1/33061_1_22",
+      "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/y-9-0.1_state_20250529140828_20250529141127.xls",
+      "camera_setting_fps": 10.0,
+      "camera_setting_source": "候选值：与用户给出的 10 Hz 实验频率范围一致，但原始目录未提供设置记录",
+      "loading_speed": 0.1,
+      "speed_label": "0.1",
+      "formal_vfm_allowed": false,
+      "notes": "自动检测到长时间加载和末端掉载；正式发布仍需确认相机设置和单轴非加载方向的零力处理。"
+    },
+    {
+      "experiment_id": "Y-10-1-01",
+      "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/orginal_all/Y-10-1-01/Test1/33061_1_23",
+      "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/y-10-1_state_20250529141618_20250529141633.xls",
+      "camera_setting_fps": 100.0,
+      "camera_setting_source": "候选值：由图像编号跨度和控制器总时长估计；未在原始目录确认",
+      "loading_speed": 1.0,
+      "speed_label": "1",
+      "formal_vfm_allowed": false,
+      "notes": "当前力文件末端未检测到峰值后的持续掉载，不能自动确定断裂点。"
+    },
+    {
+      "experiment_id": "Y-11-10-01",
+      "image_folder": "D:/C盘迁移/Desktop/yuan/data/XY/picture-20250529/orginal_all/Y-11-10-01/Test1/33061_1_24",
+      "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/y-11-10_state_20250529142519_20250529142520.xls",
+      "camera_setting_fps": 500.0,
+      "camera_setting_source": "候选值：由图像编号跨度和控制器总时长估计；未在原始目录确认",
+      "loading_speed": 10.0,
+      "speed_label": "10",
+      "formal_vfm_allowed": false,
+      "notes": "初始 Y 通道已处于较大负载，初始基线不能代表零力；同时未检测到标准加载起点和断裂点。"
+    },
+    {
+      "experiment_id": "Y-08-0.1",
+      "status": "UNRESOLVED",
+      "image_folder": "UNKNOWN",
+      "force_file": "D:/C盘迁移/Desktop/yuan/data/XY/data-20250529/20250529/y-8-0.1_state_20250529135520_20250529135754.xls",
+      "camera_setting_source": "UNKNOWN",
+      "notes": "已找到 Press 力文件，但原始目录、XY.zip 和现有历史结果中没有对应 JPG/DAT 图像目录。"
+    }
+  ]
+}
