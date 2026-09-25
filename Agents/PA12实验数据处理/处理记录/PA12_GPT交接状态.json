@@ -127,24 +127,24 @@
   ],
   "latest_verification": {
     "verified_date": "2026-09-26",
-    "unit_tests": "116/116 passed",
+    "unit_tests": "117/117 passed",
     "compileall": "2026-09-26 fresh passed",
-    "scope_note": "116/116 为同步、DIC、边界、检查器、自建VFM、机器轴映射、E–ν剖面、跨实验合成留出/生产口径、全量 Markdown 报告生成、严格留出映射/样本数门槛和应力—应变事件/清单帧闭环测试；compileall通过。输出级审计允许模型比较中的空白预测列，但禁止NaN/无穷值。",
+    "scope_note": "117/117 包含同步/DIC/边界、检查器、自建VFM、机器轴映射、E–ν剖面、跨实验留出、严格留出、曲线审计，以及同步输入状态命名和边界力规则回归；compileall通过。输出级审计允许模型比较中的空白预测列，但禁止NaN/无穷值。",
     "force_output_contract": {
       "status": "passed",
       "experiment_count": 10,
       "overview_count": 10,
       "matchid_index_count": 10,
-      "formal_force_triplet_count": 8,
+      "sync_triplet_ready_count": 8,
       "blocked_or_manual_count": 2
     },
     "output_audit": {
       "audit_passed": true,
-      "formal_vfm_ready": false,
+      "all_sync_triplets_ready": false,
       "experiment_count": 10,
       "overview_count": 10,
       "matchid_index_count": 10,
-      "formal_force_triplet_count": 8,
+      "sync_triplet_ready_count": 8,
       "blocked_or_manual_count": 2
     },
     "stress_strain_audit": {
@@ -176,7 +176,7 @@
       "Agents/PA12实验数据处理/处理记录/PA12批量处理报告.md"
     ],
     "legacy_labels": ["VFM_READY", "formal_vfm_ready:true", "正式 VFM 已完成"],
-    "legacy_meaning": "同步力值/照片-X-Y 数量与输出契约通过；不是 MatchID .vfm 工程、Boundary/Forces 导入、虚功或参数识别通过。",
+    "legacy_meaning": "VFM_READY 和 formal_vfm_ready 字段表示同步力值/照片-X-Y 数量与数值输出契约通过；不是 MatchID .vfm 工程、Boundary/Forces 导入、虚功或参数识别通过。当前审计已改用 sync_triplet_ready/all_sync_triplets_ready。",
     "authoritative_current_sources": [
       "Agents/PA12实验数据处理/MatchID_VFM准备/PA12_MatchID_VFM闭环状态.json",
       "Agents/PA12实验数据处理/处理记录/PA12_GPT交接状态.json",

@@ -1,6 +1,6 @@
 {
   "audit_passed": true,
-  "formal_vfm_ready": false,
+  "all_sync_triplets_ready": false,
   "config": "configs\\pa12_rotated_batch.json",
   "output_root": "D:\\2026.9.21_finally",
   "experiment_count": 10,
@@ -12,7 +12,7 @@
       "status": "VFM_READY",
       "failures": [],
       "vfm": {
-        "formal_vfm_ready": true,
+        "sync_triplet_ready": true,
         "match_count": 284,
         "x_count": 284,
         "y_count": 284,
@@ -24,7 +24,7 @@
       "status": "VFM_READY",
       "failures": [],
       "vfm": {
-        "formal_vfm_ready": true,
+        "sync_triplet_ready": true,
         "match_count": 257,
         "x_count": 257,
         "y_count": 257,
@@ -36,7 +36,7 @@
       "status": "VFM_READY",
       "failures": [],
       "vfm": {
-        "formal_vfm_ready": true,
+        "sync_triplet_ready": true,
         "match_count": 12,
         "x_count": 12,
         "y_count": 12,
@@ -48,7 +48,7 @@
       "status": "VFM_READY",
       "failures": [],
       "vfm": {
-        "formal_vfm_ready": true,
+        "sync_triplet_ready": true,
         "match_count": 126,
         "x_count": 126,
         "y_count": 126,
@@ -60,7 +60,7 @@
       "status": "VFM_READY",
       "failures": [],
       "vfm": {
-        "formal_vfm_ready": true,
+        "sync_triplet_ready": true,
         "match_count": 126,
         "x_count": 126,
         "y_count": 126,
@@ -72,7 +72,7 @@
       "status": "VFM_READY",
       "failures": [],
       "vfm": {
-        "formal_vfm_ready": true,
+        "sync_triplet_ready": true,
         "match_count": 63,
         "x_count": 63,
         "y_count": 63,
@@ -84,7 +84,7 @@
       "status": "VFM_READY",
       "failures": [],
       "vfm": {
-        "formal_vfm_ready": true,
+        "sync_triplet_ready": true,
         "match_count": 36,
         "x_count": 36,
         "y_count": 36,
@@ -96,7 +96,7 @@
       "status": "VFM_READY",
       "failures": [],
       "vfm": {
-        "formal_vfm_ready": true,
+        "sync_triplet_ready": true,
         "match_count": 223,
         "x_count": 223,
         "y_count": 223,

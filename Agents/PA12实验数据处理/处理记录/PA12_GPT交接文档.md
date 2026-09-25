@@ -16,11 +16,11 @@
 
 ## 1.1 最新验证状态
 
-- 全量回归测试：当前工作树 `116/116` 通过；`compileall` 通过。本轮增加曲线 CSV 与批次清单帧数/首末图像闭环、完整 12 配对 Markdown 报告、机器轴映射感知留出筛选和留出样本数门槛测试。
+- 全量回归测试：当前工作树最新结果见 `PA12_GPT交接状态.json`；覆盖同步审计状态语义和边界载荷规则回归测试。`compileall` 通过。
 - Python 编译检查：`python -m compileall -q tools tests` 于 2026-09-26 通过。
 - 力值/概览审计：10 组概览和 10 组 MatchID 实验索引齐全；8 组正式力值三文件通过数量与数值契约，S23 为诊断状态，S24 为预载释放记录。
-- 输出契约审计：通过（`audit_passed=true`）；8 组正式力值三文件的照片/X/Y 行数分别一致；整体 `formal_vfm_ready=false` 仅由 S23、S24 状态门禁导致。
-- 语义复核：历史 `PA12数据合理性审计结果.json` 的实验级 `formal_vfm_ready:true` 和 `PA12批量处理报告.md` 的“正式 VFM 已完成”表示同步力值/输出契约通过，不表示 MatchID `.vfm` 工程或虚功/参数识别完成。当前以 `PA12_MatchID_VFM闭环状态.json` 的 `formal_matchid_vfm_ready=false`、实际 `.vfm` 文件和人工 VFM 审计为准。
+- 输出契约审计：通过（`audit_passed=true`）；机器字段现为 `sync_triplet_ready` / `all_sync_triplets_ready`，仅表示照片—力表与 X/Y CSV 的同步输入契约通过。8 组可审计试验的三者数量一致；S23、S24 不属于完整输入三文件审计对象。
+- 状态语义：本审计不输出 `formal_vfm_ready`，也不判定材料参数或 VFM 识别发布资格。历史 `VFM_READY`、`formal_vfm_ready:true` 只表示同步输入数量/数值契约通过；正式 MatchID 状态以 `PA12_MatchID_VFM闭环状态.json` 的 `formal_matchid_vfm_ready=false` 和实际工程审计为准。
 - 应力—应变审计：6 组通过，S15/S22/S23 需复核，S24 为预载释放记录。新增逐组 CSV 行数和首末照片与批次清单一致性检查；9 组图的 CSV 帧数、首末帧与有效清单相符。S15 最后完整 DIC 帧为 `000284.jpg`，视觉断裂帧 `000285.jpg` 的 DAT 场不完整；S22 峰后最低应力比 `0.207442`，略高于 `0.20` 自动门槛；S23 力数据止于 `001528.jpg`，视觉断裂帧 `001547.jpg`，断裂力缺失。均不据此补造或改写曲线。
 - MatchID 闭环审计：8 组为 `MATCHID_VFM_INPUT_READY`；S23 为 `FORCE_REVIEW_REQUIRED`；S24 为 `PRELOAD_RELEASE_ONLY`；`formal_matchid_vfm_ready=false`。
 - 当前版本 MatchID 2D 19.2.2.0 的 DAT 字段映射、Results Viewer 导出列、分隔符和单位已经本地同帧交叉验证；更换版本时必须重新验证。

@@ -13,7 +13,7 @@ from tools.vfm_boundary import (
 
 
 class VfmBoundaryTests(unittest.TestCase):
-    def test_boundary_report_uses_user_confirmed_matchid_force_rule(self):
+    def test_boundary_report_preserves_user_force_rule_for_self_built_vfm(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             path = Path(temporary_directory) / "boundary.md"
             _write_markdown(
@@ -40,7 +40,8 @@ class VfmBoundaryTests(unittest.TestCase):
             )
             report = path.read_text(encoding="utf-8")
 
-            self.assertIn("机器力传感器读数直接作为 ROI 边界合力输入 MatchID 自带 VFM", report)
+            self.assertIn("自建 VFM 主路径和 MatchID 对照均按用户确认", report)
+            self.assertIn("机器力传感器读数直接作为 ROI 边界合力", report)
             self.assertIn("所有当前双轴试验均为等双轴", report)
             self.assertIn("按 0.2、2、20 mm/s 分速率识别", report)
             self.assertNotIn("力臂仍需确认", report)

@@ -93,7 +93,7 @@ def audit_vfm_triplet(
             failures.append("Y 主动方向存在非正力值")
 
     return {
-        "formal_vfm_ready": not failures,
+        "sync_triplet_ready": not failures,
         "match_count": match_count,
         "x_count": x_count,
         "y_count": y_count,
@@ -195,15 +195,15 @@ def audit_outputs(config_path: Path) -> dict:
     for result in experiment_results:
         failures.extend(f"{result['experiment_id']}：{failure}" for failure in result["failures"])
 
-    all_experiments_formal_ready = all(
+    all_sync_triplets_ready = all(
         item["status"] == "VFM_READY"
         and item["vfm"] is not None
-        and item["vfm"]["formal_vfm_ready"]
+        and item["vfm"]["sync_triplet_ready"]
         for item in experiment_results
     )
     return {
         "audit_passed": not failures,
-        "formal_vfm_ready": not failures and all_experiments_formal_ready,
+        "all_sync_triplets_ready": not failures and all_sync_triplets_ready,
         "config": str(config_path),
         "output_root": str(output_root),
         "experiment_count": len(batch["experiments"]),
@@ -222,17 +222,18 @@ def _write_report(path: Path, audit: dict) -> None:
         "",
         "## 审计目的",
         "",
-        "检查批量生成结果是否满足进入下一阶段 MatchID VFM 前的机器可读契约，不重算原始力值，不替代人工实验判断。",
+        "检查照片—力对应表与 X/Y 同步力文件的机器可读数量和数值契约；不判定材料参数或 VFM 识别是否正式发布。",
         "",
         "## 总体结论",
         "",
         f"- 配置实验数：`{audit['experiment_count']}`。",
         f"- 实验概览行数：`{audit['overview_count']}`。",
         f"- MatchID 实验级索引行数：`{audit['matchid_index_count']}`。",
-        f"- 正式 VFM 三文件审计对象：`{len(ready)}` 个。",
+        f"- 同步输入三文件审计对象：`{len(ready)}` 个。",
         f"- 阻断或待人工确认对象：`{len(blocked)}` 个。",
         f"- 输出契约审计：**{'通过' if audit['audit_passed'] else '存在失败项'}**。",
-        f"- 全部配置实验均已生成正式 VFM：**{'是' if audit['formal_vfm_ready'] else '否'}**。",
+        f"- 照片—力—X/Y 同步输入数量契约在全部配置实验中就绪：**{'是' if audit['all_sync_triplets_ready'] else '否'}**。",
+        "- 本报告只审计同步输入契约，不代表正式材料参数/VFM 发布就绪。",
         "",
         "## 分实验结果",
         "",
@@ -240,11 +241,11 @@ def _write_report(path: Path, audit: dict) -> None:
     for item in audit["experiments"]:
         vfm = item["vfm"]
         if vfm is None:
-            lines.append(f"- `{item['experiment_id']}`（{item['status']}）：未执行正式 VFM 三文件审计。")
+            lines.append(f"- `{item['experiment_id']}`（{item['status']}）：不属于完整同步输入三文件审计对象。")
         else:
             lines.append(
                 f"- `{item['experiment_id']}`：照片 `{vfm['match_count']}`，X `{vfm['x_count']}`，Y `{vfm['y_count']}`；"
-                f"三者一致={'是' if vfm['formal_vfm_ready'] else '否'}。"
+                f"三者一致={'是' if vfm['sync_triplet_ready'] else '否'}。"
             )
         if item["failures"]:
             lines.extend(f"  - 失败：{failure}" for failure in item["failures"])
@@ -252,10 +253,10 @@ def _write_report(path: Path, audit: dict) -> None:
         "",
         "## 下一步",
         "",
-        "- 正式 VFM 力值通过数量和数值契约后，仍需确认 MatchID Job 是否覆盖同一批有效帧。",
+        "- 同步力值通过数量和数值契约后，仍需确认 DIC Job 是否覆盖同一批有效帧。",
         "- MatchID 2D 19.2.2.0 的 Results Viewer 字段、分隔符和单位已在当前版本本地交叉验证；更换版本时需重新验证 DAT 映射。",
         "- S23 已由视觉确认断裂，但力文件在断裂前结束，断裂时力缺失；不补造断裂力。S24 是预载释放记录，不进入完整拉伸识别。",
-        "- MatchID 自带 VFM 为基准；外围机器力按用户确认直接作为中心 ROI 边界合力。核对中心 ROI 1 mm、外围结构 3 mm、ROI 位置、旋转 XY、逐帧同步和参考帧零力映射。",
+        "- 此输出审计不代替 VFM 虚功、材料参数识别或物理证据门槛；外围机器力按用户确认直接作为中心 ROI 边界合力，相关定义见自建 VFM 方法记录。",
         "- 双轴数据均为等双轴；按 0.2、2、20 mm/s 分速率识别。阶段 1 固定 ν=0.375 识别 E；阶段 2 固定 E、ν 识别 Y、H。",
     ]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")

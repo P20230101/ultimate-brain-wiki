@@ -432,7 +432,7 @@ class Pa12SyncTests(unittest.TestCase):
                 active_axes=["X", "Y"],
             )
 
-            self.assertFalse(audit["formal_vfm_ready"])
+            self.assertFalse(audit["sync_triplet_ready"])
             self.assertIn("数量不一致", "；".join(audit["failures"]))
 
     def test_output_audit_distinguishes_clean_audit_from_all_experiments_formal_ready(self):
@@ -496,7 +496,41 @@ class Pa12SyncTests(unittest.TestCase):
             audit = audit_outputs(config_path)
 
             self.assertTrue(audit["audit_passed"], audit["failures"])
-            self.assertFalse(audit["formal_vfm_ready"])
+            self.assertTrue(audit["experiments"][0]["vfm"]["sync_triplet_ready"])
+            self.assertNotIn("formal_vfm_ready", audit["experiments"][0]["vfm"])
+            self.assertFalse(audit["all_sync_triplets_ready"])
+
+    def test_output_audit_report_calls_triplets_sync_inputs_not_formal_vfm(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            report_path = Path(temporary_directory) / "audit.md"
+            _write_report(
+                report_path,
+                {
+                    "experiment_count": 1,
+                    "overview_count": 1,
+                    "matchid_index_count": 1,
+                    "audit_passed": True,
+                    "all_sync_triplets_ready": True,
+                    "formal_vfm_ready": False,
+                    "experiments": [
+                        {
+                            "experiment_id": "S1",
+                            "status": "VFM_READY",
+                            "failures": [],
+                            "sync_triplet_ready": True,
+                            "vfm": {"match_count": 2, "x_count": 2, "y_count": 2, "sync_triplet_ready": True},
+                        }
+                    ],
+                },
+            )
+
+            report = report_path.read_text(encoding="utf-8")
+
+            self.assertIn("同步输入三文件审计对象", report)
+            self.assertIn("同步输入数量契约在全部配置实验中就绪", report)
+            self.assertIn("本报告只审计同步输入契约", report)
+            self.assertIn("正式材料参数/VFM 发布就绪", report)
+            self.assertNotIn("正式 VFM 三文件审计对象", report)
 
     def test_audit_report_records_locally_validated_matchid_mapping(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
@@ -508,6 +542,7 @@ class Pa12SyncTests(unittest.TestCase):
                     "overview_count": 0,
                     "matchid_index_count": 0,
                     "audit_passed": True,
+                    "all_sync_triplets_ready": False,
                     "formal_vfm_ready": False,
                     "experiments": [],
                 },
