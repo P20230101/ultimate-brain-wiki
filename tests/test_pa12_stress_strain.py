@@ -51,6 +51,22 @@ class Pa12StressStrainAuditTests(unittest.TestCase):
             self.assertEqual(result["axes"]["Y"]["status"], "NOT_APPLICABLE")
             self.assertTrue(result["plot"]["valid"])
 
+    def test_audit_requires_curve_row_count_and_endpoints_to_match_manifest(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            csv_path, plot_path, report_path = self._write_curve(Path(temporary_directory))
+            result = audit_stress_strain_file(
+                csv_path,
+                plot_path,
+                report_path,
+                active_axes=("X",),
+                expected_row_count=5,
+                expected_first_image="000001.jpg",
+                expected_last_image="000006.jpg",
+            )
+            self.assertEqual(result["status"], "REVIEW_REQUIRED")
+            self.assertFalse(result["frame_index_matches_manifest"])
+            self.assertEqual(result["row_count"], 6)
+
     def test_audit_experiment_keeps_unresolved_experiment_unprocessed(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             result = audit_experiment(
@@ -105,6 +121,7 @@ class Pa12StressStrainAuditTests(unittest.TestCase):
             )
 
             self.assertIn("000285.jpg", result["event_context"])
+            self.assertEqual(result["event_context"].count("视觉断裂帧"), 1)
             self.assertIn("DAT全场不完整", result["event_context"])
             self.assertIn("000284.jpg", result["event_context"])
 
@@ -154,6 +171,35 @@ class Pa12StressStrainAuditTests(unittest.TestCase):
 
             report = report_path.read_text(encoding="utf-8")
             self.assertIn("预载释放记录", report)
+
+    def test_stress_audit_report_shows_curve_frame_manifest_match(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            report_path = Path(temporary_directory) / "audit.md"
+            _write_report(
+                report_path,
+                {
+                    "formal_curve_audit_ready": True,
+                    "experiments": [
+                        {
+                            "experiment_id": "S19_X_0.2",
+                            "status": "PASS",
+                            "active_axes": ["X"],
+                            "row_count": 6,
+                            "frame_index_matches_manifest": True,
+                            "report_exists": True,
+                            "plot": {"valid": True},
+                            "axes": {
+                                "X": {"status": "PASS", "finite": True, "strain_monotonic": True,
+                                      "force_nonnegative_after_first": True, "first_force_near_zero": True,
+                                      "has_peak_and_drop": True, "post_peak_min_ratio": 0.1},
+                                "Y": {"status": "NOT_APPLICABLE"},
+                            },
+                        }
+                    ],
+                },
+            )
+            report = report_path.read_text(encoding="utf-8")
+            self.assertIn("首末帧与批次清单匹配=是", report)
 
     def test_stress_audit_report_explains_missing_fracture_drop(self):
         with tempfile.TemporaryDirectory() as temporary_directory:

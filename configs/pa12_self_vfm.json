@@ -26,7 +26,7 @@
   "stage2_acceptance": {
     "minimum_points": 20,
     "max_relative_rmse": 0.25,
-    "definition": "阶段2至少有20个峰值前塑性点，且Linear等效应力拟合RMSE不超过拟合应力范围的25%。"
+    "definition": "阶段2至少有20个峰值前塑性点，且Linear等效应力拟合RMSE不超过这些拟合点最大等效应力的25%。"
   },
   "geometry": {
     "roi_thickness_mm": 1.0,

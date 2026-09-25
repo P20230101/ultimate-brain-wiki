@@ -5,6 +5,10 @@
       "status": "REVIEW_REQUIRED",
       "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S15_XY_0.2_应力应变.csv",
       "row_count": 284,
+      "frame_index_matches_manifest": true,
+      "expected_row_count": 284,
+      "expected_first_image": "000001.jpg",
+      "expected_last_image": "000284.jpg",
       "active_axes": [
         "X",
         "Y"
@@ -65,12 +69,16 @@
       },
       "report_exists": true,
       "experiment_id": "S15_XY_0.2",
-      "event_context": "视觉断裂帧=000285.jpg，000285.jpg 为视觉断裂帧，但同名 DAT 仅约 5,277 点，显著低于前序约 98,000 点完整场；保留原始 JPG/DAT，正式 DIC/VFM 使用 000284.jpg 作为最后完整场帧。；曲线最后有效帧=000284.jpg"
+      "event_context": "000285.jpg 为视觉断裂帧，但同名 DAT 仅约 5,277 点，显著低于前序约 98,000 点完整场；保留原始 JPG/DAT，正式 DIC/VFM 使用 000284.jpg 作为最后完整场帧。；曲线最后有效帧=000284.jpg"
     },
     {
       "status": "PASS",
       "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S16_XY_0.2_应力应变.csv",
       "row_count": 257,
+      "frame_index_matches_manifest": true,
+      "expected_row_count": 257,
+      "expected_first_image": "000001.jpg",
+      "expected_last_image": "000257.jpg",
       "active_axes": [
         "X",
         "Y"
@@ -136,6 +144,10 @@
       "status": "PASS",
       "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S17_XY_20_应力应变.csv",
       "row_count": 12,
+      "frame_index_matches_manifest": true,
+      "expected_row_count": 12,
+      "expected_first_image": "000003.jpg",
+      "expected_last_image": "000014.jpg",
       "active_axes": [
         "X",
         "Y"
@@ -201,6 +213,10 @@
       "status": "PASS",
       "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S18_XY_2_应力应变.csv",
       "row_count": 126,
+      "frame_index_matches_manifest": true,
+      "expected_row_count": 126,
+      "expected_first_image": "000003.jpg",
+      "expected_last_image": "000128.jpg",
       "active_axes": [
         "X",
         "Y"
@@ -266,6 +282,10 @@
       "status": "PASS",
       "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S19_X_0.2_应力应变.csv",
       "row_count": 126,
+      "frame_index_matches_manifest": true,
+      "expected_row_count": 126,
+      "expected_first_image": "000002.jpg",
+      "expected_last_image": "000127.jpg",
       "active_axes": [
         "X"
       ],
@@ -313,6 +333,10 @@
       "status": "PASS",
       "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S20_X_2_应力应变.csv",
       "row_count": 63,
+      "frame_index_matches_manifest": true,
+      "expected_row_count": 63,
+      "expected_first_image": "000005.jpg",
+      "expected_last_image": "000067.jpg",
       "active_axes": [
         "X"
       ],
@@ -360,6 +384,10 @@
       "status": "PASS",
       "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S21_X_20_应力应变.csv",
       "row_count": 36,
+      "frame_index_matches_manifest": true,
+      "expected_row_count": 36,
+      "expected_first_image": "000010.jpg",
+      "expected_last_image": "000045.jpg",
       "active_axes": [
         "X"
       ],
@@ -407,6 +435,10 @@
       "status": "REVIEW_REQUIRED",
       "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S22_Y_0.2_应力应变.csv",
       "row_count": 223,
+      "frame_index_matches_manifest": true,
+      "expected_row_count": 223,
+      "expected_first_image": "000008.jpg",
+      "expected_last_image": "001784.jpg",
       "active_axes": [
         "Y"
       ],
@@ -454,6 +486,10 @@
       "status": "REVIEW_REQUIRED",
       "csv": "D:\\2026.9.21_finally\\Agents\\PA12实验数据处理\\应力应变\\S23_Y_2_应力应变.csv",
       "row_count": 191,
+      "frame_index_matches_manifest": true,
+      "expected_row_count": 191,
+      "expected_first_image": "000008.jpg",
+      "expected_last_image": "001528.jpg",
       "active_axes": [
         "Y"
       ],

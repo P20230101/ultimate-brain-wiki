@@ -149,6 +149,9 @@ def audit_stress_strain_file(
     report_path: Path,
     *,
     active_axes: tuple[str, ...] | list[str],
+    expected_row_count: int | None = None,
+    expected_first_image: str | None = None,
+    expected_last_image: str | None = None,
 ) -> dict:
     try:
         rows = _read_rows(csv_path)
@@ -166,15 +169,25 @@ def audit_stress_strain_file(
         axis: _audit_axis(rows, axis, axis in active_axes)
         for axis in ("X", "Y")
     }
+    image_names = [row["照片"] for row in rows]
+    frame_index_matches = (
+        (expected_row_count is None or len(rows) == expected_row_count)
+        and (expected_first_image is None or image_names[0] == expected_first_image)
+        and (expected_last_image is None or image_names[-1] == expected_last_image)
+    )
     plot = _png_info(plot_path)
     report_exists = report_path.is_file() and report_path.stat().st_size > 0
     active_pass = all(axes[axis]["status"] == "PASS" for axis in active_axes)
     inactive_pass = all(axes[axis]["status"] == "NOT_APPLICABLE" for axis in ("X", "Y") if axis not in active_axes)
-    status = "PASS" if active_pass and inactive_pass and plot["valid"] and report_exists else "REVIEW_REQUIRED"
+    status = "PASS" if active_pass and inactive_pass and frame_index_matches and plot["valid"] and report_exists else "REVIEW_REQUIRED"
     return {
         "status": status,
         "csv": str(csv_path),
         "row_count": len(rows),
+        "frame_index_matches_manifest": frame_index_matches,
+        "expected_row_count": expected_row_count,
+        "expected_first_image": expected_first_image,
+        "expected_last_image": expected_last_image,
         "active_axes": list(active_axes),
         "axes": axes,
         "plot": plot,
@@ -213,6 +226,9 @@ def audit_experiment(entry: dict, manifest_row: dict, output_root: Path) -> dict
         plot_path,
         report_path,
         active_axes=_active_axes(entry),
+        expected_row_count=manifest_row.get("photo_count"),
+        expected_first_image=manifest_row.get("first_image"),
+        expected_last_image=manifest_row.get("last_image"),
     )
     result["experiment_id"] = experiment_id
     if entry.get("visual_fracture_confirmed"):
@@ -223,9 +239,11 @@ def audit_experiment(entry: dict, manifest_row: dict, output_root: Path) -> dict
                 f"{entry['last_force_supported_photo']}；断裂力缺失"
             )
         elif entry.get("excluded_frame_numbers"):
+            fracture_context = entry["excluded_frame_reason"]
+            if fracture_frame not in fracture_context:
+                fracture_context = f"视觉断裂帧={fracture_frame}；{fracture_context}"
             result["event_context"] = (
-                f"视觉断裂帧={fracture_frame}，{entry['excluded_frame_reason']}；"
-                f"曲线最后有效帧={manifest_row['last_image']}"
+                f"{fracture_context}；曲线最后有效帧={manifest_row['last_image']}"
             )
         else:
             result["event_context"] = f"视觉断裂帧={fracture_frame}"
@@ -275,6 +293,11 @@ def _write_report(path: Path, audit: dict) -> None:
         y_status = item["axes"]["Y"]["status"]
         plot_status = "有效" if item["plot"]["valid"] else "无效/缺失"
         notes = []
+        if "frame_index_matches_manifest" in item:
+            notes.append(
+                f"有效曲线行数={item['row_count']}，首末帧与批次清单匹配="
+                f"{'是' if item['frame_index_matches_manifest'] else '否'}"
+            )
         for axis in item["active_axes"]:
             result = item["axes"][axis]
             if not result["finite"]:
@@ -295,6 +318,8 @@ def _write_report(path: Path, audit: dict) -> None:
                 notes.append(f"{axis}向{detail}")
         if not item["plot"]["valid"]:
             notes.append("检查图PNG缺失或无效")
+        if not item.get("frame_index_matches_manifest", True):
+            notes.append("曲线 CSV 行数或首末照片与批量清单不一致")
         if not item["report_exists"]:
             notes.append("应力—应变分析报告缺失")
         if item.get("event_context"):

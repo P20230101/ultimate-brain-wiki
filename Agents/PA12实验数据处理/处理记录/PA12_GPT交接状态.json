@@ -7,7 +7,7 @@
     "status": "DIAGNOSTIC_PIPELINE_ACTIVE_FORMAL_PARAMETERS_REVIEW_REQUIRED",
     "primary_method": "自建 VFM；MatchID 资料作为格式、方向、边界和 GUI 历史审计",
     "success_definition": "原始JPG/DAT/XLS只读；可重复执行照片-DIC-Press-自建VFM处理链；逐实验生成同步数据、完整工程应力—应变图（同图显示有效X/Y曲线并标记线性段和屈服候选）、逐点内外虚功/残差、诊断级参数候选、灵敏度/稳定性和中文交接。先完成所有数据可支持的诊断，不因等待物理证据而停止计算；诊断候选不得标为正式材料参数。只有ROI/厚度/截面/边界、机器—DIC坐标、本构和应变测度、独立ν、虚功闭合、参数稳定性与跨实验留出门槛通过后才发布正式材料参数/J2结果。MatchID仅为可选对照，不是停工条件",
-    "current_task": "继续逐组审核应力—应变曲线和内部关系；只读审计已知9组图表存在，6组PASS、S15/S22/S23为REVIEW_REQUIRED、S24为PRELOAD_RELEASE_ONLY。同步核对自建VFM当前结果及文档版本；运行可复现诊断与稳定性分析，保留所有正式参数发布门槛。",
+    "current_task": "S15/S22/S23曲线事件与自建VFM帧级关系复核、S19-S22四窗口诊断、S19-S21留出及S22映射感知75/25留出均已完成。S22留出只有1个有效峰前塑性点，状态为INSUFFICIENT_TEST_POINTS，不构成验证。下一步补齐单轴几何/坐标、双轴ROI配准和独立nu证据；所有候选继续保持非正式状态。",
     "quality_review": {
       "S15_XY_0.2": {"full_history_residual_rmse_x_N": 6417.20092, "full_history_residual_rmse_y_N": 6532.553864, "cumulative_E_range_MPa": [-8527.135984, 6996.115161], "conditional_E_MPa_at_nu_0_375": 3536.445696, "profile_nu_minimum_at_upper_bound": 0.499, "status": "REVIEW_REQUIRED"},
       "S16_XY_0.2": {"full_history_residual_rmse_x_N": 4882.159102, "full_history_residual_rmse_y_N": 4919.443607, "cumulative_E_range_MPa": [3410.423189, 10146.905981], "conditional_E_MPa_at_nu_0_375": 3410.423189, "profile_1pct_nu_range": [0.048, 0.499], "status": "REVIEW_REQUIRED"},
@@ -19,7 +19,7 @@
       "补齐真实 ROI 与中心 1 mm 厚度区域的空间边界证据",
       "为 ν 获得独立可追溯约束；现有 E/Y/H 仅为固定 nu=0.375 条件候选",
       "在物理积分域及 ν 门槛通过后重新执行阶段 1 与 J2 参数识别",
-      "完成跨速度/跨实验诊断；取得同速率重复试验后评估材料重复性和模型适用范围",
+      "S15-S18跨速度/跨实验迁移诊断已完成；取得同速率重复试验后评估材料重复性和模型适用范围",
       "单轴真实厚度、有效宽度、标距、Polygon 物理含义和外功边界仍须独立补证",
       "保持 S23 断裂力缺失、S24 预载释放和所有未过门槛结果为非正式状态",
       "取得同速率重复试验，以评估试样间重复性；当前 S15–S18 只能评估跨曲线迁移"
@@ -56,7 +56,7 @@
   "completed": [
     {
       "item": "等双轴跨实验留出诊断",
-      "details": "S15–S18完整Job ROI执行留一实验E及Linear Y/H条件迁移；18个配对结果全部标记DIAGNOSTIC_ONLY。跨速率跨曲线预测不等于材料重复性验证；S17阶段2点数不足。",
+      "details": "S15–S18等双轴完整Job ROI执行留一实验E及Linear Y/H条件迁移；12个有向配对全部标记DIAGNOSTIC_ONLY。阶段2门槛和E迁移归一化已与生产口径对齐；S17只有4个阶段2候选点。跨速率预测不等于材料重复性验证。",
       "paths": [
         "tools/audit_pa12_self_vfm_cross_experiment.py",
         "Agents/PA12实验数据处理/VFM自建/汇总/PA12等双轴跨实验留出审计.csv",
@@ -127,9 +127,9 @@
   ],
   "latest_verification": {
     "verified_date": "2026-09-26",
-    "unit_tests": "108/108 passed",
+    "unit_tests": "116/116 passed",
     "compileall": "2026-09-26 fresh passed",
-    "scope_note": "108/108 为同步、DIC、边界、检查器、自建VFM、机器轴映射回归、E–ν剖面、跨实验合成留出和应力—应变事件上下文测试的全量结果；compileall通过。输出级审计允许模型比较中的空白预测列，但禁止NaN/无穷值。",
+    "scope_note": "116/116 为同步、DIC、边界、检查器、自建VFM、机器轴映射、E–ν剖面、跨实验合成留出/生产口径、全量 Markdown 报告生成、严格留出映射/样本数门槛和应力—应变事件/清单帧闭环测试；compileall通过。输出级审计允许模型比较中的空白预测列，但禁止NaN/无穷值。",
     "force_output_contract": {
       "status": "passed",
       "experiment_count": 10,
@@ -927,7 +927,7 @@
     "primary_method": "self-built VFM",
     "matchid_role": "historical_audit_only",
     "method": "自建两阶段平面应力虚功候选；已确认的双轴旋转映射为机器 X 使用 DIC Eyy、机器 Y 使用 Exx。阶段1暂固定 nu=0.375 计算条件 E，阶段2计算约化 Linear Y/H 并比较通用 Ludwik、Swift、Voce I、Voce II；阶段F剖面审计表明 nu 未稳定识别。正式内功使用 ROI 内相邻完整网格单元拆分的逐点两三角形积分；缺失单元不补足，均值矩形法只保留为基线。",
-    "geometry_scope": "仅等双轴十字试样；中心 ROI 厚度 1 mm，外围整体厚度 3 mm。",
+    "geometry_scope": "双轴 S15–S18 使用完整 Job ROI 主结果与独立 DIC subset 内缩域敏感性；中心 ROI 厚度 1 mm，外围整体厚度 3 mm。单轴 S19–S22 为 Job Polygon 条件诊断，不套用双轴物理几何。",
     "experiments": {
       "S15_XY_0.2": {"status": "SELF_VFM_REVIEW_REQUIRED", "effective_frames": 284, "area_ratio_range": "0.895428–0.922534", "conditional_E_at_nu_0_375_MPa": 3536.445695876974, "Y_MPa": 34.05508131776048, "H_MPa": 154.5631162695147},
       "S16_XY_0.2": {"status": "SELF_VFM_REVIEW_REQUIRED", "effective_frames": 257, "area_ratio_range": "0.892248", "conditional_E_at_nu_0_375_MPa": 3410.423189261645, "Y_MPa": 39.4925665907021, "H_MPa": 156.39344709148475},
@@ -943,7 +943,20 @@
       "decision": "单轴须显式映射机器力通道到DIC轴，并同步修正虚场长度和受力边长；获得坐标确认前不重算正式E/J2，也不解释当前非正E为材料性质"
     },
     "output_audit": "8 组 DIC—力同步输入均通过数量契约；自建 VFM 四组等双轴及四组单轴输出均重算；面积/几何门槛未通过，正式自建 VFM 未就绪。全量 pytest 与编译结果更新见 latest_verification。",
-    "area_gate": "四组面积比均低于 0.95，因此均保持 SELF_VFM_REVIEW_REQUIRED；候选参数不是最终材料参数。"
+    "area_gate": "四组完整 Job ROI 面积比均低于 0.95，因此均保持 SELF_VFM_REVIEW_REQUIRED；候选参数不是最终材料参数。",
+    "effective_domain_sensitivity_reproduction": {
+      "date": "2026-09-26",
+      "status": "REPRODUCED_STAGE_D_NUMBERS_MATCH",
+      "runner": "tools/run_pa12_self_vfm_effective_domain.py",
+      "policy": "完整 Job ROI 保持主结果；DIC subset 内缩有效域为独立敏感性分析，不覆盖主结果。",
+      "results": {
+        "S15_XY_0.2": {"frames": 284, "E_MPa": 3396.7077200520475, "Y_MPa": 35.4156432950229, "H_MPa": 162.86363987201094},
+        "S16_XY_0.2": {"frames": 257, "E_MPa": 3221.413268675937, "Y_MPa": 44.9684083422276, "H_MPa": 139.3700365029159},
+        "S17_XY_20": {"frames": 12, "E_MPa": 4754.544267341975, "Y_MPa": null, "H_MPa": null, "stage_2_status": "INSUFFICIENT_POINTS"},
+        "S18_XY_2": {"frames": 126, "E_MPa": 4348.3417146526, "Y_MPa": 53.43439841556, "H_MPa": 331.9114153466467}
+      },
+      "interpretation": "逐实验 JSON 已刷新为阶段 I 显式机器轴—DIC映射；数值与阶段 D 比较表一致。subset 域参数漂移证明结果对积分域口径敏感，不证明其为真实物理 VFM 边界；所有数值仍为敏感性候选。"
+    }
     ,"stage_b_single_axis_polygon": {
       "status": "REVIEW_REQUIRED",
       "experiments": ["S19_X_0.2", "S20_X_2", "S21_X_20", "S22_Y_0.2"],
@@ -1097,8 +1110,8 @@
     },
     "mapping_candidate": "S22：机器 Y→DIC y/Eyy（轴向），机器 X→DIC x/Exx（横向）；受配置、原始照片和 ROI 长短边共同支持",
     "mapping_status": "IMAGE_SUPPORTED_NEEDS_COORDINATE_CONFIRMATION",
-    "runner_finding": "当前 runner 无条件沿用双轴映射 X→Eyy、Y→Exx；对 S22 还以 Ly 作为 Y 力截面长度，若 Job/DIC 坐标和照片方向一致则应使用 Lx。需修正通道—虚场及截面映射后重算。",
-    "decision": "当前 S22 非正 E 很可能受轴/边长映射影响；表观ν窗口敏感且弹性区未确认，不作正式材料参数。等待坐标确认后实现逐实验显式映射并重算。"
+    "runner_finding": "阶段G记录了旧版固定双轴映射导致的 S22 非正 E 风险；阶段I已实现逐实验机器轴—DIC显式映射并按 X→x、Y→y 重算。当前严格留出也复用该映射，但只有1个满足规则的峰前塑性留出点。",
+    "decision": "阶段I映射下 S22 条件 E/Y/H 为正，但传感器—Job/DIC坐标仍未正式标定，积分面积和单轴几何/外功门槛未通过；严格留出点数不足。因此保留条件诊断，不作正式材料参数。"
   },
   "stage_h_gate": {
     "status": "REVIEW_REQUIRED",
@@ -1124,6 +1137,7 @@
       "S21_X_20": {"machine_x_dic_axis": "y", "machine_y_dic_axis": "x", "status": "CANDIDATE_UNVERIFIED", "E_MPa": 16912.331255, "Y_MPa": null, "H_MPa": null, "minimum_area_ratio": 0.867534},
       "S22_Y_0.2": {"machine_x_dic_axis": "x", "machine_y_dic_axis": "y", "status": "IMAGE_SUPPORTED_NEEDS_COORDINATE_CONFIRMATION", "E_MPa": 10535.036031, "Y_MPa": 113.090364, "H_MPa": 202.772901, "minimum_area_ratio": 0.826930, "prior_mapping_E_MPa": -26339.72}
     },
+    "strict_holdout": {"status": "INSUFFICIENT_TEST_POINTS", "split": "75/25 chronological", "train_rows": 167, "test_rows": 56, "elastic_observations": 3, "plastic_train_points": 125, "plastic_test_points": 1, "E_MPa": 10535.036031, "Y_MPa": 113.090364, "H_MPa": 202.772901, "test_rmse_MPa": 26.114771, "machine_x_dic_axis": "x", "machine_y_dic_axis": "y", "interpretation": "映射感知计算完成；单个留出塑性点不足以评价泛化，结果非PASS。"},
     "qualification": "全组单轴状态保持SELF_VFM_REVIEW_REQUIRED；固定nu=0.375、候选映射、面积门槛和单轴几何/外功未通过，不得发布正式参数。"
   },
   "stress_strain_curve_audit_snapshot": {
@@ -1132,7 +1146,93 @@
     "status_counts": {"PASS": 6, "REVIEW_REQUIRED": 3, "PRELOAD_RELEASE_ONLY": 1},
     "review_experiments": ["S15_XY_0.2", "S22_Y_0.2", "S23_Y_2"],
     "formal_curve_audit_ready": false,
-    "note": "状态计数涵盖全部10组实验；9组已有曲线，S24为预载释放且不生成拉伸曲线。PNG存在不等于曲线审核通过。"
+    "note": "状态计数涵盖全部10组实验；9组已有完整有效照片区间曲线，CSV行数和首末照片均与批次清单一致；S24为预载释放且不生成拉伸曲线。PNG存在不等于曲线审核通过。",
+    "event_interpretation": {
+      "S15_XY_0.2": "000285.jpg 为视觉断裂帧，但其 DAT 场不完整；000284.jpg 是最后完整 DIC/VFM 帧，曲线无可用峰后断裂段，属事件截断而非证明材料没有屈服或延性。",
+      "S22_Y_0.2": "峰后最低应力/峰值=0.207442，略高于自动门槛0.20；保持人工复核，不把阈值边缘结果解释为数据错误或自动通过。",
+      "S23_Y_2": "视觉断裂帧001547.jpg 晚于最后力支持照片001528.jpg；断裂力缺失，当前曲线是断裂前截断，不外推或补造。"
+    }
   },
-  "next_action": "跨实验审计已完成：S15–S18仅可解释为跨速率跨曲线迁移，不能证明同速率重复性；S17阶段2点数不足。继续核查S15/S22/S23应力—应变关系并解释失败项，执行剩余可计算诊断。正式材料参数/J2发布仍被真实ROI/厚度/截面/边界、机器—DIC坐标、独立ν、本构/应变测度、虚功残差、稳定性与留出门槛阻断。MatchID仅作可选审计；S23断裂力缺失不补造，S24预载释放不进入完整拉伸。"
+  "curve_vfm_relationship_review": {
+    "date": "2026-09-26",
+    "status": "READ_ONLY_COMPLETED",
+    "method": "逐帧对照应力—应变 CSV、照片—力表、自建 VFM 内外虚功 CSV/JSON 和原始照片；未重写原始或派生数据。",
+    "experiments": {
+      "S15_XY_0.2": {
+        "curve_rows": 284,
+        "x_peak_photo": "000284.jpg",
+        "x_peak_stress_mpa": 53.606,
+        "y_peak_photo": "000283.jpg",
+        "y_peak_stress_mpa": 53.461,
+        "y_last_to_peak_ratio": 0.999688,
+        "last_complete_dic_photo": "000284.jpg",
+        "visual_fracture_photo": "000285.jpg",
+        "visual_fracture_dic_points": 5277,
+        "preceding_full_field_points_approx": 98000,
+        "stage2_candidate_rows": 258,
+        "stage2_photo_span": ["000005.jpg", "000284.jpg"],
+        "stage2_residual_rmse_x_n": 275.985188,
+        "stage2_residual_rmse_y_n": 276.868447,
+        "last_frame_residual_x_n": 218.360007,
+        "last_frame_residual_y_n": 217.701470,
+        "interpretation": "断裂帧缺完整 DIC 场，曲线无可用峰后断裂段；残差未闭合。"
+      },
+      "S22_Y_0.2": {
+        "peak_photo": "001120.jpg",
+        "peak_stress_mpa": 50.343333,
+        "peak_strain": 0.744203,
+        "peak_force_n": 1510.3,
+        "last_photo": "001784.jpg",
+        "last_stress_mpa": 10.443333,
+        "last_strain": 1.203773,
+        "last_force_n": 313.3,
+        "post_peak_min_to_peak_ratio": 0.207442,
+        "last_photo_visual_state": "试样仍可见连续，不能将降载自动判为断裂",
+        "stage2_candidate_rows": 125,
+        "stage2_photo_span": ["000032.jpg", "001024.jpg"],
+        "stage2_y_residual_rmse_n": 163.807674,
+        "stage2_y_max_abs_residual_n": 772.574835,
+        "stage2_covers_curve_peak": false,
+        "curve_geometry_assumption_mm": {"width": 30.0, "thickness": 1.0, "gauge_length": 30.0},
+        "job_roi_lengths_mm": [10.166626, 44.333156],
+        "single_axis_geometry_status": "UNCONFIRMED",
+        "interpretation": "阶段2候选窗口早于曲线峰值；峰值和峰后段没有阶段2预测。单轴实际截面和标距未确认，曲线工程应力/应变不可直接等同于 Job ROI 边界应力/虚功。"
+      },
+      "S23_Y_2": {
+        "last_force_supported_photo": "001528.jpg",
+        "last_force_y_n": 1259.37,
+        "last_curve_stress_mpa": 41.979,
+        "last_curve_strain": 1.02067,
+        "photos_before_fracture": ["001545.jpg", "001546.jpg"],
+        "visual_fracture_photo": "001547.jpg",
+        "force_at_visual_fracture": null,
+        "self_vfm_output": false,
+        "interpretation": "照片确认力记录结束后发生断裂；断裂力/应力缺失，不外推、不补造。"
+      }
+    }
+  },
+  "single_axis_stability_diagnostic": {
+    "date": "2026-09-26",
+    "status": "DIAGNOSTIC_ONLY",
+    "window_runner": "tools/audit_pa12_self_vfm_stability.py",
+    "window_count": 4,
+    "window_fit_ranges_mpa": {
+      "S19_X_0.2": {"Y": [-14.650390, 103.881905], "H": [-4039.838032, 28887.281421], "elastic_points_by_window": [24, 0, 0, 0]},
+      "S20_X_2": {"Y": [35.773274, 150.091990], "H": [-11742.471342, 21579.654398], "elastic_points_by_window": [14, 13, 0, 0]},
+      "S21_X_20": {"Y": [16.101785, 111.006513], "H": [-10668.789948, 22637.586491], "elastic_points_by_window": [8, 9, 0, 0]},
+      "S22_Y_0.2": {"Y": [96.594063, 249.204673], "H": [-320.992583, 629.134528], "elastic_points_by_window": [3, 0, 0, 0]}
+    },
+    "strict_holdout": {
+      "runner": "tools/audit_pa12_self_vfm_strict_holdout.py",
+      "train_fraction": 0.75,
+      "mapping_scope": "本结果记录首轮脚本对 S19-S21 的留出。S22 后续已按逐实验机器轴—DIC 映射独立计算，结果记在 stage_i_gate.strict_holdout；本对象不应被解释为 S22 从未运行。",
+      "results": {
+        "S19_X_0.2": {"E_MPa": 5389.402871, "Y_MPa": -17.592800, "H_MPa": 40772.497524, "test_rmse_MPa": 145.800336, "train_rows": 94, "test_rows": 32},
+        "S20_X_2": {"E_MPa": 17600.491868, "Y_MPa": 37.320379, "H_MPa": 20912.537683, "test_rmse_MPa": 71.786607, "train_rows": 47, "test_rows": 16},
+        "S21_X_20": {"E_MPa": 16912.331255, "Y_MPa": 28.012632, "H_MPa": 16024.818116, "test_rmse_MPa": 114.610708, "train_rows": 27, "test_rows": 9}
+      }
+    },
+    "interpretation": "四窗口 H 大幅漂移并变号；后段窗口没有弹性点，不能独立识别 E。S19-S21 留出只表示计算完成，不代表预测质量或材料参数通过；S22 映射感知留出仅有1个有效峰前塑性点，状态为 INSUFFICIENT_TEST_POINTS。所有单轴结果仍为 REVIEW_REQUIRED。"
+  },
+  "next_action": "S15/S22/S23曲线—照片—同步力—有效DIC/VFM帧级复核已完成；S19-S22四窗口稳定性和S19-S21匹配候选映射的75/25严格留出已完成。S22严格留出已按结果JSON中的机器轴—DIC映射与生产阈值重算；训练段167帧、留出段56帧，训练E=10535.04 MPa、Y=113.09 MPa、H=202.77 MPa，但留出只有1个峰前塑性点，RMSE=26.11 MPa仅作单点诊断，状态为INSUFFICIENT_TEST_POINTS，不算验证通过。所有结果保持诊断级。正式参数/J2仍需真实ROI/厚度/截面/边界、机器—DIC坐标、独立ν、本构/应变测度、虚功残差、稳定性及独立留出门槛。取得S16实物—STEP/ROI配准、单轴实测几何和坐标证据后再重算。MatchID仅作历史审计；S23断裂力缺失不补造，S24预载释放不进入完整拉伸。"
 }
