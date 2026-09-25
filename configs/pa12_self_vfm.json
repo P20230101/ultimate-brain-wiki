@@ -7,6 +7,12 @@
     "status": "REVIEW_REQUIRED",
     "reason": "单轴 Job Polygon 已用于逐点积分，但单轴实测厚度、有效宽度、标距、积分域物理含义和外功边界尚未独立确认。"
   },
+  "machine_axis_mapping_by_experiment": {
+    "S19_X_0.2": {"machine_x_dic_axis": "y", "machine_y_dic_axis": "x", "status": "CANDIDATE_UNVERIFIED", "evidence": "试样长轴沿图像竖直方向；机器X到DIC坐标的装夹/传感器标定未找到。"},
+    "S20_X_2": {"machine_x_dic_axis": "y", "machine_y_dic_axis": "x", "status": "CANDIDATE_UNVERIFIED", "evidence": "试样长轴沿图像竖直方向；机器X到DIC坐标的装夹/传感器标定未找到。"},
+    "S21_X_20": {"machine_x_dic_axis": "y", "machine_y_dic_axis": "x", "status": "CANDIDATE_UNVERIFIED", "evidence": "试样长轴沿图像竖直方向；机器X到DIC坐标的装夹/传感器标定未找到。"},
+    "S22_Y_0.2": {"machine_x_dic_axis": "x", "machine_y_dic_axis": "y", "status": "IMAGE_SUPPORTED_NEEDS_COORDINATE_CONFIRMATION", "evidence": "原始照片中试样上下夹持，Job ROI长轴沿DIC y；仍缺传感器—Job坐标正式标定。"}
+  },
   "nu": 0.375,
   "elastic_strain_limit": 0.005,
   "minimum_force_n": 5.0,

@@ -1,7 +1,10 @@
 import math
+import csv
+import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 
 from matplotlib.tri import Triangulation
 import numpy as np
@@ -13,8 +16,10 @@ from tools.run_pa12_self_vfm import (
     _effective_dicom_geometry,
     _geometry_quality,
     _machine_axis_strain_arrays,
+    _experiment_axis_mapping,
     _read_frame_points,
     _usable_modulus,
+    process_experiment,
 )
 
 from tools.pa12_self_vfm import (
@@ -338,6 +343,132 @@ class Pa12SelfVfmTests(unittest.TestCase):
         self.assertEqual(mapping["machine_y_strain"], 0.02)
         self.assertEqual(mapping["machine_x_virtual_length_mm"], 20.0)
         self.assertEqual(mapping["machine_y_edge_length_mm"], 20.0)
+
+    def test_machine_axis_mapping_can_follow_vertical_single_axis_specimen(self):
+        mapping = rotated_machine_axes(
+            exx=0.02,
+            eyy=0.03,
+            length_x_mm=10.0,
+            length_y_mm=20.0,
+            machine_x_dic_axis="x",
+            machine_y_dic_axis="y",
+        )
+
+        self.assertEqual(mapping["machine_x_strain"], 0.02)
+        self.assertEqual(mapping["machine_y_strain"], 0.03)
+        self.assertEqual(mapping["machine_x_virtual_length_mm"], 10.0)
+        self.assertEqual(mapping["machine_x_edge_length_mm"], 20.0)
+        self.assertEqual(mapping["machine_y_virtual_length_mm"], 20.0)
+        self.assertEqual(mapping["machine_y_edge_length_mm"], 10.0)
+
+    def test_machine_axis_strain_arrays_accepts_explicit_single_axis_mapping(self):
+        points = {
+            "x": np.array([0.0]),
+            "y": np.array([0.0]),
+            "exx": np.array([0.02]),
+            "eyy": np.array([0.03]),
+            "exy": np.array([0.0]),
+        }
+
+        mapped = _machine_axis_strain_arrays(
+            points,
+            machine_x_dic_axis="x",
+            machine_y_dic_axis="y",
+        )
+
+        np.testing.assert_allclose(mapped["exx"], [0.02])
+        np.testing.assert_allclose(mapped["eyy"], [0.03])
+
+    def test_s22_experiment_mapping_is_explicit_and_remains_unverified(self):
+        config = {
+            "machine_axis_mapping_by_experiment": {
+                "S22_Y_0.2": {
+                    "machine_x_dic_axis": "x",
+                    "machine_y_dic_axis": "y",
+                    "status": "IMAGE_SUPPORTED_NEEDS_COORDINATE_CONFIRMATION",
+                }
+            }
+        }
+
+        mapping = _experiment_axis_mapping(
+            {"experiment_id": "S22_Y_0.2", "loading_mode": "单轴 Y"},
+            config,
+        )
+
+        self.assertEqual(mapping, {"machine_x_dic_axis": "x", "machine_y_dic_axis": "y"})
+
+    def test_stage2_uses_configured_axis_for_plastic_strain_and_virtual_work(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            experiment_id = "S22_Y_0.2"
+            preparation_dir = root / "Agents" / "PA12实验数据处理" / "MatchID_VFM准备" / experiment_id
+            merged_dir = preparation_dir / "merged"
+            merged_dir.mkdir(parents=True)
+            index_path = preparation_dir / f"{experiment_id}_DIC全场—力索引.csv"
+            axial_strains = [0.0, 0.001, 0.002, 0.004, 0.006, 0.008, 0.010, 0.012]
+            force_y = [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0]
+            with index_path.open("w", newline="", encoding="utf-8-sig") as handle:
+                writer = csv.DictWriter(handle, fieldnames=["照片", "时间/s", "X向力/N", "Y向力/N"])
+                writer.writeheader()
+                for index, force in enumerate(force_y):
+                    writer.writerow({"照片": f"{index:06d}.jpg", "时间/s": index, "X向力/N": 0.0, "Y向力/N": force})
+                    with (merged_dir / f"{index:06d}_DIC全场—力.csv").open(
+                        "w", newline="", encoding="utf-8-sig"
+                    ) as frame_handle:
+                        frame_writer = csv.DictWriter(frame_handle, fieldnames=["x", "y", "exx", "eyy", "exy"])
+                        frame_writer.writeheader()
+                        for x, y in ((0.0, 0.0), (10.0, 0.0), (10.0, 20.0), (0.0, 20.0)):
+                            frame_writer.writerow(
+                                {"x": x, "y": y, "exx": 0.0, "eyy": axial_strains[index], "exy": 0.0}
+                            )
+
+            config_path = Path(__file__).resolve().parents[1] / "configs" / "pa12_self_vfm.json"
+            self_config = json.loads(config_path.read_text(encoding="utf-8"))
+            self_config["eligible_loading_modes"] = ["单轴 Y"]
+            self_config["machine_axis_mapping_by_experiment"] = {
+                experiment_id: {"machine_x_dic_axis": "x", "machine_y_dic_axis": "y"}
+            }
+            self_config["nu"] = 0.0
+            self_config["elastic_strain_limit"] = 0.0025
+            self_config["minimum_plastic_strain"] = 0.001
+            self_config["minimum_hardening_points"] = 5
+            self_config["stage2_acceptance"]["minimum_points"] = 5
+            geometry = {
+                "roi_bounds_mm": (0.0, 10.0, 0.0, 20.0),
+                "roi_polygon_mm": [(0.0, 0.0), (10.0, 0.0), (10.0, 20.0), (0.0, 20.0)],
+                "roi_is_axis_aligned_rectangle": True,
+                "area_mm2": 200.0,
+                "bounding_area_mm2": 200.0,
+                "length_x_mm": 10.0,
+                "length_y_mm": 20.0,
+            }
+            result_directory = root / "result"
+            with patch("tools.run_pa12_self_vfm._plot_experiment"):
+                process_experiment(
+                    {"experiment_id": experiment_id, "loading_mode": "单轴 Y", "formal_vfm_allowed": True},
+                    {"output_root": str(root)},
+                    self_config,
+                    geometry_override=geometry,
+                    result_directory=result_directory,
+                )
+
+            result = json.loads((result_directory / f"{experiment_id}_结果.json").read_text(encoding="utf-8"))
+            self.assertAlmostEqual(result["阶段1"]["E_MPa"], 1000.0, places=8)
+            with (result_directory / f"{experiment_id}_内外虚功.csv").open(encoding="utf-8-sig") as handle:
+                rows = list(csv.DictReader(handle))
+            row = next(item for item in rows if item["照片"] == "000003.jpg")
+            expected_plastic = equivalent_plastic_strain_plane_stress(
+                exx=0.0,
+                eyy=0.004,
+                exy=0.0,
+                sigma_x_mpa=0.0,
+                sigma_y_mpa=3.0,
+                modulus_mpa=1000.0,
+                nu=0.0,
+            )
+            self.assertAlmostEqual(float(row["等效塑性应变"]), expected_plastic, places=9)
+            expected_internal_y = float(row["阶段2模型等效应力/MPa"]) * 200.0 / 20.0
+            self.assertAlmostEqual(float(row["阶段2内部虚功Y/N"]), expected_internal_y, places=7)
 
     def test_plastic_strain_subtracts_plane_stress_elastic_part(self):
         e_xx = (10.0 - 0.25 * 4.0) / 1000.0 + 0.01

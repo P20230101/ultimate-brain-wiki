@@ -291,21 +291,24 @@ def rotated_machine_axes(
     eyy: float,
     length_x_mm: float,
     length_y_mm: float,
+    machine_x_dic_axis: str = "y",
+    machine_y_dic_axis: str = "x",
 ) -> dict[str, float]:
     """Map rotated-DIC normal fields and lengths to machine X/Y.
 
-    The project calibration fixes machine X at the rotated top/bottom pair
-    and machine Y at the rotated left/right pair.  The helper keeps this
-    physical mapping separate from the generic mathematical x/y formulas.
+    DIC axes are explicit so single-axis specimen orientation can differ
+    from the cruciform calibration. Edge length is perpendicular to the
+    loading direction; virtual-field length follows it.
     """
-
+    dic_strains = {"x": exx, "y": eyy}
+    dic_lengths = {"x": length_x_mm, "y": length_y_mm}
     return {
-        "machine_x_strain": eyy,
-        "machine_y_strain": exx,
-        "machine_x_virtual_length_mm": length_y_mm,
-        "machine_y_virtual_length_mm": length_x_mm,
-        "machine_x_edge_length_mm": length_x_mm,
-        "machine_y_edge_length_mm": length_y_mm,
+        "machine_x_strain": dic_strains[machine_x_dic_axis],
+        "machine_y_strain": dic_strains[machine_y_dic_axis],
+        "machine_x_virtual_length_mm": dic_lengths[machine_x_dic_axis],
+        "machine_y_virtual_length_mm": dic_lengths[machine_y_dic_axis],
+        "machine_x_edge_length_mm": dic_lengths["y" if machine_x_dic_axis == "x" else "x"],
+        "machine_y_edge_length_mm": dic_lengths["y" if machine_y_dic_axis == "x" else "x"],
     }
 
 

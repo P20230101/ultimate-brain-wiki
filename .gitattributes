@@ -1,2 +1,3 @@
 raw/assets/PA12_几何STEP/*.step -text -whitespace
 raw/assets/PA12_几何STEP/*_source_topology.json -text -whitespace
+raw/PA12_Stage2_Evidence/*.md -text -whitespace

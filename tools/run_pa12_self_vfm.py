@@ -228,9 +228,28 @@ def _align_frame_arrays(
     }
 
 
-def _machine_axis_strain_arrays(points: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
-    """Map rotated-DIC normal strains to machine X/Y before virtual-work integration."""
-    return points | {"exx": points["eyy"], "eyy": points["exx"]}
+def _machine_axis_strain_arrays(
+    points: dict[str, np.ndarray],
+    *,
+    machine_x_dic_axis: str = "y",
+    machine_y_dic_axis: str = "x",
+) -> dict[str, np.ndarray]:
+    """Map DIC normal strains to explicitly configured machine directions."""
+    dic_fields = {"x": points["exx"], "y": points["eyy"]}
+    return points | {
+        "exx": dic_fields[machine_x_dic_axis],
+        "eyy": dic_fields[machine_y_dic_axis],
+    }
+
+
+def _experiment_axis_mapping(entry: dict, self_config: dict) -> dict[str, str]:
+    if entry["loading_mode"] == "双轴":
+        return {"machine_x_dic_axis": "y", "machine_y_dic_axis": "x"}
+    mapping = self_config["machine_axis_mapping_by_experiment"][entry["experiment_id"]]
+    return {
+        "machine_x_dic_axis": mapping["machine_x_dic_axis"],
+        "machine_y_dic_axis": mapping["machine_y_dic_axis"],
+    }
 
 
 def _align_frame_points(
@@ -558,6 +577,12 @@ def process_experiment(
     index_rows = _read_index(index_path)
     geometry = geometry_override or _geometry(Path(entry["dic_job_file"]))
     geometry_quality = _geometry_quality(loading_mode, geometry, self_config)
+    axis_mapping = _experiment_axis_mapping(entry, self_config)
+    axis_mapping_record = (
+        {"status": "CALIBRATED_CRUCIFORM", **axis_mapping}
+        if loading_mode == "双轴"
+        else self_config["machine_axis_mapping_by_experiment"][experiment_id]
+    )
     thickness = float(self_config["geometry"]["roi_thickness_mm"])
     nu = float(self_config["nu"])
     frame_data: list[dict] = []
@@ -583,13 +608,13 @@ def process_experiment(
         force_y = _finite(row["Y向力/N"], f"{experiment_id}/{photo}/Y")
         if force_x < -1e-9 or force_y < -1e-9:
             raise ValueError(f"{experiment_id}/{photo} 存在负拉伸力")
-        # 旋转后边界：顶部/底部是机器 X，左右是机器 Y。
-        # 因此机器 X 对应 DIC 竖直方向 y/eyy，机器 Y 对应 DIC 水平方向 x/exx。
+        # 按当前实验的显式机器轴—DIC映射，选择机器方向应变和虚场长度。
         axes = rotated_machine_axes(
             exx=exx,
             eyy=eyy,
             length_x_mm=float(geometry["length_x_mm"]),
             length_y_mm=float(geometry["length_y_mm"]),
+            **axis_mapping,
         )
         machine_exx = axes["machine_x_strain"]
         machine_eyy = axes["machine_y_strain"]
@@ -606,7 +631,7 @@ def process_experiment(
         )
         roi_polygon = None if geometry["roi_is_axis_aligned_rectangle"] else geometry["roi_polygon_mm"]
         pointwise = integrate_plane_stress_virtual_work_coefficients(
-            points=_machine_axis_strain_arrays(points),
+            points=_machine_axis_strain_arrays(points, **axis_mapping),
             nu=nu,
             thickness_mm=thickness,
             length_x_mm=axes["machine_x_virtual_length_mm"],
@@ -628,6 +653,10 @@ def process_experiment(
                 "mean_exx": exx,
                 "mean_eyy": eyy,
                 "mean_exy": exy,
+                "machine_exx": machine_exx,
+                "machine_eyy": machine_eyy,
+                "machine_x_virtual_length_mm": axes["machine_x_virtual_length_mm"],
+                "machine_y_virtual_length_mm": axes["machine_y_virtual_length_mm"],
                 "force_x": force_x,
                 "force_y": force_y,
                 "sigma_x": sigma_x,
@@ -707,8 +736,8 @@ def process_experiment(
     if modulus is not None and baseline is not None:
         for row in frame_data:
             row["plastic_strain"] = equivalent_plastic_strain_plane_stress(
-                exx=row["mean_eyy"],
-                eyy=row["mean_exx"],
+                exx=row["machine_exx"],
+                eyy=row["machine_eyy"],
                 exy=row["mean_exy"],
                 sigma_x_mpa=row["sigma_x"],
                 sigma_y_mpa=row["sigma_y"],
@@ -781,8 +810,8 @@ def process_experiment(
             model_sigma_x = scale * row["sigma_x"]
             model_sigma_y = scale * row["sigma_y"]
         row["model_equivalent_stress"] = model_equivalent
-        row["stage2_internal_x"] = model_sigma_x * thickness * float(geometry["area_mm2"]) / float(geometry["length_y_mm"])
-        row["stage2_internal_y"] = model_sigma_y * thickness * float(geometry["area_mm2"]) / float(geometry["length_x_mm"])
+        row["stage2_internal_x"] = model_sigma_x * thickness * float(geometry["area_mm2"]) / row["machine_x_virtual_length_mm"]
+        row["stage2_internal_y"] = model_sigma_y * thickness * float(geometry["area_mm2"]) / row["machine_y_virtual_length_mm"]
         row["stage2_residual_x"] = row["stage2_internal_x"] - row["force_x"]
         row["stage2_residual_y"] = row["stage2_internal_y"] - row["force_y"]
 
@@ -878,7 +907,7 @@ def process_experiment(
         ),
         "方法": {
             "分析口径": analysis_label or "完整 Job ROI 主结果",
-            "虚场": "旋转后X（顶部/底部）：u*=0, v*=y/Ly；Y（左右）：u*=x/Lx, v*=0",
+            "虚场": "每个机器加载方向按实验显式映射至DIC x/y；虚场长度沿加载方向，受力边长度取垂直方向",
             "边界力": "用户确认的外围机器力直接作为ROI边界合力",
             "正式积分": "ROI内按当前帧坐标网格的相邻完整单元拆分为两个三角形逐点积分；缺失单元不补足，面积比作为质量门槛",
             "回归基线": "平均应变乘矩形面积",
@@ -887,7 +916,8 @@ def process_experiment(
             "nu": nu,
             "面积_mm2": geometry["area_mm2"],
             "ROI长度_mm": [geometry["length_x_mm"], geometry["length_y_mm"]],
-            "DIC应变": "平均全场exx/eyy/exy；旋转后机器X=eyy、机器Y=exx；exy按张量剪切应变使用，gamma不参与",
+            "机器轴—DIC映射": axis_mapping_record,
+            "DIC应变": "平均全场exx/eyy/exy按机器轴—DIC配置映射；exy按张量剪切应变使用，gamma不参与",
             "阶段2": "平面应力边界应力减去弹性部分，并用塑性不可压缩估计等效塑性应变；这是自建候选算法，不是MatchID内部算法复刻",
         },
         "输入": {"照片帧数": len(frame_data), "有效DIC点数": sorted({row["point_count"] for row in frame_data}), "峰值帧": frame_data[peak_index]["照片"], "ROI边界_mm": list(geometry["roi_bounds_mm"])},

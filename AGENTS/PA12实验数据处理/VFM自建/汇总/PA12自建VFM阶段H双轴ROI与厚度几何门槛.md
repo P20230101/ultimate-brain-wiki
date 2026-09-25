@@ -4,6 +4,8 @@
 
 五个中心厚度 STEP 和逐面拓扑 JSON 已归档到当前 Vault。`tc1000.step` 的 1 mm 中心平坦面为 `28.01 × 28.01 mm`。S16 的 Job ROI 按 `0.087209 mm/pixel` 换算为 `27.209 × 27.907 mm`；若严格同心，尺寸可以容纳，但短边方向每侧只余 `0.05156 mm`（约 `0.59 pixel`）。目前没有可追溯的试样—STEP 身份绑定和亚像素位置注册，因此 S16 ROI 是否完全处于 1 mm 平坦区仍为 `REVIEW_REQUIRED`。
 
+外部 S16 FE–DIC 预检和厚度锚点记录已原样归档到 [`raw/PA12_Stage2_Evidence/`](../../../../raw/PA12_Stage2_Evidence/)。记录将 `G0-BASE-TC-1000` 作为 S16 中心 1 mm 工作厚度的诊断锚点，并提供候选 FE—DIC 坐标关系；其本身标明模型材料为临时值、空间映射为候选、正式 FE–DIC 对照未放行。因此它加强了“TC1000 是 S16 工作几何候选”的来源链，不构成试样实测厚度或物理 STEP 身份证明。
+
 本阶段缩小了几何不确定范围，但没有解除虚功或材料参数发布门槛。
 
 ## STEP 源几何证据
@@ -50,6 +52,7 @@ S16 当前逐点 VFM 实际积分面积为 `677.505105 mm²`，是 Job ROI 的 `
 
 - 源 STEP 和源拓扑副本：[`raw/assets/PA12_几何STEP/`](../../../../raw/assets/PA12_几何STEP/)
 - 外部几何检查位置：`D:\PA12_Stage2\source_geometry_inspection\`
+- 外部 S16 FE–DIC/厚度预检原文：[坐标映射预检](../../../../raw/PA12_Stage2_Evidence/阶段2_G4_S16_FE-DIC坐标映射预检.md)、[厚度锚点模型](../../../../raw/PA12_Stage2_Evidence/阶段2_G2_G4_S16厚度匹配锚点模型.md)
 - S16 ROI 与标定：`configs/pa12_rotated_batch.json`、S16 `Job.m2inp`、`Agents/PA12实验数据处理/MatchID_VFM准备/S16_XY_0.2_DIC元数据.json`
 - S16 候选空间映射：`D:\PA12_Stage2\stage2_g4_s16_spatial_mapping_preflight.json`（候选，不是正式注册）
 - S16 实际积分面积：`Agents/PA12实验数据处理/VFM自建/实验结果/S16_XY_0.2/S16_XY_0.2_结果.json`
