@@ -17,6 +17,8 @@
 
 外部 S16 FE–DIC 预检记载 S16 双轴机器 X 为图像竖直、机器 Y 为图像水平，FE X/Y 分别对应 DIC `exx/eyy`；这一证据与双轴十字试样的既有映射一致，并已归档于 [`raw/PA12_Stage2_Evidence/`](../../../../raw/PA12_Stage2_Evidence/)。S16 是双轴十字试样，不是 S19–S22 长条单轴试样，故不能用它替代单轴逐试样坐标标定。
 
+外部 Stage 2 G1 ROI/材料门槛记录进一步明确：Job ROI 尺寸不能替代实测有效截面或厚度，也没有把长轴、加载轴、图像轴、设备力通道和材料 X/Y/Z 坐标闭合的记录。该证据与本阶段的单轴 `REVIEW_REQUIRED` 结论一致。
+
 ## 重算结果
 
 全批自建 VFM 重算完成。S19–S21 的候选映射与此前双轴映射相同，数值保持不变；S22 映射和受力边长同步调整：
@@ -63,6 +65,8 @@ python tools/audit_pa12_stress_strain.py --config configs/pa12_rotated_batch.jso
 - [VFM runner](../../../../tools/run_pa12_self_vfm.py)
 - [虚功和边界映射函数](../../../../tools/pa12_self_vfm.py)
 - [外部 S16 FE–DIC 坐标预检](../../../../raw/PA12_Stage2_Evidence/阶段2_G4_S16_FE-DIC坐标映射预检.md)
+- [外部 DIC ROI 尺寸候选与边界](../../../../raw/PA12_Stage2_Evidence/阶段2_G1_DIC标定图像ROI尺寸候选.md)
+- [外部材料弹性标定门槛](../../../../raw/PA12_Stage2_Evidence/阶段2_G1材料弹性标定候选与门禁.md)
 - [阶段 B 单轴 Polygon 复核](PA12自建VFM阶段B单轴Polygon复核.md)
 - [阶段 G S22 横向应变诊断](PA12自建VFM阶段G S22单轴横向应变诊断.md)
 - [阶段 H 双轴 ROI 与厚度门槛](PA12自建VFM阶段H双轴ROI与厚度几何门槛.md)

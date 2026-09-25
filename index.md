@@ -106,7 +106,7 @@
 - [DAT 逐帧质量审计](Agents/PA12实验数据处理/MatchID_VFM准备/PA12_DIC_DAT质量审计.md)：逐照片记录 `<18>/<53>` 可用性，禁止把无应变记录的 DAT 当作完整全场。
 - [处理环境检查](Agents/PA12实验数据处理/MatchID_VFM准备/PA12_环境检查.md)：记录 Python 依赖、原始输入路径和本机 MatchID 可执行性；当前交接状态另记录窗口可枚举但桌面状态捕获不可用，未解锁 S15 GUI 人工核验。
 - [原始方向与旋转标定方向](raw/assets/PA12原始方向与旋转标定方向.jpg)：用户提供的机器方向证据。
-- [PA12 Stage 2 外部审计原文](raw/PA12_Stage2_Evidence/)：S16 FE–DIC 坐标映射预检和中心 1 mm 厚度锚点记录；仅作为预检/工作模型证据，不证明实物厚度或 STEP 身份。
+- [PA12 Stage 2 外部审计原文](raw/PA12_Stage2_Evidence/)：S16 FE–DIC 坐标映射、中心 1 mm 厚度锚点、单轴 ROI 尺寸及材料门槛记录；均为预检/候选证据，不证明实测厚度、材料方向或 STEP 身份。
 - [RAG 论文 PDF](raw/papers/lewis2020-rag-knowledge-intensive-nlp-v4.pdf)：Lewis 等，arXiv:2005.11401v4。
 - [RAG 原始文献登记卡](raw/papers/lewis2020-rag-knowledge-intensive-nlp-v4.md)：来源、哈希、解析范围和定位记录。
 - [PA12 数据源登记](raw/datasets/PA12数据源登记.md)：外部实验、DIC、MatchID、VFM 与 STEP 数据的来源和边界。
