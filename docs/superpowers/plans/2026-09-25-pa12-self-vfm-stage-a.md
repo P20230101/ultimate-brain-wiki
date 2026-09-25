@@ -4,7 +4,7 @@
 
 **Goal:** 在现有 PA12 自建 VFM 中加入可审计的 ROI 逐点三角形积分，并用同一输入同时输出逐点积分与现有均值基线结果。
 
-**Architecture:** 保留 `tools/pa12_self_vfm.py` 的材料拟合函数和现有批处理入口，在其中增加纯计算的点场积分函数；`tools/run_pa12_self_vfm.py` 读取合并 CSV 的逐点场，先做参考帧场对齐，再把积分系数送入现有阶段 1/2 拟合。输出同时记录积分方法、有效点/三角形、积分面积和与矩形面积的差异，均值法只作为回归基线，不替换正式结果。
+**Architecture:** 保留 `tools/pa12_self_vfm.py` 的材料拟合函数和现有批处理入口，在其中增加纯计算的点场积分函数；`tools/run_pa12_self_vfm.py` 读取合并 CSV 的逐点场，先做参考帧场对齐，再把积分系数送入现有阶段 1/2 拟合。规则 DIC 网格按当前帧相邻完整单元拆分为两个三角形逐点积分，缺失单元不补足。输出同时记录积分方法、有效点/三角形、积分面积和与矩形面积的差异，均值法只作为回归基线，不替换正式结果。
 
 **Tech Stack:** Python 3、NumPy、Matplotlib `tri.Triangulation`、现有 unittest/pytest、JSON/CSV/Markdown。
 
@@ -70,10 +70,10 @@ def integrate_plane_stress_virtual_work_coefficients(
     length_y_mm: float,
     roi_bounds: tuple[float, float, float, float],
 ) -> dict[str, float | int]:
-    """Integrate unit-modulus X/Y virtual-work coefficients over valid ROI triangles."""
+    """Integrate unit-modulus X/Y virtual-work coefficients over valid ROI points."""
 ```
 
-点记录只使用 `x、y、exx、eyy`。先筛选四边界内且字段有限的点；用 `matplotlib.tri.Triangulation` 对剩余点三角剖分；屏蔽三角形重心落在 ROI 外的三角形；每个三角形用面积乘三个顶点场值的平均值积分。对每个有效三角形分别积分 `exx + nu*eyy` 和 `eyy + nu*exx`，再乘 `t/(1-nu²)` 与对应虚场长度倒数。
+点记录只使用 `x、y、exx、eyy`。先筛选四边界内且字段有限的点；当前帧坐标网格的每个相邻完整单元拆为两个三角形，缺失单元跳过；无法建立规则单元的较小非结构化点场才使用 `matplotlib.tri.Triangulation`。两条路径都分别积分 `exx + nu*eyy` 和 `eyy + nu*exx`，再乘 `t/(1-nu²)` 与对应虚场长度倒数。
 
 返回至少包含：`coefficient_x`、`coefficient_y`、`integrated_area_mm2`、`valid_point_count`、`excluded_point_count`、`valid_triangle_count`、`rectangle_area_mm2`、`area_ratio`。不在函数内吞掉非法输入；沿用现有正值和泊松比约束。
 
@@ -146,7 +146,7 @@ valid_triangle_count
 
 - [ ] **Step 3: 替换阶段 1/2 的正式系数来源**
 
-在 `process_experiment` 中对每个帧读取逐点场，使用 `integrate_plane_stress_virtual_work_coefficients` 生成正式 `coefficient_x/y`；现有 `plane_stress_virtual_work_coefficients` 只生成 `baseline_coefficient_x/y`。阶段 1 的 `fit_elastic_modulus` 只接收正式逐点系数。阶段 2 的边界应力计算仍使用已确认的机器力、中心厚度和边界长度，不改变材料模型公式。
+在 `process_experiment` 中对每个帧读取逐点场，使用 `integrate_plane_stress_virtual_work_coefficients` 生成正式 `coefficient_x/y`；规则网格单元和小型非结构化帧均进入逐点三角形积分。现有 `plane_stress_virtual_work_coefficients` 只生成 `baseline_coefficient_x/y`。阶段 1 的 `fit_elastic_modulus` 只接收正式逐点系数。阶段 2 的边界应力计算仍使用已确认的机器力、中心厚度和边界长度，不改变材料模型公式。
 
 - [ ] **Step 4: 扩展逐帧 CSV 和 JSON 输出**
 
@@ -156,7 +156,7 @@ valid_triangle_count
 
 运行：`python tools/run_pa12_self_vfm.py --batch-config configs/pa12_rotated_batch.json --self-config configs/pa12_self_vfm.json`
 
-预期：现有双轴实验仍生成结果；每个实验的结果 JSON 明确记录 `pointwise_triangle`，面积不足的实验被标为复核而不是被补足。若当前入口参数不同，以 `python tools/run_pa12_self_vfm.py --help` 的实际参数为准并在日志记录命令。
+预期：现有双轴实验仍生成结果；每个实验的结果 JSON 明确记录 `pointwise_triangle`、有效三角形数和面积比，面积不足的实验被标为复核而不是被补足。若当前入口参数不同，以 `python tools/run_pa12_self_vfm.py --help` 的实际参数为准并在日志记录命令。
 
 ### Task 5: 更新自建 VFM 文档与 Obsidian 证据
 
@@ -207,7 +207,7 @@ git diff --check
 
 - [ ] **Step 3: 检查结果审计字段**
 
-读取一个双轴结果 JSON 和对应 CSV，确认正式方法为 `pointwise_triangle`、基线方法单独记录、厚度为 `1.0`、机器 X/Y 映射可见、面积比和门槛状态可追溯。若任一字段缺失，修复输出后重新运行该实验和目标测试。
+读取一个双轴结果 JSON 和对应 CSV，确认正式方法为逐点积分、基线方法单独记录、厚度为 `1.0`、机器 X/Y 映射可见、面积比和门槛状态可追溯。若任一字段缺失，修复输出后重新运行该实验和目标测试。
 
 - [ ] **Step 4: 提交阶段 A 变更**
 

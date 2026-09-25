@@ -4,6 +4,8 @@
   "方法": {
     "虚场": "旋转后X（顶部/底部）：u*=0, v*=y/Ly；Y（左右）：u*=x/Lx, v*=0",
     "边界力": "用户确认的外围机器力直接作为ROI边界合力",
+    "正式积分": "ROI内按当前帧坐标网格的相邻完整单元拆分为两个三角形逐点积分；缺失单元不补足，面积比作为质量门槛",
+    "回归基线": "平均应变乘矩形面积",
     "厚度_mm": 1.0,
     "外围整体厚度_mm": 3.0,
     "nu": 0.375,
@@ -20,7 +22,21 @@
     "有效DIC点数": [
       10403
     ],
-    "峰值帧": "000011.jpg"
+    "峰值帧": "000011.jpg",
+    "ROI边界_mm": [
+      34.373352,
+      62.011976,
+      35.772776,
+      63.84872
+    ]
+  },
+  "积分质量": {
+    "status": "REVIEW_REQUIRED",
+    "minimum_area_ratio": 0.95,
+    "minimum_observed_area_ratio": 0.9050041405416648,
+    "maximum_observed_area_ratio": 0.9050041405416648,
+    "minimum_integrated_area_mm2": 702.2655289726799,
+    "maximum_excluded_point_count": 0
   },
   "阶段1": {
     "拟合帧数": 4,
@@ -28,30 +44,30 @@
       "000004.jpg",
       "000007.jpg"
     ],
-    "E_MPa": 4519.5294056991725,
+    "E_MPa": 4991.171333371406,
     "nu": 0.375,
     "质量": {
       "status": "PASS",
-      "relative_rmse": 0.05599926542831259,
+      "relative_rmse": 0.06186808127419739,
       "maximum_active_force_n": 941.95,
       "acceptance_limit": 0.1
     },
     "虚功拟合": {
-      "modulus_mpa": 4519.5294056991725,
-      "rmse_n": 52.74850807019905,
-      "max_abs_residual_n": 103.37194266648595,
+      "modulus_mpa": 4991.171333371406,
+      "rmse_n": 58.27663915623024,
+      "max_abs_residual_n": 110.16872382330754,
       "point_count": 8
     }
   },
   "阶段2": {
-    "拟合帧数": 3,
+    "拟合帧数": 4,
     "首末拟合帧": [
-      "000004.jpg",
+      "000008.jpg",
       "000011.jpg"
     ],
     "质量": {
       "status": "NOT_COMPUTED",
-      "point_count": 3,
+      "point_count": 4,
       "minimum_points": 20
     },
     "Y_MPa": null,

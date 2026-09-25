@@ -498,3 +498,122 @@
 - 更新：`Agents/PA12实验数据处理/VFM自建/`、`tools/pa12_self_vfm.py`、`tools/run_pa12_self_vfm.py`。
 - 结论：S16_XY_0.2 与 S18_XY_2 达到当前自建阶段候选门槛；S15_XY_0.2 需复核；S17_XY_20 帧数不足以完成阶段 2；S19–S24 因单轴几何/外功边界未确认或记录不完整而跳过。输出包含逐帧内外虚功、应力空间、E/Y/H、参数稳定性和 Linear/Ludwik/Swift/通用 Voce I/II 对比。
 - 限制：这些是自建 VFM 候选结果，不替代 MatchID 正式工程或最终材料结论；单轴组和 S23/S24 不得静默补值。
+## [2026-09-21] config | 真实 Obsidian vault 同步
+
+- 来源：用户截图与 Obsidian 本地配置
+- 更新：`.obsidian/`, `raw/`, `wiki/`, `schema/`, `index.md`, `log.md`
+- 结论：已将框架配置到 Obsidian 当前打开的 `second brain` vault，并保留 Obsidian 自动生成的工作区状态。
+- 待验证：Obsidian 重新加载后能在文件浏览器、书签和模板中看到对应入口。
+
+## [2026-09-21] policy | 论文写作框架
+
+- 来源：用户指令
+- 更新：`AGENTS/论文写作框架.md`, `AGENTS.md`, `index.md`, `log.md`
+- 结论：已将论文润色、Discussion 写作和论文结构化总结要求写入长期协议。
+- 待验证：后续论文写作任务中按该框架先澄清需求，再输出方案或正文。
+
+## [2026-09-21] policy | Introduction 与 Discussion 结构
+
+- 来源：用户指令
+- 更新：`AGENTS/论文写作框架.md`, `log.md`
+- 结论：已补充 Introduction 倒三角结构和 Discussion 正三角结构，用于组织论文宏观论证。
+- 待验证：后续论文引言与讨论写作中按该结构检查段落功能。
+
+## [2026-09-22] config | MinerU 与 Semantic Scholar
+
+- 来源：用户提供的 API 配置
+- 更新：`AGENTS/科研工具环境.md`, `AGENTS.md`, `index.md`, `log.md`
+- 结论：MinerU `4.0.5` 远程解析和 Semantic Scholar API 已配置并通过只读接口验证；密钥仅保存在用户级环境变量和本机工具配置中。
+- 待验证：重启 Codex 后确认新进程自动读取用户级环境变量。
+
+## [2026-09-22] schema | Skill 分类与调用协议
+
+- 来源：用户要求统一分类 skill 并规定调用顺序
+- 更新：`AGENTS/技能分类与调用协议.md`, `AGENTS.md`, `index.md`
+- 结论：已按流程控制、资料解析、文献检索、论文写作、数据分析、视觉材料和环境维护分类，并为常见科研任务指定主 skill 与辅助 skill。
+- 待验证：后续任务按路由协议调用，并在交付前执行对应验证。
+
+## [2026-09-22] config | 科研工具环境补齐
+
+- 来源：环境检测结果与用户要求
+- 更新：用户级 MinerU 后端变量、本机 Python 依赖、`AGENTS/科研工具环境.md`
+- 结论：CUDA Torch、MinerU Torch/llama-cpp、本地 managed standard 服务和远程 MinerU 均已通过验证；已有实验图片已成功完成本地 standard 解析。
+- 待验证：重启 Codex 后确认当前新进程继承后端变量；Semantic Scholar 等待服务端限流解除后复测。
+
+## [2026-09-22] experiment | MinerU 新文件可用性验证
+
+- 来源：`AGENTS/PA12实验数据处理/VFM专用力值/X方向/X-0.1-258.csv`
+- 更新：MinerU 本地文档库解析缓存
+- 结论：此前未解析过的 CSV 文件首次解析完成，`cache_hit=false`、`status=done`、`tier=flash`，返回非空 Markdown 表格内容。
+- 待验证：后续如需继续读取，使用 `doc:8152268/tier:flash/page:1/block:1` 及其 continuation locator。
+
+## [2026-09-22] ingest | Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks
+
+- 来源：`raw/papers/lewis2020-rag-knowledge-intensive-nlp-v4.pdf`、`raw/papers/lewis2020-rag-knowledge-intensive-nlp-v4.md`
+- 更新：`wiki/literature/rag-2020-knowledge-intensive-nlp.md`、`wiki/README.md`、`index.md`
+- 核心问题：检索器与生成器能否通过端到端训练组合参数化记忆和可更新的非参数化记忆，并在多类知识密集型任务上获得收益？
+- 关键结论：RAG 在文中报告的开放域问答、生成和事实核验任务上取得竞争力；消融、人工评价和索引热替换实验共同支持检索增强、事实性和知识更新的论证。
+- 证据：本地 MinerU 4.0.5 `standard` 解析完成，文档标识为 `doc:23e3249`，覆盖 19 页；关键证据位于第 2、6–8、17、19 页及对应 block locator。
+- 冲突：Semantic Scholar 本次元数据请求返回 HTTP 429；因此元数据以 arXiv 官方页面核对，未将限流误判为解析故障。
+- 待验证：本页尚未独立复现实验数值；后续若要验证模型效果，应固定数据切分、检索数量、索引版本、解码策略和评估指标。
+
+## [2026-09-22] review | research-agent-skills 外部科研流水线评估
+
+- 来源：https://github.com/Sun-tech2020/research-agent-skills
+- 更新：`AGENTS/技能分类与调用协议.md`
+- 结论：该仓库是面向经济学、计量经济学和量化金融的 11 个 `*.skill` JSON 模块集合，不包含 Codex 所需的 `SKILL.md`，因此未直接安装或注册。
+- 可复用：文献捕获、原文客观解构、分阶段人工确认、文献综述与结果合成的流程思想。
+- 不可直接复用：经济学变量、市场/政策语义、计量模型预设和宏观数据字典。
+- 力学适配边界：后续必须改写为载荷、位移、应力、应变、材料参数、边界条件、单位、误差、收敛与独立验证；在改写完成前继续使用本库现有 `mineru`、`NovaForge` 和数据分析路由。
+
+## [2026-09-22] ingest | PA12 外部数据源与双轴试样几何登记
+
+- 来源：`D:\C盘迁移\Desktop\yuan\data`
+- 更新：`raw/datasets/PA12数据源登记.md`、`AGENTS/PA12双轴试样仿真与实验全流程.md`、`wiki/methods/PA12双轴中心区均匀性筛选.md`、`AGENTS/PA12双轴试样仿真/`
+- 结论：已核对 XY/XZ 实验数据、MatchID/VFM 文件和五个中心厚度 STEP；中心厚度为 3.0/2.5/2.0/1.5/1.0 mm，总厚度均为 3.0 mm。
+- 待验证：材料参数、力值单位、实际加载比、XZ 数据的 Z 向标定含义，以及备用形状和长宽尺寸来源。
+
+## [2026-09-22] experiment | Abaqus 与数据接入可执行性检查
+
+- 来源：Abaqus 2025、MinerU 4.0.5、本地数据目录和 `verification.json`
+- 更新：`AGENTS/PA12双轴试样仿真/pa12_biaxial_scan.py`、`postprocess_uniformity.py`、`run_scan.ps1`
+- 结论：Abaqus 2025 可执行；MinerU 本地 `standard` 服务健康；五个 STEP 均登记为单一实体且包围盒为 150.4 × 150.4 × 3.0 mm。已建立导入、网格、四臂耦合、位移加载和中心区 ODB 指标提取入口。
+- 待验证：本次先验证输入文件生成链路；脚本中的 PA12 材料卡明确为流程临时值，不能作为正式科学结论，正式提交需替换为实验标定参数。
+
+## [2026-09-22] experiment | PA12 Abaqus 前处理、求解与 ODB 后处理验证
+
+- 来源：五个真实 STEP、`pa12_biaxial_scan.py`、`postprocess_uniformity.py`、Abaqus 2025。
+- 更新：`AGENTS/PA12双轴试样仿真/runs/`、`AGENTS/PA12双轴试样仿真/验证/2026-09-22_流程验证报告.md`、`index.md`、`AGENTS/PA12双轴试样仿真与实验全流程.md`。
+- 结论：五个 STEP 均生成 `.inp/.cae`；`a=3.0 mm` 粗网格临时材料值作业成功完成，ODB 中心区后处理输出 `primary_score=0.0353768`。
+- 限制：材料卡为流程临时值，不能用于论文或正式设计排序；正式任务仍需材料标定、网格收敛、五模型求解和实验留出验证。
+## [2026-09-25] experiment | PA12 自建 VFM 阶段 A 逐点积分复核
+
+- 来源：`Agents/PA12实验数据处理/MatchID_VFM准备/S15_XY_0.2/merged/`、`configs/pa12_rotated_batch.json`、`configs/pa12_self_vfm.json`
+- 更新：`tools/pa12_self_vfm.py`、`tools/run_pa12_self_vfm.py`、`tests/test_pa12_self_vfm.py`、`Agents/PA12实验数据处理/VFM自建/README.md`、`Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段A记录.md`、`index.md`
+- 结论：自建 VFM 已加入 ROI 逐点数值积分；规则网格使用二维梯形求积，非结构化帧使用三角形回退，矩形均值法保留为基线。S15 完整处理 284 帧，面积比约 `0.895–0.923`，低于 `0.95` 门槛，状态为 `SELF_VFM_REVIEW_REQUIRED`。`E=3536.35 MPa`、`Y=34.06 MPa`、`H=154.56 MPa` 仅为候选值。
+- 验证：自建 VFM 目标测试 `14 passed`；核心模块编译通过；S15 逐帧 CSV、JSON、参数收敛和图表已写出。
+- 待验证：S15 ROI 与实体 1 mm 区域的空间叠合；S16/S17/S18 分组重算；单轴几何/外功门槛；参数稳定性和留出验证。
+
+## [2026-09-25] audit | PA12 自建 VFM 阶段 A 四组批处理复核
+
+- 来源：`configs/pa12_self_vfm.json`、S15/S16/S17/S18 自建 VFM 结果 JSON/CSV。
+- 更新：`Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段A记录.md`。
+- 结论：四组等双轴批处理分别写出 284/257/12/126 帧；正式逐点积分实际均为 `pointwise_triangle`，面积比约为 0.891–0.923，均低于 0.95，因此全部保持 `SELF_VFM_REVIEW_REQUIRED`。E、Y、H 仍是候选值，不是最终材料参数。
+- 验证：自建 VFM 目标测试 `15 passed`；全量测试 `91 passed`；工具编译通过；真实 S15 单帧 100489 点积分约 0.014 s。
+- 待验证：先完成 ROI 与实体中心 1 mm 区域的空间叠合解释，再建立单轴几何、厚度、ROI 和外功证据；在这些门槛通过前不进行单轴正式参数识别。
+
+## [2026-09-25] refactor | PA12 VFM 主流程切换与交接状态同步
+
+- 来源：用户明确选择“历史 MatchID 资料保留为审计证据，主流程改为自建 VFM”；自建 VFM 阶段 A 四组结果及 S16 GUI 审计记录。
+- 更新：`Agents/PA12实验数据处理/处理记录/PA12实验总体方法与防跑偏协议.md`、`Agents/PA12实验数据处理/处理记录/PA12_GPT交接文档.md`、`Agents/PA12实验数据处理/处理记录/PA12_GPT交接状态.json`、`Agents/PA12实验数据处理/MatchID_VFM准备/PA12_VFM边界载荷说明.md`、`index.md`。
+- 结论：自建 VFM 成为当前计算主路径；MatchID `.vfm`、Boundary/Forces 和 GUI 试算保留为历史格式/方向/载荷审计。四组等双轴阶段 A 结果均为 `SELF_VFM_REVIEW_REQUIRED`，候选 E/Y/H 不升格为最终材料参数。
+- 保留的历史问题：S16 `3try` X/Y 力 MAE=`26.1206/23.4119 N`、末帧差=`1452.79/1478.85 N`；`4try_step3` 的 Forces 数量为 `0`；第 16 轮 `Y=63.93 MPa`、`H=41.55 MPa` 仅为 GUI 中间候选。
+- 验证：自建 VFM 目标测试 `15 passed`；全量测试 `94 passed`；工具编译通过；四组结果一致性审计通过。
+- 下一步：复核四组自建 VFM 的 ROI/面积比、内外虚功、残差和参数稳定性，再补齐单轴几何、厚度、积分域和外功证据。
+
+## [2026-09-25] refactor | PA12 自建 VFM 正式积分规则收敛
+
+- 来源：`tools/pa12_self_vfm.py` 的规则网格积分实现、`tests/test_pa12_self_vfm.py` 新增规则网格方法测试、四组阶段 A 重算结果。
+- 更新：正式积分统一为 `pointwise_triangle`；删除规则网格二维梯形求积作为正式路径的歧义；更新配置、阶段 A 记录、GPT 交接文档和 README。
+- 结论：S15/S16/S17/S18 的最低积分面积比均低于 `0.95`，全部保持 `SELF_VFM_REVIEW_REQUIRED`；候选 E/Y/H 不能升格为最终材料参数。
+- 下一步：取得实际 DIC 有效场边界与中心 1 mm 厚度的几何证据，再决定是否修改 ROI 配置并重算；单轴实验继续等待独立几何和外功证据。

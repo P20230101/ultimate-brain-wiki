@@ -3,6 +3,8 @@ from __future__ import annotations
 import math
 from collections.abc import Sequence
 
+import numpy as np
+from matplotlib.path import Path as MatplotlibPath
 from matplotlib.tri import Triangulation
 
 
@@ -35,13 +37,15 @@ def plane_stress_virtual_work_coefficients(
 
 def integrate_plane_stress_virtual_work_coefficients(
     *,
-    points: Sequence[dict[str, float]],
+    points: Sequence[dict[str, float]] | dict[str, np.ndarray],
     nu: float,
     thickness_mm: float,
     length_x_mm: float,
     length_y_mm: float,
     roi_bounds: tuple[float, float, float, float],
-) -> dict[str, float | int]:
+    roi_polygon: Sequence[tuple[float, float]] | None = None,
+    triangulation: Triangulation | None = None,
+) -> dict[str, float | int | str]:
     """Integrate unit-modulus virtual-work coefficients over valid ROI triangles."""
 
     if not -1.0 < nu < 0.5:
@@ -51,29 +55,189 @@ def integrate_plane_stress_virtual_work_coefficients(
     x_min, x_max, y_min, y_max = roi_bounds
     if x_min >= x_max or y_min >= y_max:
         raise ValueError("ROI边界必须具有正面积")
+    polygon_path = None
+    polygon_vertices = None
+    if roi_polygon is None:
+        roi_area = (x_max - x_min) * (y_max - y_min)
+    else:
+        polygon = np.asarray(roi_polygon, dtype=float)
+        if polygon.ndim != 2 or polygon.shape[1] != 2 or len(polygon) < 3:
+            raise ValueError("ROI Polygon 至少需要三个二维顶点")
+        if not np.isfinite(polygon).all():
+            raise ValueError("ROI Polygon 顶点必须为有限数")
+        roi_area = 0.5 * abs(
+            float(np.dot(polygon[:, 0], np.roll(polygon[:, 1], -1)))
+            - float(np.dot(polygon[:, 1], np.roll(polygon[:, 0], -1)))
+        )
+        if roi_area <= 0.0:
+            raise ValueError("ROI Polygon 必须具有正面积")
+        polygon_vertices = polygon
+        polygon_path = MatplotlibPath(
+            np.vstack((polygon, polygon[0])),
+            closed=True,
+        )
 
-    valid_points: list[dict[str, float]] = []
-    excluded_point_count = 0
-    for point in points:
-        x = float(point["x"])
-        y = float(point["y"])
-        exx = float(point["exx"])
-        eyy = float(point["eyy"])
-        if not all(math.isfinite(value) for value in (x, y, exx, eyy)):
-            excluded_point_count += 1
-            continue
-        if x_min <= x <= x_max and y_min <= y <= y_max:
-            valid_points.append({"x": x, "y": y, "exx": exx, "eyy": eyy})
-        else:
-            excluded_point_count += 1
+    def on_polygon_boundary(x: float, y: float) -> bool:
+        if polygon_vertices is None:
+            return False
+        tolerance = 1e-8
+        for start, end in zip(polygon_vertices, np.roll(polygon_vertices, -1, axis=0)):
+            dx = float(end[0] - start[0])
+            dy = float(end[1] - start[1])
+            segment_length_squared = dx * dx + dy * dy
+            cross = (x - float(start[0])) * dy - (y - float(start[1])) * dx
+            projection = (x - float(start[0])) * dx + (y - float(start[1])) * dy
+            if (
+                abs(cross) <= tolerance
+                and -tolerance <= projection <= segment_length_squared + tolerance
+            ):
+                return True
+        return False
 
-    if len(valid_points) < 3:
-        raise ValueError("ROI内有效点不足以建立三角剖分")
+    def on_polygon_boundary_array(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+        if polygon_vertices is None:
+            return np.zeros(len(x), dtype=bool)
+        tolerance = 1e-8
+        boundary = np.zeros(len(x), dtype=bool)
+        for start, end in zip(polygon_vertices, np.roll(polygon_vertices, -1, axis=0)):
+            dx = float(end[0] - start[0])
+            dy = float(end[1] - start[1])
+            segment_length_squared = dx * dx + dy * dy
+            cross = (x - float(start[0])) * dy - (y - float(start[1])) * dx
+            projection = (x - float(start[0])) * dx + (y - float(start[1])) * dy
+            boundary |= (
+                (np.abs(cross) <= tolerance)
+                & (projection >= -tolerance)
+                & (projection <= segment_length_squared + tolerance)
+            )
+        return boundary
 
-    triangulation = Triangulation(
-        [point["x"] for point in valid_points],
-        [point["y"] for point in valid_points],
-    )
+    def inside_region(x: float, y: float) -> bool:
+        if not (x_min <= x <= x_max and y_min <= y <= y_max):
+            return False
+        return (
+            polygon_path is None
+            or polygon_path.contains_point((x, y), radius=1e-9)
+            or on_polygon_boundary(x, y)
+        )
+
+    def inside_region_array(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+        inside = (x >= x_min) & (x <= x_max) & (y >= y_min) & (y <= y_max)
+        if polygon_path is not None:
+            inside &= polygon_path.contains_points(np.column_stack((x, y)), radius=1e-9) | on_polygon_boundary_array(x, y)
+        return inside
+
+    if isinstance(points, dict):
+        arrays = {key: np.asarray(points[key], dtype=float) for key in ("x", "y", "exx", "eyy")}
+        count = len(arrays["x"])
+        if any(len(value) != count for value in arrays.values()):
+            raise ValueError("DIC逐点数组长度不一致")
+        finite = np.ones(count, dtype=bool)
+        for value in arrays.values():
+            finite &= np.isfinite(value)
+        inside = finite & inside_region_array(arrays["x"], arrays["y"])
+        valid_x = arrays["x"][inside]
+        valid_y = arrays["y"][inside]
+        valid_exx = arrays["exx"][inside]
+        valid_eyy = arrays["eyy"][inside]
+        if len(valid_x) < 3:
+            raise ValueError("ROI内有效点不足以建立数值积分")
+        points = [
+            {"x": float(x), "y": float(y), "exx": float(exx), "eyy": float(eyy)}
+            for x, y, exx, eyy in zip(arrays["x"], arrays["y"], arrays["exx"], arrays["eyy"])
+        ]
+
+    if triangulation is None:
+        valid_points: list[dict[str, float]] = []
+        excluded_point_count = 0
+        for point in points:
+            x = float(point["x"])
+            y = float(point["y"])
+            exx = float(point["exx"])
+            eyy = float(point["eyy"])
+            if not all(math.isfinite(value) for value in (x, y, exx, eyy)):
+                excluded_point_count += 1
+                continue
+            if inside_region(x, y):
+                valid_points.append({"x": x, "y": y, "exx": exx, "eyy": eyy})
+            else:
+                excluded_point_count += 1
+        if len(valid_points) < 3:
+            raise ValueError("ROI内有效点不足以建立三角剖分")
+
+        x_values = sorted({point["x"] for point in valid_points})
+        y_values = sorted({point["y"] for point in valid_points})
+        grid_keys = {(point["x"], point["y"]) for point in valid_points}
+        point_by_coordinate = {(point["x"], point["y"]): point for point in valid_points}
+        if roi_polygon is None and len(x_values) >= 2 and len(y_values) >= 2:
+            integrated_area = 0.0
+            integrated_x = 0.0
+            integrated_y = 0.0
+            valid_triangle_count = 0
+            for x_left, x_right in zip(x_values, x_values[1:]):
+                for y_bottom, y_top in zip(y_values, y_values[1:]):
+                    corners = [
+                        point_by_coordinate.get((x_left, y_bottom)),
+                        point_by_coordinate.get((x_right, y_bottom)),
+                        point_by_coordinate.get((x_right, y_top)),
+                        point_by_coordinate.get((x_left, y_top)),
+                    ]
+                    if any(point is None for point in corners):
+                        continue
+                    p00, p10, p11, p01 = corners
+                    triangle_area = (x_right - x_left) * (y_top - y_bottom) / 2.0
+                    for triangle_points in ((p00, p10, p11), (p00, p11, p01)):
+                        integrated_area += triangle_area
+                        integrated_x += triangle_area * sum(
+                            point["exx"] + nu * point["eyy"] for point in triangle_points
+                        ) / 3.0
+                        integrated_y += triangle_area * sum(
+                            point["eyy"] + nu * point["exx"] for point in triangle_points
+                        ) / 3.0
+                        valid_triangle_count += 1
+            if valid_triangle_count:
+                factor = thickness_mm / (1.0 - nu * nu)
+                return {
+                    "coefficient_x": factor * integrated_x / length_x_mm,
+                    "coefficient_y": factor * integrated_y / length_y_mm,
+                    "integrated_area_mm2": integrated_area,
+                    "valid_point_count": len(valid_points),
+                    "excluded_point_count": excluded_point_count,
+                    "valid_triangle_count": valid_triangle_count,
+                    "rectangle_area_mm2": roi_area,
+                    "roi_area_mm2": roi_area,
+                    "area_ratio": integrated_area / roi_area,
+                    "integration_method": "pointwise_triangle",
+                }
+        if len(valid_points) > 50000:
+            raise ValueError("ROI内规则网格缺少足够完整单元，拒绝对大点场执行无界三角剖分")
+        triangulation = Triangulation(
+            [point["x"] for point in valid_points],
+            [point["y"] for point in valid_points],
+        )
+    else:
+        valid_points = []
+        excluded_point_count = 0
+        for point in points:
+            x = float(point["x"])
+            y = float(point["y"])
+            exx = float(point["exx"])
+            eyy = float(point["eyy"])
+            if not all(math.isfinite(value) for value in (x, y, exx, eyy)):
+                excluded_point_count += 1
+                continue
+            if inside_region(x, y):
+                valid_points.append({"x": x, "y": y, "exx": exx, "eyy": eyy})
+            else:
+                excluded_point_count += 1
+        if len(valid_points) != len(triangulation.x):
+            raise ValueError("复用的三角剖分与当前 ROI 内 DIC 点数不一致")
+        for index, point in enumerate(valid_points):
+            if not (
+                math.isclose(point["x"], float(triangulation.x[index]), rel_tol=0.0, abs_tol=1e-9)
+                and math.isclose(point["y"], float(triangulation.y[index]), rel_tol=0.0, abs_tol=1e-9)
+            ):
+                raise ValueError("复用的三角剖分与当前 ROI 坐标不一致")
     integrated_area = 0.0
     integrated_x = 0.0
     integrated_y = 0.0
@@ -82,9 +246,13 @@ def integrate_plane_stress_virtual_work_coefficients(
         vertices = [valid_points[index] for index in triangle]
         centroid_x = sum(point["x"] for point in vertices) / 3.0
         centroid_y = sum(point["y"] for point in vertices) / 3.0
-        if not (x_min <= centroid_x <= x_max and y_min <= centroid_y <= y_max):
+        if not inside_region(centroid_x, centroid_y):
             continue
         first, second, third = vertices
+        if roi_polygon is not None and not all(
+            inside_region(point["x"], point["y"]) for point in vertices
+        ):
+            continue
         area = abs(
             (
                 (second["x"] - first["x"]) * (third["y"] - first["y"])
@@ -103,7 +271,6 @@ def integrate_plane_stress_virtual_work_coefficients(
         raise ValueError("ROI内没有有效三角形")
 
     factor = thickness_mm / (1.0 - nu * nu)
-    rectangle_area = (x_max - x_min) * (y_max - y_min)
     return {
         "coefficient_x": factor * integrated_x / length_x_mm,
         "coefficient_y": factor * integrated_y / length_y_mm,
@@ -111,8 +278,10 @@ def integrate_plane_stress_virtual_work_coefficients(
         "valid_point_count": len(valid_points),
         "excluded_point_count": excluded_point_count,
         "valid_triangle_count": valid_triangle_count,
-        "rectangle_area_mm2": rectangle_area,
-        "area_ratio": integrated_area / rectangle_area,
+        "rectangle_area_mm2": roi_area,
+        "roi_area_mm2": roi_area,
+        "area_ratio": integrated_area / roi_area,
+        "integration_method": "pointwise_triangle",
     }
 
 

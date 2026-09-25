@@ -1,8 +1,12 @@
 {
   "batch_config": "configs/pa12_rotated_batch.json",
   "output_directory": "Agents/PA12实验数据处理/VFM自建",
-  "eligible_loading_modes": ["双轴"],
-  "ineligible_mode_reason": "单轴 Job Shape 与双轴中心ROI/厚度口径不同；在单轴实测厚度、虚场边界和几何确认前不输出自建VFM参数。",
+  "eligible_loading_modes": ["双轴", "单轴 X", "单轴 Y"],
+  "ineligible_mode_reason": "当前批次只允许双轴和单轴 X/Y；其他加载模式不进入自建 VFM。",
+  "single_axis_geometry_gate": {
+    "status": "REVIEW_REQUIRED",
+    "reason": "单轴 Job Polygon 已用于逐点积分，但单轴实测厚度、有效宽度、标距、积分域物理含义和外功边界尚未独立确认。"
+  },
   "nu": 0.375,
   "elastic_strain_limit": 0.005,
   "minimum_force_n": 5.0,
@@ -26,11 +30,14 @@
   "virtual_fields": {
     "x": "旋转后机器X（顶部/底部）：u*=0, v*=y/Ly",
     "y": "旋转后机器Y（左右）：u*=x/Lx, v*=0",
-    "area_rule": "使用旋转Job Shape矩形外接尺寸；DIC点均值乘ROI面积和中心厚度。"
+    "integration_method": "pointwise_triangle",
+    "baseline_method": "mean_strain_rectangle",
+    "minimum_area_ratio": 0.95,
+    "area_rule": "正式结果使用ROI内当前帧坐标网格的逐点两三角形积分；缺失单元不补足，积分面积与理论ROI面积的比值低于minimum_area_ratio时只允许人工复核。DIC点均值乘ROI面积和中心厚度仅作为回归基线。"
   },
   "stage_rules": {
     "stage_1": "固定ν=0.375；只用修正后平均应变不超过elastic_strain_limit且外力大于minimum_force_n的加载帧识别E。",
     "stage_2": "固定阶段1 E和ν；使用峰值前的边界等效应力与DIC平面应力塑性应变估计识别线性Y/H。",
-    "model_scope": "当前只实现Linear等向硬化；Voce I/II、Ludwik、Swift需先核实与MatchID界面一致的公式后再加入。"
+    "model_scope": "阶段2的正式门槛使用Linear等向硬化；同时导出通用文献形式的Ludwik、Swift、Voce I、Voce II比较，不能视为MatchID同名模型的复刻。"
   }
 }

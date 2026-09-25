@@ -32,3 +32,5 @@ vfm_check_run.json
 # 旧版自建 VFM 在单轴几何门槛锁定前产生的诊断目录，不作为正式输出。
 Agents/PA12实验数据处理/VFM自建/实验结果/S19_X_0.2/
 Agents/PA12实验数据处理/VFM自建/实验结果/S20_X_2/
+AGENTS/PA12双轴试样仿真/runs/
+AGENTS/PA12双轴试样仿真/__pycache__/

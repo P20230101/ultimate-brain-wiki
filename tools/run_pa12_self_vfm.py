@@ -7,6 +7,8 @@ import math
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 if __package__:
     from .matchid_prepare import parse_job_metadata
@@ -46,6 +48,11 @@ FRAME_FIELDS = [
     "照片",
     "时间/s",
     "点数",
+    "参考帧点数",
+    "当前帧点数",
+    "匹配点数",
+    "参考帧缺失点数",
+    "当前帧新增点数",
     "平均exx",
     "平均eyy",
     "平均exy",
@@ -63,6 +70,10 @@ FRAME_FIELDS = [
     "面积比",
     "有效三角形数",
     "排除点数",
+    "积分方法",
+    "基线方法",
+    "逐点/基线系数差异X/%",
+    "逐点/基线系数差异Y/%",
     "阶段1内部虚功X/N",
     "阶段1外部虚功X/N",
     "阶段1残差X/N",
@@ -172,6 +183,51 @@ def _read_frame_points(source) -> list[dict[str, float]]:
     return points
 
 
+def _read_frame_arrays(path: Path) -> dict[str, np.ndarray]:
+    frame = pd.read_csv(path, encoding="utf-8-sig", usecols=["x", "y", "exx", "eyy", "exy"])
+    arrays = {key: frame[key].to_numpy(dtype=float) for key in ("x", "y", "exx", "eyy", "exy")}
+    if len(arrays["x"]) == 0:
+        raise ValueError(f"{path} 没有 DIC 点")
+    if any(not np.isfinite(value).all() for value in arrays.values()):
+        raise ValueError(f"{path} 含非有限 DIC 字段")
+    return arrays
+
+
+def _align_frame_arrays(
+    reference: dict[str, np.ndarray],
+    current: dict[str, np.ndarray],
+) -> dict[str, np.ndarray]:
+    reference_order = np.lexsort((reference["y"], reference["x"]))
+    current_order = np.lexsort((current["y"], current["x"]))
+    key_dtype = np.dtype([("x", "<f8"), ("y", "<f8")])
+    reference_keys = np.empty(len(reference_order), dtype=key_dtype)
+    current_keys = np.empty(len(current_order), dtype=key_dtype)
+    reference_keys["x"] = reference["x"][reference_order]
+    reference_keys["y"] = reference["y"][reference_order]
+    current_keys["x"] = current["x"][current_order]
+    current_keys["y"] = current["y"][current_order]
+    _, reference_indices, current_indices = np.intersect1d(
+        reference_keys,
+        current_keys,
+        assume_unique=True,
+        return_indices=True,
+    )
+    if len(reference_indices) < 3:
+        raise ValueError("参考帧与当前帧 DIC 坐标交集不足以进行虚功积分")
+    return {
+        "x": current["x"][current_order][current_indices],
+        "y": current["y"][current_order][current_indices],
+        "exx": current["exx"][current_order][current_indices] - reference["exx"][reference_order][reference_indices],
+        "eyy": current["eyy"][current_order][current_indices] - reference["eyy"][reference_order][reference_indices],
+        "exy": current["exy"][current_order][current_indices] - reference["exy"][reference_order][reference_indices],
+        "reference_point_count": np.array([len(reference_order)], dtype=int),
+        "current_point_count": np.array([len(current_order)], dtype=int),
+        "matched_point_count": np.array([len(reference_indices)], dtype=int),
+        "reference_missing_point_count": np.array([len(reference_order) - len(reference_indices)], dtype=int),
+        "current_extra_point_count": np.array([len(current_order) - len(current_indices)], dtype=int),
+    }
+
+
 def _align_frame_points(
     reference: list[dict[str, float]],
     current: list[dict[str, float]],
@@ -197,7 +253,7 @@ def _align_frame_points(
     return aligned
 
 
-def _geometry(job_path: Path) -> dict[str, float | str]:
+def _geometry(job_path: Path) -> dict[str, object]:
     job = parse_job_metadata(job_path)
     x_pixels, y_pixels = _shape_coordinates(job["shape"])
     conversion = float(job["conversion_mm_per_pixel"])
@@ -205,11 +261,37 @@ def _geometry(job_path: Path) -> dict[str, float | str]:
     min_y, max_y = min(y_pixels), max(y_pixels)
     length_x = (max_x - min_x) * conversion
     length_y = (max_y - min_y) * conversion
+    polygon_mm = [(x * conversion, y * conversion) for x, y in zip(x_pixels, y_pixels)]
+    polygon_area = 0.5 * abs(
+        sum(
+            x1 * y2 - y1 * x2
+            for (x1, y1), (x2, y2) in zip(polygon_mm, polygon_mm[1:] + polygon_mm[:1])
+        )
+    )
+    if polygon_area <= 0.0:
+        raise ValueError(f"{job_path} 的 Job Shape Polygon 面积不是正数")
+    rectangle_vertices = {
+        (min_x * conversion, min_y * conversion),
+        (max_x * conversion, min_y * conversion),
+        (max_x * conversion, max_y * conversion),
+        (min_x * conversion, max_y * conversion),
+    }
+    roi_is_axis_aligned_rectangle = len(polygon_mm) == 4 and all(
+        any(
+            math.isclose(x, expected_x, rel_tol=0.0, abs_tol=1e-9)
+            and math.isclose(y, expected_y, rel_tol=0.0, abs_tol=1e-9)
+            for expected_x, expected_y in rectangle_vertices
+        )
+        for x, y in polygon_mm
+    )
     return {
         "length_x_mm": length_x,
         "length_y_mm": length_y,
-        "area_mm2": length_x * length_y,
+        "area_mm2": polygon_area,
+        "bounding_area_mm2": length_x * length_y,
+        "roi_is_axis_aligned_rectangle": roi_is_axis_aligned_rectangle,
         "conversion_mm_per_pixel": conversion,
+        "roi_polygon_mm": polygon_mm,
         "roi_bounds_mm": (
             min_x * conversion,
             max_x * conversion,
@@ -218,6 +300,27 @@ def _geometry(job_path: Path) -> dict[str, float | str]:
         ),
         "roi_bounds_px": f"x={min_x:g}–{max_x:g}, y={min_y:g}–{max_y:g} px",
         "reference_image": Path(job["reference_image"]).name,
+    }
+
+
+def _geometry_quality(
+    loading_mode: str,
+    geometry: dict[str, object],
+    self_config: dict,
+) -> dict[str, object]:
+    if loading_mode.startswith("单轴"):
+        gate = self_config["single_axis_geometry_gate"]
+        return {
+            "status": "REVIEW_REQUIRED",
+            "reason": gate["reason"],
+            "roi_area_mm2": float(geometry["area_mm2"]),
+            "bounding_area_mm2": float(geometry["bounding_area_mm2"]),
+        }
+    return {
+        "status": "PASS",
+        "reason": "双轴 Job Shape 已按当前中心 ROI 工作口径解析；面积覆盖仍由积分质量门槛单独判定。",
+        "roi_area_mm2": float(geometry["area_mm2"]),
+        "bounding_area_mm2": float(geometry["bounding_area_mm2"]),
     }
 
 
@@ -391,6 +494,7 @@ def _plot_experiment(
 
 def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
     experiment_id = entry["experiment_id"]
+    loading_mode = entry.get("loading_mode", "")
     output_root = Path(batch["output_root"])
     preparation_dir = output_root / "Agents" / "PA12实验数据处理" / "MatchID_VFM准备" / experiment_id
     index_path = preparation_dir / f"{experiment_id}_DIC全场—力索引.csv"
@@ -409,28 +513,28 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
 
     index_rows = _read_index(index_path)
     geometry = _geometry(Path(entry["dic_job_file"]))
+    geometry_quality = _geometry_quality(loading_mode, geometry, self_config)
     thickness = float(self_config["geometry"]["roi_thickness_mm"])
     nu = float(self_config["nu"])
     frame_data: list[dict] = []
+    baseline_arrays: dict[str, np.ndarray] | None = None
     baseline: dict[str, float] | None = None
-    baseline_points: list[dict[str, float]] | None = None
     for row in index_rows:
         photo = row["照片"]
         frame_path = merged_dir / f"{Path(photo).stem}_DIC全场—力.csv"
-        raw_points = _read_frame_points(frame_path)
-        if baseline_points is None:
-            baseline_points = raw_points
-        points = _align_frame_points(baseline_points, raw_points)
-        point_count = len(points)
-        means = {
-            key: sum(point[key] for point in points) / point_count
-            for key in ("exx", "eyy", "exy")
-        }
-        exx = means["exx"]
-        eyy = means["eyy"]
-        exy = means["exy"]
-        if baseline is None:
-            baseline = {key: 0.0 for key in ("exx", "eyy", "exy")}
+        raw_points = _read_frame_arrays(frame_path)
+        if baseline_arrays is None:
+            baseline_arrays = raw_points
+            baseline = {
+                key: float(raw_points[key].mean())
+                for key in ("exx", "eyy", "exy")
+            }
+        points_arrays = _align_frame_arrays(baseline_arrays, raw_points)
+        points = points_arrays
+        point_count = len(points_arrays["x"])
+        exx = float(points_arrays["exx"].mean())
+        eyy = float(points_arrays["eyy"].mean())
+        exy = float(points_arrays["exy"].mean())
         force_x = _finite(row["X向力/N"], f"{experiment_id}/{photo}/X")
         force_y = _finite(row["Y向力/N"], f"{experiment_id}/{photo}/Y")
         if force_x < -1e-9 or force_y < -1e-9:
@@ -456,6 +560,7 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
             length_x_mm=axes["machine_x_virtual_length_mm"],
             length_y_mm=axes["machine_y_virtual_length_mm"],
         )
+        roi_polygon = None if geometry["roi_is_axis_aligned_rectangle"] else geometry["roi_polygon_mm"]
         pointwise = integrate_plane_stress_virtual_work_coefficients(
             points=points,
             nu=nu,
@@ -463,6 +568,7 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
             length_x_mm=axes["machine_x_virtual_length_mm"],
             length_y_mm=axes["machine_y_virtual_length_mm"],
             roi_bounds=geometry["roi_bounds_mm"],
+            roi_polygon=roi_polygon,
         )
         frame_data.append(
             {
@@ -470,6 +576,11 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
                 "照片": photo,
                 "时间/s": _finite(row["时间/s"], f"{experiment_id}/{photo}/time"),
                 "point_count": point_count,
+                "reference_point_count": int(points_arrays["reference_point_count"][0]),
+                "current_point_count": int(points_arrays["current_point_count"][0]),
+                "matched_point_count": int(points_arrays["matched_point_count"][0]),
+                "reference_missing_point_count": int(points_arrays["reference_missing_point_count"][0]),
+                "current_extra_point_count": int(points_arrays["current_extra_point_count"][0]),
                 "mean_exx": exx,
                 "mean_eyy": eyy,
                 "mean_exy": exy,
@@ -486,16 +597,27 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
                 "area_ratio": float(pointwise["area_ratio"]),
                 "valid_triangle_count": int(pointwise["valid_triangle_count"]),
                 "excluded_point_count": int(pointwise["excluded_point_count"]),
+                "integration_method": str(pointwise["integration_method"]),
                 "plastic_strain": 0.0,
+                "baseline_method": self_config["virtual_fields"]["baseline_method"],
             }
         )
 
-    loading_mode = entry.get("loading_mode", "")
     if loading_mode == "双轴":
         active_axes = ["X", "Y"]
     else:
         active_axes = [axis for axis in ("X", "Y") if axis in loading_mode]
     minimum_force = float(self_config["minimum_force_n"])
+    minimum_area_ratio = float(self_config["virtual_fields"]["minimum_area_ratio"])
+    area_ratios = [row["area_ratio"] for row in frame_data]
+    integration_quality = {
+        "status": "PASS" if min(area_ratios) >= minimum_area_ratio else "REVIEW_REQUIRED",
+        "minimum_area_ratio": minimum_area_ratio,
+        "minimum_observed_area_ratio": min(area_ratios),
+        "maximum_observed_area_ratio": max(area_ratios),
+        "minimum_integrated_area_mm2": min(row["integrated_area_mm2"] for row in frame_data),
+        "maximum_excluded_point_count": max(row["excluded_point_count"] for row in frame_data),
+    }
     strain_limit = float(self_config["elastic_strain_limit"])
     elastic_indices = [
         index
@@ -621,6 +743,11 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
                 "照片": row["照片"],
                 "时间/s": f"{row['时间/s']:.6f}",
                 "点数": row["point_count"],
+                "参考帧点数": row["reference_point_count"],
+                "当前帧点数": row["current_point_count"],
+                "匹配点数": row["matched_point_count"],
+                "参考帧缺失点数": row["reference_missing_point_count"],
+                "当前帧新增点数": row["current_extra_point_count"],
                 "平均exx": f"{row['mean_exx']:.10g}",
                 "平均eyy": f"{row['mean_eyy']:.10g}",
                 "平均exy": f"{row['mean_exy']:.10g}",
@@ -638,6 +765,10 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
                 "面积比": f"{row['area_ratio']:.8f}",
                 "有效三角形数": row["valid_triangle_count"],
                 "排除点数": row["excluded_point_count"],
+                "积分方法": row["integration_method"],
+                "基线方法": row["baseline_method"],
+                "逐点/基线系数差异X/%": "" if row["baseline_coefficient_x"] == 0.0 else f"{100.0 * (row['coefficient_x'] / row['baseline_coefficient_x'] - 1.0):.8f}",
+                "逐点/基线系数差异Y/%": "" if row["baseline_coefficient_y"] == 0.0 else f"{100.0 * (row['coefficient_y'] / row['baseline_coefficient_y'] - 1.0):.8f}",
                 "阶段1内部虚功X/N": f"{row['stage1_internal_x']:.8f}",
                 "阶段1外部虚功X/N": f"{row['force_x']:.8f}",
                 "阶段1残差X/N": f"{row['stage1_residual_x']:.8f}",
@@ -682,8 +813,10 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
             if (
                 modulus is not None
                 and hardening_fit is not None
+                and integration_quality["status"] == "PASS"
                 and stage1_quality["status"] == "PASS"
                 and stage2_quality["status"] == "PASS"
+                and geometry_quality["status"] == "PASS"
             )
             else "SELF_VFM_REVIEW_REQUIRED"
             if modulus is not None
@@ -692,6 +825,8 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
         "方法": {
             "虚场": "旋转后X（顶部/底部）：u*=0, v*=y/Ly；Y（左右）：u*=x/Lx, v*=0",
             "边界力": "用户确认的外围机器力直接作为ROI边界合力",
+            "正式积分": "ROI内按当前帧坐标网格的相邻完整单元拆分为两个三角形逐点积分；缺失单元不补足，面积比作为质量门槛",
+            "回归基线": "平均应变乘矩形面积",
             "厚度_mm": thickness,
             "外围整体厚度_mm": float(self_config["geometry"]["overall_thickness_mm"]),
             "nu": nu,
@@ -700,7 +835,9 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
             "DIC应变": "平均全场exx/eyy/exy；旋转后机器X=eyy、机器Y=exx；exy按张量剪切应变使用，gamma不参与",
             "阶段2": "平面应力边界应力减去弹性部分，并用塑性不可压缩估计等效塑性应变；这是自建候选算法，不是MatchID内部算法复刻",
         },
-        "输入": {"照片帧数": len(frame_data), "有效DIC点数": sorted({row["point_count"] for row in frame_data}), "峰值帧": frame_data[peak_index]["照片"]},
+        "输入": {"照片帧数": len(frame_data), "有效DIC点数": sorted({row["point_count"] for row in frame_data}), "峰值帧": frame_data[peak_index]["照片"], "ROI边界_mm": list(geometry["roi_bounds_mm"])},
+        "几何质量": geometry_quality,
+        "积分质量": integration_quality,
         "阶段1": {
             "拟合帧数": len(elastic_indices),
             "首末拟合帧": None if not elastic_indices else [frame_data[elastic_indices[0]]["照片"], frame_data[elastic_indices[-1]]["照片"]],
@@ -754,7 +891,7 @@ def run(batch_config_path: Path, self_config_path: Path) -> dict:
     _write_json(
         output_dir / "PA12自建VFM结果.json",
         {
-            "状态": "当前为自建VFM阶段结果；未替代MatchID正式识别",
+            "状态": "当前为自建VFM阶段结果；候选参数尚未通过全部质量门槛",
             "结果": results,
             "配置": str(self_config_path),
         },
@@ -766,10 +903,11 @@ def run(batch_config_path: Path, self_config_path: Path) -> dict:
         "",
         "## 当前方法",
         "",
-        "- 阶段1固定 ν=0.375，使用常应变单位虚场和中心 ROI 厚度 1 mm，对加载初期 DIC 全场积分并识别 E。",
+        "- 阶段1固定 ν=0.375，使用常应变单位虚场、中心 ROI 厚度 1 mm 和当前帧逐点三角形积分，对加载初期 DIC 全场识别 E。",
         "- 阶段2固定阶段1 E 和 ν，使用边界合力换算的平面应力与 DIC 应变约化识别 Linear 等向硬化 Y/H。",
         "- 外围整体厚度 3 mm 只作几何记录；虚功和应力使用中心 ROI 厚度 1 mm。",
         "- 这是可复现的自建候选算法；它不读取 MatchID 内部的 Newton/J2 状态，也不把界面中间值写成最终材料参数。",
+        "- 每一帧将坐标集合与参考帧取交集后积分；缺失点或缺失单元不填充。理论 ROI 与实际 DIC 点场的面积比低于 0.95 时，结果只能进入人工复核。",
         "",
         "## 结果",
         "",
@@ -786,7 +924,8 @@ def run(batch_config_path: Path, self_config_path: Path) -> dict:
         "## 限制",
         "",
         "- 已输出 Linear、通用 Ludwik、通用 Swift、经典 Voce I 和线性+指数 Voce II 的比较；Voce I/II 的通用名称不等同于 MatchID 界面同名模型，软件内部公式仍待核实。",
-        "- Y/H 是阶段2约化识别候选，需与 MatchID 可导出的内外虚功、应力空间和参数边界逐组对照。",
+        "- Y/H 是阶段2约化识别候选，需与逐帧内外虚功、应力空间、参数边界和独立实验逐组对照。",
+        "- 当前四组等双轴实验的逐帧面积比均未达到 0.95 正式门槛，因此本批次参数统一标记为 REVIEW_REQUIRED；这不是数值失败，而是实际点场覆盖不足的证据。",
         "- S23 因视觉断裂处无力数据、S24 因预载释放记录不进入本批次。",
         "",
         "## 输出目录",

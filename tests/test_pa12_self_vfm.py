@@ -1,7 +1,18 @@
 import math
+from pathlib import Path
+from tempfile import TemporaryDirectory
 import unittest
 
-from tools.run_pa12_self_vfm import _align_frame_points, _read_frame_points
+from matplotlib.tri import Triangulation
+import numpy as np
+
+from tools.run_pa12_self_vfm import (
+    _align_frame_arrays,
+    _align_frame_points,
+    _geometry,
+    _geometry_quality,
+    _read_frame_points,
+)
 
 from tools.pa12_self_vfm import (
     equivalent_plastic_strain_plane_stress,
@@ -17,6 +28,47 @@ from tools.pa12_self_vfm import (
 
 
 class Pa12SelfVfmTests(unittest.TestCase):
+    def test_single_axis_geometry_gate_stays_in_review(self):
+        quality = _geometry_quality(
+            "单轴 X",
+            {"area_mm2": 10.0, "bounding_area_mm2": 12.0},
+            {"single_axis_geometry_gate": {"reason": "独立几何证据未完成"}},
+        )
+
+        self.assertEqual(quality["status"], "REVIEW_REQUIRED")
+        self.assertEqual(quality["reason"], "独立几何证据未完成")
+
+    def test_geometry_preserves_polygon_area_and_vertices(self):
+        with TemporaryDirectory() as directory:
+            job_path = Path(directory) / "Job.m2inp"
+            job_path.write_text(
+                "<Conversion>=<1>\n"
+                "<Reference$image>=<000000.jpg>\n"
+                "<Shape>=<2;0;False;4;0;0;2;0;1;1;0;1>\n",
+                encoding="utf-8",
+            )
+
+            geometry = _geometry(job_path)
+
+        self.assertAlmostEqual(geometry["area_mm2"], 1.5)
+        self.assertAlmostEqual(geometry["bounding_area_mm2"], 2.0)
+        self.assertEqual(len(geometry["roi_polygon_mm"]), 4)
+        self.assertFalse(geometry["roi_is_axis_aligned_rectangle"])
+
+    def test_geometry_recognizes_axis_aligned_rectangle(self):
+        with TemporaryDirectory() as directory:
+            job_path = Path(directory) / "Job.m2inp"
+            job_path.write_text(
+                "<Conversion>=<1>\n"
+                "<Reference$image>=<000000.jpg>\n"
+                "<Shape>=<2;0;False;4;0;0;2;0;2;1;0;1>\n",
+                encoding="utf-8",
+            )
+
+            geometry = _geometry(job_path)
+
+        self.assertTrue(geometry["roi_is_axis_aligned_rectangle"])
+
     def test_frame_points_are_read_with_coordinates_and_strains(self):
         from io import StringIO
 
@@ -32,6 +84,44 @@ class Pa12SelfVfmTests(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             _align_frame_points(reference, current)
+
+    def test_frame_arrays_subtract_reference_field_only_after_coordinate_check(self):
+        reference = {
+            "x": np.array([0.0, 1.0, 0.0]),
+            "y": np.array([0.0, 0.0, 1.0]),
+            "exx": np.array([0.1, 0.2, 0.3]),
+            "eyy": np.array([0.2, 0.3, 0.4]),
+            "exy": np.array([0.0, 0.0, 0.0]),
+        }
+        current = {key: value.copy() for key, value in reference.items()}
+        current["exx"] += 0.01
+        aligned = _align_frame_arrays(reference, current)
+        np.testing.assert_allclose(aligned["exx"], [0.01, 0.01, 0.01])
+        self.assertEqual(int(aligned["matched_point_count"][0]), 3)
+        current["x"][0] = 0.1
+        with self.assertRaises(ValueError):
+            _align_frame_arrays(reference, current)
+
+    def test_frame_arrays_join_coordinate_set_when_point_order_changes(self):
+        reference = {
+            "x": np.array([0.0, 1.0, 2.0, 3.0]),
+            "y": np.array([0.0, 0.0, 0.0, 0.0]),
+            "exx": np.array([0.1, 0.2, 0.3, 0.4]),
+            "eyy": np.array([0.0, 0.0, 0.0, 0.0]),
+            "exy": np.array([0.0, 0.0, 0.0, 0.0]),
+        }
+        current = {
+            "x": np.array([2.0, 0.0, 1.0]),
+            "y": np.array([0.0, 0.0, 0.0]),
+            "exx": np.array([0.35, 0.11, 0.25]),
+            "eyy": np.array([0.0, 0.0, 0.0]),
+            "exy": np.array([0.0, 0.0, 0.0]),
+        }
+        aligned = _align_frame_arrays(reference, current)
+        self.assertEqual(int(aligned["matched_point_count"][0]), 3)
+        self.assertEqual(int(aligned["reference_missing_point_count"][0]), 1)
+        self.assertEqual(int(aligned["current_extra_point_count"][0]), 0)
+        np.testing.assert_allclose(aligned["exx"], [0.01, 0.05, 0.05])
 
     def test_pointwise_virtual_work_integrates_constant_field_over_two_triangles(self):
         points = [
@@ -57,6 +147,31 @@ class Pa12SelfVfmTests(unittest.TestCase):
         self.assertAlmostEqual(result["coefficient_y"], expected_y)
         self.assertEqual(result["valid_triangle_count"], 2)
 
+    def test_numpy_grid_uses_pointwise_triangle_integration(self):
+        grid_x, grid_y = np.meshgrid(
+            np.array([0.0, 0.5, 1.0]),
+            np.array([0.0, 0.5, 1.0]),
+        )
+        points = {
+            "x": grid_x.ravel(),
+            "y": grid_y.ravel(),
+            "exx": np.full(9, 0.01),
+            "eyy": np.full(9, 0.02),
+        }
+
+        result = integrate_plane_stress_virtual_work_coefficients(
+            points=points,
+            nu=0.25,
+            thickness_mm=1.0,
+            length_x_mm=1.0,
+            length_y_mm=1.0,
+            roi_bounds=(0.0, 1.0, 0.0, 1.0),
+        )
+
+        self.assertEqual(result["integration_method"], "pointwise_triangle")
+        self.assertEqual(result["valid_triangle_count"], 8)
+        self.assertAlmostEqual(result["integrated_area_mm2"], 1.0)
+
     def test_pointwise_virtual_work_excludes_points_outside_roi(self):
         points = [
             {"x": 0.0, "y": 0.0, "exx": 0.01, "eyy": 0.02},
@@ -77,6 +192,65 @@ class Pa12SelfVfmTests(unittest.TestCase):
 
         self.assertAlmostEqual(result["integrated_area_mm2"], 2.0)
         self.assertEqual(result["excluded_point_count"], 1)
+
+    def test_polygon_roi_uses_polygon_area_instead_of_bounding_rectangle(self):
+        points = [
+            {"x": 0.0, "y": 0.0, "exx": 0.01, "eyy": 0.02},
+            {"x": 2.0, "y": 0.0, "exx": 0.01, "eyy": 0.02},
+            {"x": 1.0, "y": 1.0, "exx": 0.01, "eyy": 0.02},
+            {"x": 0.0, "y": 1.0, "exx": 0.01, "eyy": 0.02},
+            {"x": 2.0, "y": 1.0, "exx": 100.0, "eyy": 100.0},
+        ]
+
+        result = integrate_plane_stress_virtual_work_coefficients(
+            points=points,
+            nu=0.25,
+            thickness_mm=1.0,
+            length_x_mm=2.0,
+            length_y_mm=1.0,
+            roi_bounds=(0.0, 2.0, 0.0, 1.0),
+            roi_polygon=[(0.0, 0.0), (2.0, 0.0), (1.0, 1.0), (0.0, 1.0)],
+        )
+
+        self.assertAlmostEqual(result["integrated_area_mm2"], 1.5)
+        self.assertAlmostEqual(result["roi_area_mm2"], 1.5)
+        self.assertAlmostEqual(result["area_ratio"], 1.0)
+        self.assertEqual(result["excluded_point_count"], 1)
+
+    def test_pointwise_virtual_work_reuses_reference_triangulation(self):
+        points = [
+            {"x": 0.0, "y": 0.0, "exx": 0.01, "eyy": 0.02},
+            {"x": 2.0, "y": 0.0, "exx": 0.01, "eyy": 0.02},
+            {"x": 2.0, "y": 1.0, "exx": 0.01, "eyy": 0.02},
+            {"x": 0.0, "y": 1.0, "exx": 0.01, "eyy": 0.02},
+        ]
+        triangulation = Triangulation(
+            [point["x"] for point in points],
+            [point["y"] for point in points],
+        )
+        result = integrate_plane_stress_virtual_work_coefficients(
+            points=points,
+            nu=0.25,
+            thickness_mm=1.0,
+            length_x_mm=2.0,
+            length_y_mm=1.0,
+            roi_bounds=(0.0, 2.0, 0.0, 1.0),
+            triangulation=triangulation,
+        )
+        self.assertAlmostEqual(result["integrated_area_mm2"], 2.0)
+        self.assertEqual(result["valid_triangle_count"], 2)
+
+        moved = [dict(point, x=point["x"] + 0.1) for point in points]
+        with self.assertRaises(ValueError):
+            integrate_plane_stress_virtual_work_coefficients(
+                points=moved,
+                nu=0.25,
+                thickness_mm=1.0,
+                length_x_mm=2.0,
+                length_y_mm=1.0,
+                roi_bounds=(0.0, 2.0, 0.0, 1.0),
+                triangulation=triangulation,
+            )
     def test_constant_virtual_field_coefficients_are_dimensionally_consistent(self):
         bx, by = plane_stress_virtual_work_coefficients(
             exx=0.01,

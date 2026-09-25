@@ -10,7 +10,8 @@
       "Y": "(Y1_Press + Y2_Press) / 2"
     },
     "press_means_force": true,
-    "vfm_method": "MatchID built-in VFM",
+    "vfm_method": "自建 VFM（主流程）；MatchID 内置 VFM 资料仅作历史审计",
+    "matchid_role": "historical_audit_only",
     "machine_sensor_force_is_roi_boundary_resultant": true,
     "rebuild_roi_edge_traction_distribution": false,
     "thickness_mm": {
@@ -312,7 +313,8 @@
     }
   ],
   "vfm_identification_status": {
-    "method": "MatchID 自带 VFM",
+    "method": "自建 VFM 主路径",
+    "matchid_role": "历史格式、方向、Boundary/Forces 和 GUI 试算审计；不作为主流程计算依赖",
     "boundary_force_rule": "外围机器力传感器值直接作为 ROI 边界合力；不恢复四边牵引分布，不假设均布边界应力。",
     "thickness_mm": {
       "outer_structure": 3.0,
@@ -882,17 +884,20 @@
     ]
   },
   "self_vfm_status": {
-    "formal_matchid_replacement": false,
-    "method": "自建两阶段平面应力虚功识别；阶段1固定 nu=0.375 识别 E，阶段2固定 E/nu 识别 Linear Y/H，并比较通用 Ludwik、Swift、Voce I、Voce II。",
+    "formal_matchid_replacement": true,
+    "primary_method": "self-built VFM",
+    "matchid_role": "historical_audit_only",
+    "method": "自建两阶段平面应力虚功识别；阶段1固定 nu=0.375 识别 E，阶段2固定 E/nu 识别 Linear Y/H，并比较通用 Ludwik、Swift、Voce I、Voce II。正式内部虚功使用 ROI 内当前帧相邻完整网格单元拆分的逐点两三角形积分；缺失单元不补足，均值矩形法只保留为基线。",
     "geometry_scope": "仅等双轴十字试样；中心 ROI 厚度 1 mm，外围整体厚度 3 mm。",
     "experiments": {
-      "S15_XY_0.2": {"status": "SELF_VFM_REVIEW_REQUIRED", "E_MPa": 3273.8409999601095, "Y_MPa": 34.006867768150386, "H_MPa": 156.45119742268645},
-      "S16_XY_0.2": {"status": "SELF_VFM_CANDIDATE", "E_MPa": 3048.813928400544, "Y_MPa": 42.461864253133214, "H_MPa": 131.6271228715904},
-      "S17_XY_20": {"status": "SELF_VFM_REVIEW_REQUIRED", "E_MPa": 4519.5294056991725, "Y_MPa": null, "H_MPa": null},
-      "S18_XY_2": {"status": "SELF_VFM_CANDIDATE", "E_MPa": 4111.393073671239, "Y_MPa": 50.43790275515913, "H_MPa": 313.31494205059926}
+      "S15_XY_0.2": {"status": "SELF_VFM_REVIEW_REQUIRED", "effective_frames": 284, "area_ratio_range": "0.895428–0.922534", "E_MPa": 3536.325691109768, "Y_MPa": 34.05516569213514, "H_MPa": 154.56307562919164},
+      "S16_XY_0.2": {"status": "SELF_VFM_REVIEW_REQUIRED", "effective_frames": 257, "area_ratio_range": "0.892248", "E_MPa": 3405.144014940585, "Y_MPa": 39.496722905743255, "H_MPa": 156.3962631222995},
+      "S17_XY_20": {"status": "SELF_VFM_REVIEW_REQUIRED", "effective_frames": 12, "area_ratio_range": "0.905004", "E_MPa": 4991.171333371406, "Y_MPa": null, "H_MPa": null, "stage_2_status": "INSUFFICIENT_POINTS"},
+      "S18_XY_2": {"status": "SELF_VFM_REVIEW_REQUIRED", "effective_frames": 126, "area_ratio_range": "0.891147", "E_MPa": 4606.810141584899, "Y_MPa": 43.76825969545511, "H_MPa": 632.268653131508}
     },
     "single_axis_status": "S19–S24 跳过；单轴实测厚度、有效积分域和边界外功尚未有独立证据。",
-    "output_audit": "四组结果的内外虚功和模型对比 CSV 行数与帧数一致；非空数值无 NaN/无穷值。"
+    "output_audit": "四组结果的内外虚功和模型对比 CSV 行数与帧数一致；非空数值无 NaN/无穷值；目标测试 15/15、全量测试 94/94、编译检查通过。",
+    "area_gate": "四组面积比均低于 0.95，因此均保持 SELF_VFM_REVIEW_REQUIRED；候选参数不是最终材料参数。"
   },
   "not_done_before_vfm_identification": [
     "为 S23 寻找独立的断裂时刻证据；在没有证据前保持诊断状态。",
@@ -923,8 +928,10 @@
     "self_vfm_formulas": "tools/pa12_self_vfm.py",
     "self_vfm_report": "Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段报告.md",
     "self_vfm_summary": "Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM结果.csv",
-    "self_vfm_readme": "Agents/PA12实验数据处理/VFM自建/README.md"
+    "self_vfm_readme": "Agents/PA12实验数据处理/VFM自建/README.md",
+    "self_vfm_stage_a_record": "Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段A记录.md"
   },
   "formal_matchid_vfm_ready": false,
-  "next_action": "MatchID 路径继续保留 S15 ROI/参考帧和 S16 Forces 的人工核验门槛；自建 VFM 路径已可复现输出四组等双轴实验的内外虚功、应力空间、E/Y/H 和通用硬化模型比较。当前 S16、S18 为候选，S15 需复核，S17 帧数不足；单轴 S19–S22 在独立几何、厚度、积分域和外功边界证据补齐前不启动参数识别；S23 断裂力缺失，S24 为预载释放。下一步是人工复核候选曲线和几何，再决定是否将某组结果作为 MatchID 或论文参数输入。"
+  "formal_self_vfm_ready": false,
+  "next_action": "主流程沿自建 VFM 继续：先复核 S15/S16/S17/S18 的 ROI 与中心 1 mm 区域叠合、面积比、内外虚功、残差和参数稳定性；再补齐 S19–S22 单轴试样的独立厚度、有效积分域和外功边界证据，未完成前不启动单轴参数识别。MatchID 文件和 S16 3try/4try_step3/第16轮 GUI 数值保留为历史审计记录，不作为自建计算依赖；S23 缺少断裂力证据，S24 为预载释放记录。"
 }

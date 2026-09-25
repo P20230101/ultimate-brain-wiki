@@ -5,6 +5,9 @@
 ## 快速入口
 
 - [维护协议](AGENTS.md)
+- [论文写作框架](AGENTS/论文写作框架.md)
+- [科研工具环境](AGENTS/科研工具环境.md)
+- [技能分类与调用协议](AGENTS/技能分类与调用协议.md)
 - [工作日志](log.md)
 - [原始资料说明](raw/README.md)
 - [Wiki 总览](wiki/README.md)
@@ -16,6 +19,8 @@
 - 默认新笔记位置：`wiki/`。
 - 默认附件位置：`raw/assets/`。
 - 模板目录：`schema/obsidian-templates/`。
+- 每日记录目录：`wiki/daily/`。
+- 书签入口：`index.md`、`log.md`、`wiki/`、`raw/`、`schema/`。
 - 推荐流程：资料先进入 `raw/`，再用模板编译到 `wiki/`，最后追加 `log.md`。
 
 ## 核心架构
@@ -27,6 +32,13 @@
 | The schema | `AGENTS.md`, `schema/` | 规定命名、页面字段、ingest/query/lint 流程 | 已初始化 |
 
 ## Wiki 页面
+
+### 长期框架
+
+- [论文写作框架](AGENTS/论文写作框架.md)：论文润色、Discussion 写作和论文结构化总结协议。
+- [科研工具环境](AGENTS/科研工具环境.md)：MinerU 论文解析和 Semantic Scholar 文献检索配置。
+- [技能分类与调用协议](AGENTS/技能分类与调用协议.md)：所有 skill 的分类、路由和执行顺序。
+- [PA12 双轴试样仿真与实验全流程](AGENTS/PA12双轴试样仿真与实验全流程.md)：当前 SLS PA12 双轴试样课题的执行协议。
 
 ### 总览
 
@@ -44,6 +56,12 @@
 - [PA12 论文写作学习：从实验结果到可辩护结论](wiki/methods/PA12论文写作学习_两篇激光烧结PA12论文.md)：从两篇激光烧结 PA12 论文提炼摘要、引言、方法、结果讨论和结论的写法。
 - [去 AI 味与非防御性学术写作](wiki/methods/去AI味与非防御性学术写作.md)：规定后续中文论文修订如何删套话、保留证据边界并避免重复性防御表达。
 
+### 文献
+
+- [检索增强生成：面向知识密集型自然语言处理任务](wiki/literature/rag-2020-knowledge-intensive-nlp.md)：以一篇新论文验证“官方来源 → Raw source → MinerU → 中文 Wiki”的完整流程。
+- [PA12 双轴中心区均匀性筛选](wiki/methods/PA12双轴中心区均匀性筛选.md)：用 Abaqus、DIC 和 VFM 比较中心区均匀性的力学方法页。
+- [PA12 流程验证报告](AGENTS/PA12双轴试样仿真/验证/2026-09-22_流程验证报告.md)：五个 STEP 前处理、Abaqus smoke solve 和 ODB 指标提取的证据。
+
 ## 原始资料
 
 - [Karpathy LLM Wiki gist](raw/karpathy-llm-wiki.md)：本仓库的初始参考资料。
@@ -57,9 +75,9 @@
 - [PA12 单轴试样几何证据缺口](Agents/PA12实验数据处理/处理记录/PA12单轴几何证据缺口.md)：记录长条单轴试样与双轴中心 ROI 的区别，以及单轴厚度、宽度、标距、积分域和外功定义的未确认项。
 - [S19 全场应变预审](Agents/PA12实验数据处理/处理记录/PA12_S19全场应变预审.md)：126 帧、9144 点/帧的 Exx/Eyy/Exy 空间统计；支持进入灵敏度/秩分析，但不直接证明 Y/H 可辨识。
 - [PA12 双轴 VFM 首试候选评估](Agents/PA12实验数据处理/处理记录/PA12双轴VFM首试候选评估.md)：暂选 S15_XY_0.2 做 MatchID 输入/虚功核验；S15 目录目前只有 Job/mti，没有 `.vfm` 工程文件；`.mti` 已确认参考帧、285 条含参考帧的有效 DIC 条目、`000285=False` 和 ROI 元数据；原始 Press 表的四个力通道可按同一照片时间轴复用，S15 VFM 需要每组 285 个值（参考帧零值 + 284 个非参考帧），平均值与现有 CSV 差异小于 `5×10⁻⁷ N`。REV B 图纸给出双轴中心约 28×28 mm、中心厚度 1 mm，模型采用外围总厚 3 mm（图纸标为推定值）；若同心，S15 Job ROI 约 28.78×28.78 mm 位于名义 30 mm 减薄区内，但相对 28 mm 平坦区每侧超出约 0.388 mm，当前标为潜在过渡区重叠，未通过人工核验；不等于开始参数识别，且不适用于单轴长条几何。
-- [GPT/MatchID 交接文档](Agents/PA12实验数据处理/处理记录/PA12_GPT交接文档.md)：记录当前 GUI 试算、S16 输入问题、S15有效帧、S19 `.vfm` 缺少 Boundary/Forces 及线性本构 H 符号待核验项。
-- [GPT/MatchID 机器状态](Agents/PA12实验数据处理/处理记录/PA12_GPT交接状态.json)：记录实验级状态、已更正的 S15 284 帧有效合并口径、MatchID 自带 VFM 边界合力规则和 S16 试算状态。
-- [PA12 实验总体方法与防跑偏协议](Agents/PA12实验数据处理/处理记录/PA12实验总体方法与防跑偏协议.md)：固定 MatchID 自带 VFM、外围传感器力作为 ROI 边界合力、中心/外围厚度区分及逐组分阶段识别规则。
+- [GPT/VFM 交接文档](Agents/PA12实验数据处理/处理记录/PA12_GPT交接文档.md)：记录自建 VFM 主流程、四组阶段 A 结果，以及 S16 输入问题和 GUI 中间候选；历史 MatchID 资料只作审计证据。
+- [GPT/VFM 机器状态](Agents/PA12实验数据处理/处理记录/PA12_GPT交接状态.json)：记录实验级状态、已更正的 S15 284 帧有效合并口径、自建 VFM 主路径、历史 MatchID 边界审计和 S16 试算状态。
+- [PA12 实验总体方法与防跑偏协议](Agents/PA12实验数据处理/处理记录/PA12实验总体方法与防跑偏协议.md)：固定自建 VFM 主路径、外围传感器力作为 ROI 边界合力、中心/外围厚度区分及逐组分阶段识别规则；MatchID 保留为历史审计。
 - [PA12 GPT 交接状态](Agents/PA12实验数据处理/处理记录/PA12_GPT交接状态.json)：当前短 STEP 已按实体拓扑复核 `150.4×150.4×3.0 mm` 包络、中心 `1 mm` 平面和约 `0.995 mm` 过渡几何；`verification.json` 长文件名映射仍待补证，实物厚度与 S15 ROI containment 仍未通过，不据此解除 VFM 门槛。
 - [PA12 单轴到双轴弹塑性 VFM 总目标与阶段路线图](wiki/PA12单轴到双轴弹塑性VFM总目标与阶段路线图.md)：保留完整项目目标与分阶段门槛；追加 Linear 公式负斜率与正 H 工作参数的已核实冲突及识别前置核验要求。
 - [批量处理报告](Agents/PA12实验数据处理/处理记录/PA12批量处理报告.md)：旋转序列批处理状态和输出位置；其中“VFM_READY/正式 VFM”是同步力值输出契约，不等于 MatchID `.vfm` 工程或虚功完成。
@@ -70,14 +88,17 @@
 - [实验概览汇总](Agents/PA12实验数据处理/实验概览/PA12实验概览_汇总.xlsx)：中文实验概览表。
 - [应力—应变结果](Agents/PA12实验数据处理/应力应变/)：每个已处理实验的名义应力—应变表、曲线图和线性/屈服候选报告。
 - [MatchID VFM 准备包](Agents/PA12实验数据处理/MatchID_VFM准备/)：DIC 元数据、已验证 DAT 字段映射、帧—力—时间索引和下一步导出说明。
-- [PA12 自建 VFM 输出](Agents/PA12实验数据处理/VFM自建/)：在 MatchID 输入或参数识别需要独立复核时，导出内外虚功、E、Y/H、应力空间和五类通用硬化模型对比；当前只对等双轴几何证据充分的实验开放。
+- [PA12 自建 VFM 输出](Agents/PA12实验数据处理/VFM自建/)：PA12 VFM 主流程入口；导出逐点内外虚功、E、Y/H、应力空间和五类通用硬化模型对比。阶段 A 记录见 [PA12自建VFM阶段A记录](Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段A记录.md)；四组当前均为 `SELF_VFM_REVIEW_REQUIRED`，MatchID 文件仅保留为历史审计证据。
 - [MatchID 闭环状态](Agents/PA12实验数据处理/MatchID_VFM准备/PA12_MatchID_VFM闭环状态.md)：区分同步力值、DAT 全场记录、Job 覆盖、缺导出、无效导出和已合并状态。
-- [PA12 等双轴 VFM 当前检查结果](Agents/PA12实验数据处理/MatchID_VFM准备/PA12等双轴VFM当前检查结果.md) / [CSV](Agents/PA12实验数据处理/MatchID_VFM准备/PA12等双轴VFM当前检查结果.csv)：按 0.2、2、20 mm/s 汇总四组实验检查项；S15有效帧为284。检查器定向测试 4/4、当前全量回归 83/83 通过；当前 Markdown/CSV 与 builder 全字段一致，并分别表达预处理/VFM同步状态。
-- [VFM 边界载荷说明](Agents/PA12实验数据处理/MatchID_VFM准备/PA12_VFM边界载荷说明.md)：机器通道到旋转后边界映射、外围力作为 MatchID 自带 VFM 边界合力、S15 四边力蓝图 CSV/JSON，以及 S16 完整 `.vfm` 格式审计；S16 `3try` 载荷不同步、`4try_step3` 的 `Forces count=0`，第 16 轮为交接主记录中的 GUI 中间候选，受保护并行报告另有第 28 轮候选；两者均非最终参数。
+- [PA12 等双轴 VFM 当前检查结果](Agents/PA12实验数据处理/MatchID_VFM准备/PA12等双轴VFM当前检查结果.md) / [CSV](Agents/PA12实验数据处理/MatchID_VFM准备/PA12等双轴VFM当前检查结果.csv)：按 0.2、2、20 mm/s 汇总四组实验检查项；S15有效帧为284。检查器定向测试和全量回归结果以 GPT 交接状态及最新日志为准；当前 Markdown/CSV 与 builder 全字段一致，并分别表达预处理/VFM同步状态。
+- [VFM 边界载荷说明](Agents/PA12实验数据处理/MatchID_VFM准备/PA12_VFM边界载荷说明.md)：保留机器通道到旋转后边界映射、外围力作为 ROI 边界合力、S15 四边力蓝图 CSV/JSON，以及 S16 完整 `.vfm` 格式审计；当前自建 VFM 为主流程，S16 `3try` 载荷不同步、`4try_step3` 的 `Forces count=0` 和第 16 轮数值均仅为历史 GUI 审计，不是最终参数。
 - [VFM 边界载荷审计](Agents/PA12实验数据处理/MatchID_VFM准备/PA12_VFM边界载荷审计.json)：完整 S16 `.vfm` 的 Boundary/Forces、帧数、厚度和正值力审计。
 - [DAT 逐帧质量审计](Agents/PA12实验数据处理/MatchID_VFM准备/PA12_DIC_DAT质量审计.md)：逐照片记录 `<18>/<53>` 可用性，禁止把无应变记录的 DAT 当作完整全场。
 - [处理环境检查](Agents/PA12实验数据处理/MatchID_VFM准备/PA12_环境检查.md)：记录 Python 依赖、原始输入路径和本机 MatchID 可执行性；当前交接状态另记录窗口可枚举但桌面状态捕获不可用，未解锁 S15 GUI 人工核验。
 - [原始方向与旋转标定方向](raw/assets/PA12原始方向与旋转标定方向.jpg)：用户提供的机器方向证据。
+- [RAG 论文 PDF](raw/papers/lewis2020-rag-knowledge-intensive-nlp-v4.pdf)：Lewis 等，arXiv:2005.11401v4。
+- [RAG 原始文献登记卡](raw/papers/lewis2020-rag-knowledge-intensive-nlp-v4.md)：来源、哈希、解析范围和定位记录。
+- [PA12 数据源登记](raw/datasets/PA12数据源登记.md)：外部实验、DIC、MatchID、VFM 与 STEP 数据的来源和边界。
 
 ## 当前成功标准
 
@@ -86,3 +107,5 @@
 - `index.md` 能作为 Obsidian 和 GitHub Pages 的首页。
 - `log.md` 能追踪每次资料处理、查询和健康检查。
 - PA12 总目标按[阶段计划](Agents/PA12实验数据处理/处理记录/PA12总目标与阶段计划.md)执行；已有 DIC—同步力合并和 VFM 文件格式审计不等于参数识别完成。仍需完成单轴弹塑性识别、模型比较、独立验证、双轴识别/验证、四类图表和最终人工审核。
+- 新论文可由 MinerU 解析并编译为带 locator 引用的中文文献页。
+- PA12 原始数据可被定位到，五个已核实厚度模型可进入 Abaqus 输入文件生成和中心区均匀性后处理流程。
