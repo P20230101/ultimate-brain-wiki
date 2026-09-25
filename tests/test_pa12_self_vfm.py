@@ -12,6 +12,7 @@ from tools.run_pa12_self_vfm import (
     _geometry,
     _geometry_quality,
     _read_frame_points,
+    _usable_modulus,
 )
 
 from tools.pa12_self_vfm import (
@@ -28,6 +29,11 @@ from tools.pa12_self_vfm import (
 
 
 class Pa12SelfVfmTests(unittest.TestCase):
+    def test_nonpositive_elastic_fit_is_not_used_for_plastic_strain(self):
+        self.assertIsNone(_usable_modulus({"modulus_mpa": -12.0}))
+        self.assertIsNone(_usable_modulus({"modulus_mpa": 0.0}))
+        self.assertAlmostEqual(_usable_modulus({"modulus_mpa": 1200.0}), 1200.0)
+
     def test_single_axis_geometry_gate_stays_in_review(self):
         quality = _geometry_quality(
             "单轴 X",
