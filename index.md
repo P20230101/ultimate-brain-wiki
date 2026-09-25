@@ -89,6 +89,8 @@
 - [应力—应变结果](Agents/PA12实验数据处理/应力应变/)：每个已处理实验的名义应力—应变表、曲线图和线性/屈服候选报告。
 - [MatchID VFM 准备包](Agents/PA12实验数据处理/MatchID_VFM准备/)：DIC 元数据、已验证 DAT 字段映射、帧—力—时间索引和下一步导出说明。
 - [PA12 自建 VFM 输出](Agents/PA12实验数据处理/VFM自建/)：PA12 VFM 主流程入口；导出逐点内外虚功、E、Y/H、应力空间和五类通用硬化模型对比。阶段 A 记录见 [PA12自建VFM阶段A记录](Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段A记录.md)；四组当前均为 `SELF_VFM_REVIEW_REQUIRED`，MatchID 文件仅保留为历史审计证据。
+- [PA12 自建 VFM 阶段 B：单轴 Polygon 复核](Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段B单轴Polygon复核.md)：S19–S22 已接入真实 Job Polygon；结果全部保留复核状态，单轴几何、面积覆盖和外功边界门槛尚未通过。
+- [PA12 自建 VFM 阶段 C：等双轴虚功与稳定性门槛](Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段C等双轴虚功与稳定性门槛.md)：汇总 S15–S18 的面积比、阶段 1 虚功残差和阶段 2 可用性；四组均未通过正式发布门槛，S16/S18 进入稳定性复核候选。
 - [MatchID 闭环状态](Agents/PA12实验数据处理/MatchID_VFM准备/PA12_MatchID_VFM闭环状态.md)：区分同步力值、DAT 全场记录、Job 覆盖、缺导出、无效导出和已合并状态。
 - [PA12 等双轴 VFM 当前检查结果](Agents/PA12实验数据处理/MatchID_VFM准备/PA12等双轴VFM当前检查结果.md) / [CSV](Agents/PA12实验数据处理/MatchID_VFM准备/PA12等双轴VFM当前检查结果.csv)：按 0.2、2、20 mm/s 汇总四组实验检查项；S15有效帧为284。检查器定向测试和全量回归结果以 GPT 交接状态及最新日志为准；当前 Markdown/CSV 与 builder 全字段一致，并分别表达预处理/VFM同步状态。
 - [VFM 边界载荷说明](Agents/PA12实验数据处理/MatchID_VFM准备/PA12_VFM边界载荷说明.md)：保留机器通道到旋转后边界映射、外围力作为 ROI 边界合力、S15 四边力蓝图 CSV/JSON，以及 S16 完整 `.vfm` 格式审计；当前自建 VFM 为主流程，S16 `3try` 载荷不同步、`4try_step3` 的 `Forces count=0` 和第 16 轮数值均仅为历史 GUI 审计，不是最终参数。

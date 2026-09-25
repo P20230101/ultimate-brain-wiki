@@ -1,8 +1,8 @@
 {
   "batch_config": "configs/pa12_rotated_batch.json",
   "output_directory": "Agents/PA12实验数据处理/VFM自建",
-  "eligible_loading_modes": ["双轴"],
-  "ineligible_mode_reason": "单轴长条试样的厚度、有效积分域和边界外功尚无独立证据；补齐证据前不进入自建 VFM 参数识别。",
+  "eligible_loading_modes": ["双轴", "单轴 X", "单轴 Y"],
+  "ineligible_mode_reason": "其他加载模式不进入自建 VFM；单轴 X/Y 仅允许诊断 Polygon 复核，几何和外功门槛通过前不得作为正式参数识别。",
   "single_axis_geometry_gate": {
     "status": "REVIEW_REQUIRED",
     "reason": "单轴 Job Polygon 已用于逐点积分，但单轴实测厚度、有效宽度、标距、积分域物理含义和外功边界尚未独立确认。"

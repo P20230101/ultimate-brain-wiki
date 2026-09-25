@@ -6,7 +6,7 @@
   "execution_goal_v2": {
     "status": "STAGE_A_COMPLETE_REVIEW_REQUIRED",
     "primary_method": "自建 VFM；MatchID 资料作为格式、方向、边界和 GUI 历史审计",
-    "success_definition": "完成可复现的照片-DIC-Press-VFM链；四组等双轴先通过ROI覆盖、同步、虚功残差和参数稳定性门槛，再发布候选参数；单轴须先补齐独立几何和外功证据",
+    "success_definition": "完成可复现的照片-DIC-Press-VFM链；四组等双轴先通过ROI覆盖、同步、虚功残差和参数稳定性门槛，再发布候选参数；单轴先允许真实Job Polygon诊断复核但不得发布参数，正式识别须补齐独立几何和外功证据",
     "current_task": "复核四组等双轴 ROI 实际有效场覆盖、内外虚功残差和参数稳定性",
     "quality_review": {
       "S15_XY_0.2": {"stage1_rmse_x_N": 6543.63221, "stage1_rmse_y_N": 6428.478152, "cumulative_E_range_MPa": [-8529.023, 6993.93], "status": "REVIEW_REQUIRED"},
@@ -19,6 +19,7 @@
       "ROI与中心1 mm厚度空间叠合复核",
       "四组等双轴虚功残差和参数稳定性复核",
       "跨速度/跨实验候选参数比较",
+      "单轴真实Job Polygon诊断复核并保持REVIEW_REQUIRED",
       "补齐单轴独立几何、厚度、积分域和外功证据",
       "单轴VFM与最终材料参数验证"
     ]
@@ -918,6 +919,19 @@
     "single_axis_status": "S19–S24 跳过；单轴实测厚度、有效积分域和边界外功尚未有独立证据。",
     "output_audit": "四组结果的内外虚功和模型对比 CSV 行数与帧数一致；非空数值无 NaN/无穷值；目标测试 15/15、全量测试 94/94、编译检查通过。",
     "area_gate": "四组面积比均低于 0.95，因此均保持 SELF_VFM_REVIEW_REQUIRED；候选参数不是最终材料参数。"
+    ,"stage_b_single_axis_polygon": {
+      "status": "REVIEW_REQUIRED",
+      "experiments": ["S19_X_0.2", "S20_X_2", "S21_X_20", "S22_Y_0.2"],
+      "completed": "真实 Job Polygon 接入自建 VFM；Polygon 面积按标定坐标计算；逐点三角形积分不补足缺失场点；单轴结果强制保留几何复核门控。",
+      "results_summary": {
+        "S19_X_0.2": {"frames": 126, "area_ratio": 0.870952, "E_MPa": 23537.7466, "Y_MPa": 0.8282, "H_MPa": 5495.4276},
+        "S20_X_2": {"frames": 63, "area_ratio": 0.846928, "raw_E_MPa": -197223.4769, "stage_2": "NOT_COMPUTED"},
+        "S21_X_20": {"frames": 36, "area_ratio": 0.867534, "E_MPa": 101004.2415, "stage_2": "NOT_COMPUTED"},
+        "S22_Y_0.2": {"frames": 223, "area_ratio_range": "0.826930–0.847520", "E_MPa": 2415.9293, "Y_MPa": 23.7537, "H_MPa": 54.5878}
+      },
+      "gate": "单轴实际厚度、有效宽度、标距、Polygon物理含义和外部虚功边界尚无独立证据；四组面积比低于0.95；不得把上述数值写成最终材料参数或代理模型标签。",
+      "record": "Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段B单轴Polygon复核.md"
+    }
   },
   "not_done_before_vfm_identification": [
     "为 S23 寻找独立的断裂时刻证据；在没有证据前保持诊断状态。",
@@ -950,6 +964,8 @@
     "self_vfm_summary": "Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM结果.csv",
     "self_vfm_readme": "Agents/PA12实验数据处理/VFM自建/README.md",
     "self_vfm_stage_a_record": "Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段A记录.md"
+    ,"self_vfm_stage_b_record": "Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段B单轴Polygon复核.md"
+    ,"self_vfm_stage_c_record": "Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段C等双轴虚功与稳定性门槛.md"
   },
   "formal_matchid_vfm_ready": false,
   "formal_self_vfm_ready": false,
