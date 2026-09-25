@@ -260,7 +260,31 @@ def _write_report(path: Path, audit: dict) -> None:
         x_status = item["axes"]["X"]["status"]
         y_status = item["axes"]["Y"]["status"]
         plot_status = "有效" if item["plot"]["valid"] else "无效/缺失"
-        lines.append(f"| {item['experiment_id']} | {item['status']} | {x_status} | {y_status} | {plot_status} | 行数 {item['row_count']}，报告存在={item['report_exists']} |")
+        notes = []
+        for axis in item["active_axes"]:
+            result = item["axes"][axis]
+            if not result["finite"]:
+                notes.append(f"{axis}向应力/应变含缺失或非有限值")
+            if not result["strain_monotonic"]:
+                notes.append(f"{axis}向应变非单调")
+            if not result["force_nonnegative_after_first"]:
+                notes.append(f"{axis}向首行后存在负应力")
+            if not result["first_force_near_zero"]:
+                notes.append(f"{axis}向首行应力不接近零")
+            if not result["has_peak_and_drop"]:
+                ratio = result["post_peak_min_ratio"]
+                detail = "未观察到峰值后的明显掉载"
+                if ratio is not None:
+                    detail += f"（峰后最低应力/峰值={ratio:.4f}，门槛≤0.2000）"
+                else:
+                    detail += "（峰值后无可用数据）"
+                notes.append(f"{axis}向{detail}")
+        if not item["plot"]["valid"]:
+            notes.append("检查图PNG缺失或无效")
+        if not item["report_exists"]:
+            notes.append("应力—应变分析报告缺失")
+        summary = "；".join(notes) if notes else f"行数 {item['row_count']}，报告存在={item['report_exists']}"
+        lines.append(f"| {item['experiment_id']} | {item['status']} | {x_status} | {y_status} | {plot_status} | {summary} |")
     lines += [
         "",
         "## 判定说明",

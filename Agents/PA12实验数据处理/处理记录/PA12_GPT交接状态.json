@@ -4,10 +4,10 @@
   "vault": "D:/2026.9.21_finally",
   "raw_source_root": "D:/C盘迁移/Desktop/yuan",
   "execution_goal_v2": {
-    "status": "STAGE_I_REVIEW_REQUIRED",
+    "status": "DIAGNOSTIC_PIPELINE_ACTIVE_FORMAL_PARAMETERS_REVIEW_REQUIRED",
     "primary_method": "自建 VFM；MatchID 资料作为格式、方向、边界和 GUI 历史审计",
-    "success_definition": "完成可复现的照片-DIC-Press-自建VFM链；逐实验生成中文概览、同步表、力值、逐点内外虚功/残差、参数候选和不断段的名义应力—应变曲线；X/Y同图显示，任何绘图平滑不得回写计算数据；MatchID不可用时以自建VFM继续。单轴Job Polygon只作诊断并强制REVIEW_REQUIRED；只有ROI/厚度、外功边界、ν约束、参数稳定性和跨实验验证通过后才发布正式材料参数及J2结果",
-    "current_task": "阶段I已将机器轴—DIC轴映射改为逐实验显式配置，并按S22照片/Job ROI证据重算单轴诊断；全部仍为REVIEW_REQUIRED。下一步确认单轴传感器—Job坐标变换、几何/外功边界，并解决S16试样—STEP身份与ROI注册。MatchID仅作审计，不作为停工条件",
+    "success_definition": "原始JPG/DAT/XLS只读；可重复执行照片-DIC-Press-自建VFM处理链；逐实验生成同步数据、完整工程应力—应变图（同图显示有效X/Y曲线并标记线性段和屈服候选）、逐点内外虚功/残差、诊断级参数候选、灵敏度/稳定性和中文交接。先完成所有数据可支持的诊断，不因等待物理证据而停止计算；诊断候选不得标为正式材料参数。只有ROI/厚度/截面/边界、机器—DIC坐标、本构和应变测度、独立ν、虚功闭合、参数稳定性与跨实验留出门槛通过后才发布正式材料参数/J2结果。MatchID仅为可选对照，不是停工条件",
+    "current_task": "继续逐组审核应力—应变曲线和内部关系；只读审计已知9组图表存在，6组PASS、S15/S22/S23为REVIEW_REQUIRED、S24为PRELOAD_RELEASE_ONLY。同步核对自建VFM当前结果及文档版本；运行可复现诊断与稳定性分析，保留所有正式参数发布门槛。",
     "quality_review": {
       "S15_XY_0.2": {"full_history_residual_rmse_x_N": 6417.20092, "full_history_residual_rmse_y_N": 6532.553864, "cumulative_E_range_MPa": [-8527.135984, 6996.115161], "conditional_E_MPa_at_nu_0_375": 3536.445696, "profile_nu_minimum_at_upper_bound": 0.499, "status": "REVIEW_REQUIRED"},
       "S16_XY_0.2": {"full_history_residual_rmse_x_N": 4882.159102, "full_history_residual_rmse_y_N": 4919.443607, "cumulative_E_range_MPa": [3410.423189, 10146.905981], "conditional_E_MPa_at_nu_0_375": 3410.423189, "profile_1pct_nu_range": [0.048, 0.499], "status": "REVIEW_REQUIRED"},
@@ -991,6 +991,15 @@
   },
   "formal_matchid_vfm_ready": false,
   "formal_self_vfm_ready": false,
+  "stage_a_reproducibility_audit": {
+    "status": "PASS_WITH_RELEASE_GATES_UNMET",
+    "date": "2026-09-26",
+    "experiments": 4,
+    "frame_rows": 679,
+    "checks": ["photo uniqueness", "strictly increasing photo time", "stage-1 internal virtual work E*coefficient and residual identities", "stage-2 internal work and residual identities", "CSV area minima agree with result JSON"],
+    "result": "所有逐帧恒等式与源结果一致；S15/S16/S17/S18面积比仍低于0.95，S15阶段1相对RMSE=0.11199813，S17阶段2点数不足；S16/S18固定窗口及严格留出仍显示参数不稳定。",
+    "records": ["Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段C等双轴虚功与稳定性门槛.md", "Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM阶段D双口径残差与稳定性比较.md"]
+  },
   "stage_c_gate": {
     "status": "REVIEW_REQUIRED",
     "biaxial_path_consistency": "S16/S18 overall near equal-biaxial; not an explanation for H drift",
@@ -1103,9 +1112,17 @@
       "S19_X_0.2": {"machine_x_dic_axis": "y", "machine_y_dic_axis": "x", "status": "CANDIDATE_UNVERIFIED", "E_MPa": 5389.402871, "Y_MPa": 8.942002, "H_MPa": 23357.944452, "minimum_area_ratio": 0.870952},
       "S20_X_2": {"machine_x_dic_axis": "y", "machine_y_dic_axis": "x", "status": "CANDIDATE_UNVERIFIED", "E_MPa": 17600.491868, "Y_MPa": 41.736171, "H_MPa": 18526.974314, "minimum_area_ratio": 0.846928},
       "S21_X_20": {"machine_x_dic_axis": "y", "machine_y_dic_axis": "x", "status": "CANDIDATE_UNVERIFIED", "E_MPa": 16912.331255, "Y_MPa": null, "H_MPa": null, "minimum_area_ratio": 0.867534},
-      "S22_Y_0.2": {"machine_x_dic_axis": "x", "machine_y_dic_axis": "y", "status": "IMAGE_SUPPORTED_NEEDS_COORDINATE_CONFIRMATION", "E_MPa": 10535.036031, "Y_MPa": 103.581824, "H_MPa": 238.038563, "minimum_area_ratio": 0.826930, "prior_mapping_E_MPa": -26339.72}
+      "S22_Y_0.2": {"machine_x_dic_axis": "x", "machine_y_dic_axis": "y", "status": "IMAGE_SUPPORTED_NEEDS_COORDINATE_CONFIRMATION", "E_MPa": 10535.036031, "Y_MPa": 113.090364, "H_MPa": 202.772901, "minimum_area_ratio": 0.826930, "prior_mapping_E_MPa": -26339.72}
     },
     "qualification": "全组单轴状态保持SELF_VFM_REVIEW_REQUIRED；固定nu=0.375、候选映射、面积门槛和单轴几何/外功未通过，不得发布正式参数。"
   },
-  "next_action": "阶段A–I已记录照片—力同步、逐点虚功、双轴完整Job ROI主结果与内缩域敏感性、稳定性、单轴Polygon诊断、E–ν剖面、S22横向应变、S16源几何尺寸及单轴显式机器轴—DIC轴映射。当前8组自建VFM输出均为REVIEW_REQUIRED。优先确认S16试样—STEP身份和ROI亚像素注册；确认S19–S22各自传感器/夹具与Job/DIC坐标变换，随后更新映射并重算；补实测厚度、有效宽度、标距、物理积分域和有向外功边界。另需独立ν、弹性窗口、参数稳定性与跨实验留出通过后才发布E/Y/H/J2。MatchID文件及GUI历史参数仅作审计；S23断裂处缺力，S24为预载释放。"
+  "stress_strain_curve_audit_snapshot": {
+    "source": "只读执行 tools.audit_pa12_stress_strain.build_audit(configs/pa12_rotated_batch.json)",
+    "curves_present": 9,
+    "status_counts": {"PASS": 6, "REVIEW_REQUIRED": 3, "PRELOAD_RELEASE_ONLY": 1},
+    "review_experiments": ["S15_XY_0.2", "S22_Y_0.2", "S23_Y_2"],
+    "formal_curve_audit_ready": false,
+    "note": "状态计数涵盖全部10组实验；9组已有曲线，S24为预载释放且不生成拉伸曲线。PNG存在不等于曲线审核通过。"
+  },
+  "next_action": "按修订后的总目标执行：逐组复核S15/S22/S23应力—应变关系并解释失败项；复现阶段A–I自建VFM诊断、固定窗口和跨实验留出结果，优先完成仍可计算部分，不因等待物理证据而停工。正式材料参数/J2发布仍被真实ROI/厚度/截面/边界、机器—DIC坐标、独立ν、本构/应变测度、虚功残差、稳定性与留出门槛阻断。MatchID仅作可选审计；S23断裂力缺失不补造，S24预载释放不进入完整拉伸。每轮更新中文结果、完成/未完成/限制/环境/GPT接续文档，并验证后推送派生文件。"
 }

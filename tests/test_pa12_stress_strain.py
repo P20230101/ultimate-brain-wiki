@@ -101,6 +101,51 @@ class Pa12StressStrainAuditTests(unittest.TestCase):
             report = report_path.read_text(encoding="utf-8")
             self.assertIn("预载释放记录", report)
 
+    def test_stress_audit_report_explains_missing_fracture_drop(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            report_path = Path(temporary_directory) / "audit.md"
+            _write_report(
+                report_path,
+                {
+                    "formal_curve_audit_ready": False,
+                    "experiments": [
+                        {
+                            "experiment_id": "S15_XY_0.2",
+                            "status": "REVIEW_REQUIRED",
+                            "active_axes": ["X", "Y"],
+                            "row_count": 284,
+                            "report_exists": True,
+                            "plot": {"valid": True},
+                            "axes": {
+                                "X": {
+                                    "status": "REVIEW_REQUIRED",
+                                    "finite": True,
+                                    "strain_monotonic": True,
+                                    "force_nonnegative_after_first": True,
+                                    "first_force_near_zero": True,
+                                    "has_peak_and_drop": False,
+                                    "post_peak_min_ratio": None,
+                                },
+                                "Y": {
+                                    "status": "REVIEW_REQUIRED",
+                                    "finite": True,
+                                    "strain_monotonic": True,
+                                    "force_nonnegative_after_first": True,
+                                    "first_force_near_zero": True,
+                                    "has_peak_and_drop": False,
+                                    "peak_stress_mpa": 53.461,
+                                    "post_peak_min_ratio": 0.9997,
+                                },
+                            },
+                        }
+                    ],
+                },
+            )
+
+            report = report_path.read_text(encoding="utf-8")
+            self.assertIn("未观察到峰值后的明显掉载", report)
+            self.assertIn("峰后最低应力/峰值=0.9997", report)
+
 
 if __name__ == "__main__":
     unittest.main()
