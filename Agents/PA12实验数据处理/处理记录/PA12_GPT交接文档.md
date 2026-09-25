@@ -186,6 +186,8 @@
 - 当前阶段 A–I：双轴完整 Job ROI 主结果、内缩域敏感性、稳定性/留出、单轴 Polygon、E–ν 剖面、S22 横向应变窗口、源 STEP ROI 尺寸与单轴显式轴映射均已记录。四组等双轴和四组单轴仍为 `REVIEW_REQUIRED`；阶段 F 未识别稳定 ν，单轴面积比未达 0.95。S22 阶段 1/2使用同一显式轴映射，完整 Job ROI 条件候选为 `E=10535.04/Y=113.09/H=202.77 MPa`；阶段 2机器 Y 内部虚功残差 RMSE=`163.81 N`、最大绝对值=`772.57 N`，映射仍待设备坐标确认。S16 实物身份/亚像素配准缺失；S17 阶段 2点数不足，S23 断裂处无力，S24 为预载释放。详见[阶段 G](../VFM自建/汇总/PA12自建VFM阶段G S22单轴横向应变诊断.md)、[阶段 H](../VFM自建/汇总/PA12自建VFM阶段H双轴ROI与厚度几何门槛.md)和[阶段 I](../VFM自建/汇总/PA12自建VFM阶段I单轴机器轴与DIC轴映射复核.md)。
 - 当前下一道门槛：取得 S16 试样—STEP 对应和 ROI 亚像素配准；逐实验确认 S19–S22 传感器/夹具—Job/DIC 坐标变换、单轴厚度/有效宽度/标距、积分域与有向外功边界。并补独立 ν 和弹性区证据；所有门槛通过后重算 E/J2 并做跨实验留出验证。
 
+跨实验诊断入口：`tools/audit_pa12_self_vfm_cross_experiment.py`；报告：[PA12等双轴跨实验留出审计](../VFM自建/汇总/PA12等双轴跨实验留出审计.md)，机器明细：`Agents/PA12实验数据处理/VFM自建/汇总/PA12等双轴跨实验留出审计.csv`。S15–S18 组间跨速率迁移误差已计算，但没有同速率重复样本，不能由此证明材料参数重复性；S17 阶段 2未达到最小点数。
+
 复现入口：`tools/run_pa12_self_vfm.py`；配置：`configs/pa12_self_vfm.json`；E–ν 审计：`tools/audit_pa12_self_vfm_nu_profile.py`；结果总表：`Agents/PA12实验数据处理/VFM自建/汇总/PA12自建VFM结果.csv`。四组仍是复核结果；不能绕过数据、几何、面积、ν 可辨识性和稳定性门槛直接写成正式材料参数。
 
 ## 8. 可复现命令
@@ -199,6 +201,7 @@ python tools/audit_matchid_dic.py --config configs/pa12_rotated_batch.json
 python tools/audit_pa12_outputs.py --config configs/pa12_rotated_batch.json
 python tools/audit_pa12_vfm_boundary.py --config configs/pa12_vfm_boundary.json
 python tools/run_pa12_self_vfm.py --batch-config configs/pa12_rotated_batch.json --config configs/pa12_self_vfm.json
+python tools/audit_pa12_self_vfm_cross_experiment.py --results-root "Agents/PA12实验数据处理/VFM自建/实验结果" --config configs/pa12_self_vfm.json --output "Agents/PA12实验数据处理/VFM自建/汇总/PA12等双轴跨实验留出审计.csv"
 python -m compileall -q tools tests
 ```
 

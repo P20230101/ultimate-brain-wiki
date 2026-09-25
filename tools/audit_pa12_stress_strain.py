@@ -215,6 +215,20 @@ def audit_experiment(entry: dict, manifest_row: dict, output_root: Path) -> dict
         active_axes=_active_axes(entry),
     )
     result["experiment_id"] = experiment_id
+    if entry.get("visual_fracture_confirmed"):
+        fracture_frame = entry["visual_fracture_frame"]
+        if entry.get("force_missing_at_visual_fracture"):
+            result["event_context"] = (
+                f"视觉断裂帧={fracture_frame}；力数据最后支持照片="
+                f"{entry['last_force_supported_photo']}；断裂力缺失"
+            )
+        elif entry.get("excluded_frame_numbers"):
+            result["event_context"] = (
+                f"视觉断裂帧={fracture_frame}，{entry['excluded_frame_reason']}；"
+                f"曲线最后有效帧={manifest_row['last_image']}"
+            )
+        else:
+            result["event_context"] = f"视觉断裂帧={fracture_frame}"
     return result
 
 
@@ -283,6 +297,8 @@ def _write_report(path: Path, audit: dict) -> None:
             notes.append("检查图PNG缺失或无效")
         if not item["report_exists"]:
             notes.append("应力—应变分析报告缺失")
+        if item.get("event_context"):
+            notes.append(item["event_context"])
         summary = "；".join(notes) if notes else f"行数 {item['row_count']}，报告存在={item['report_exists']}"
         lines.append(f"| {item['experiment_id']} | {item['status']} | {x_status} | {y_status} | {plot_status} | {summary} |")
     lines += [

@@ -81,6 +81,60 @@ class Pa12StressStrainAuditTests(unittest.TestCase):
             self.assertEqual(result["status"], "PRELOAD_RELEASE_ONLY")
             self.assertIn("预载", result["reason"])
 
+    def test_audit_experiment_carries_visual_fracture_and_missing_dat_context(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            csv_path, plot_path, report_path = self._write_curve(Path(temporary_directory))
+
+            result = audit_experiment(
+                {
+                    "experiment_id": "S15_XY_0.2",
+                    "orientation": "XY",
+                    "visual_fracture_confirmed": True,
+                    "visual_fracture_frame": "000285.jpg",
+                    "excluded_frame_numbers": [285],
+                    "excluded_frame_reason": "DAT全场不完整",
+                },
+                {
+                    "status": "VFM_READY",
+                    "stress_strain": str(csv_path),
+                    "stress_strain_plot": str(plot_path),
+                    "stress_strain_report": str(report_path),
+                    "last_image": "000284.jpg",
+                },
+                Path(temporary_directory),
+            )
+
+            self.assertIn("000285.jpg", result["event_context"])
+            self.assertIn("DAT全场不完整", result["event_context"])
+            self.assertIn("000284.jpg", result["event_context"])
+
+    def test_audit_experiment_reports_visual_fracture_force_gap(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            csv_path, plot_path, report_path = self._write_curve(Path(temporary_directory))
+
+            result = audit_experiment(
+                {
+                    "experiment_id": "S23_Y_2",
+                    "orientation": "Y",
+                    "stress_strain_axes": ["Y"],
+                    "visual_fracture_confirmed": True,
+                    "visual_fracture_frame": "001547.jpg",
+                    "last_force_supported_photo": "001528.jpg",
+                    "force_missing_at_visual_fracture": True,
+                },
+                {
+                    "status": "DATA_LIMITED",
+                    "stress_strain": str(csv_path),
+                    "stress_strain_plot": str(plot_path),
+                    "stress_strain_report": str(report_path),
+                },
+                Path(temporary_directory),
+            )
+
+            self.assertIn("001547.jpg", result["event_context"])
+            self.assertIn("001528.jpg", result["event_context"])
+            self.assertIn("断裂力缺失", result["event_context"])
+
     def test_stress_audit_report_handles_preload_release_status(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             report_path = Path(temporary_directory) / "audit.md"
@@ -113,6 +167,7 @@ class Pa12StressStrainAuditTests(unittest.TestCase):
                             "experiment_id": "S15_XY_0.2",
                             "status": "REVIEW_REQUIRED",
                             "active_axes": ["X", "Y"],
+                            "event_context": "视觉断裂帧000285.jpg的DAT全场不完整，曲线末有效帧为000284.jpg",
                             "row_count": 284,
                             "report_exists": True,
                             "plot": {"valid": True},
@@ -145,6 +200,7 @@ class Pa12StressStrainAuditTests(unittest.TestCase):
             report = report_path.read_text(encoding="utf-8")
             self.assertIn("未观察到峰值后的明显掉载", report)
             self.assertIn("峰后最低应力/峰值=0.9997", report)
+            self.assertIn("DAT全场不完整", report)
 
 
 if __name__ == "__main__":

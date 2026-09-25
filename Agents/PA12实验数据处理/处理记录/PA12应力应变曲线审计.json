@@ -64,7 +64,8 @@
         "height": 960
       },
       "report_exists": true,
-      "experiment_id": "S15_XY_0.2"
+      "experiment_id": "S15_XY_0.2",
+      "event_context": "视觉断裂帧=000285.jpg，000285.jpg 为视觉断裂帧，但同名 DAT 仅约 5,277 点，显著低于前序约 98,000 点完整场；保留原始 JPG/DAT，正式 DIC/VFM 使用 000284.jpg 作为最后完整场帧。；曲线最后有效帧=000284.jpg"
     },
     {
       "status": "PASS",
@@ -494,7 +495,8 @@
         "height": 960
       },
       "report_exists": true,
-      "experiment_id": "S23_Y_2"
+      "experiment_id": "S23_Y_2",
+      "event_context": "视觉断裂帧=001547.jpg；力数据最后支持照片=001528.jpg；断裂力缺失"
     },
     {
       "experiment_id": "S24_Y_20",

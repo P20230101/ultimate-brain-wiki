@@ -837,3 +837,12 @@
 - 结论：9 组曲线文件均存在，6 PASS、S15/S22/S23 三组 REVIEW_REQUIRED、S24 为预载释放。S15/S22/S23 均未满足自动峰后掉载判据；报告据此要求人工核对，不补造断裂力或重写曲线。
 - 验证：新增测试先复现报告缺少掉载解释，再经实现通过；全量 pytest `105 passed`，`compileall` 通过，交接/曲线审计 JSON UTF-8 解析通过，`git diff --check` 通过。审计结果 6 PASS、3 REVIEW_REQUIRED、1 PRELOAD_RELEASE_ONLY，formal_curve_audit_ready=false。
 - 下一步：核对三组数据终点与视觉/有效 DIC 帧的对应，完成仍可计算的 VFM诊断和留出分析；正式材料参数仍按物理证据与稳定性门槛发布。
+
+## [2026-09-26] audit | PA12 等双轴跨实验留出诊断
+
+- 来源：S15–S18 完整 Job ROI 逐帧虚功 CSV、对应结果 JSON 和冻结的自建 VFM 配置。
+- 更新：新增 `tools/audit_pa12_self_vfm_cross_experiment.py`、合成数据回归测试、跨实验 CSV/报告；更新总目标、GPT 交接文档、机器状态和 `index.md`。
+- 方法：按现行阈值执行留一实验 E 迁移与峰值前 Linear Y/H 候选迁移；只纳入等双轴完整 Job ROI，不混用 subset 敏感性口径。阶段 2训练点数不足或质量不合格时不拟合。
+- 结论：S15–S18 试验跨加载速率且缺少同速率重复组；当前只能报告候选对另一条曲线的迁移误差，不能判定材料重复性。S17阶段 2点数不足；S18 到低速组的阶段 2迁移 RMSE 约 41.63–52.82 MPa。全部结果标记 `DIAGNOSTIC_ONLY`，正式参数门槛不变。
+- 验证：合成已知 E/Y/H 的留出测试通过；生产审计输出 18 个配对，全部为 `DIAGNOSTIC_ONLY`；全量 pytest `108 passed`、`compileall` 和 `git diff --check` 通过。
+- 下一步：继续处理 S15/S22/S23 曲线审计项和仍可计算的诊断；取得同速率重复试验及几何、ν、坐标、外功证据后再评估正式参数。
