@@ -72,10 +72,13 @@ def inspect_environment(config_path: Path, *, matchid_executable: Path | None = 
         overall_status = "PYTHON_DEPENDENCIES_INCOMPLETE"
     elif not inputs_ok:
         overall_status = "INPUT_PATHS_INCOMPLETE"
-    elif matchid["status"] != "AVAILABLE":
-        overall_status = "EXPORT_REQUIRES_LOCAL_MATCHID"
     else:
-        overall_status = "READY_FOR_MATCHID_EXPORT"
+        overall_status = "READY_FOR_SELF_VFM"
+    matchid_export_status = (
+        "READY_FOR_MATCHID_EXPORT"
+        if matchid["status"] == "AVAILABLE"
+        else "OPTIONAL_MATCHID_UNAVAILABLE"
+    )
     return {
         "config": str(config_path),
         "python_dependencies": dependency_status,
@@ -83,6 +86,7 @@ def inspect_environment(config_path: Path, *, matchid_executable: Path | None = 
         "input_paths": path_rows,
         "input_paths_ok": inputs_ok,
         "matchid": matchid,
+        "matchid_export_status": matchid_export_status,
         "overall_status": overall_status,
     }
 
@@ -92,6 +96,7 @@ def _write_report(path: Path, report: dict) -> None:
         "# PA12 处理环境检查",
         "",
         f"- 总体状态：`{report['overall_status']}`",
+        "- 自建 VFM：可继续运行；MatchID 不可用不会阻断虚功和参数候选计算。",
         f"- Python 依赖：`{'可用' if report['python_dependencies_ok'] else '不完整'}`",
         f"- 原始输入路径：`{'可用' if report['input_paths_ok'] else '不完整'}`",
         f"- MatchID：`{report['matchid']['status']}`",
@@ -108,7 +113,7 @@ def _write_report(path: Path, report: dict) -> None:
         lines.append(f"- 可调用路径：`{report['matchid']['path']}`")
     else:
         lines.append("- 未发现可调用的 `matchid.exe`；当前环境不能自动打开 Results Viewer 或自动导出字段。")
-        lines.append("- 需要用户在本机 MatchID Results Viewer 中导出一帧标准 CSV，再交给仓库的合并入口处理。")
+        lines.append("- 这只影响 MatchID 导出；自建 VFM 不依赖 MatchID，可直接使用已合并的 DIC—Press 数据继续分析。")
     lines += ["", "## 原始输入", ""]
     for row in report["input_paths"]:
         lines.append(
@@ -132,7 +137,7 @@ def main() -> int:
     json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     _write_report(markdown_path, report)
     print(json.dumps({"json": str(json_path), "markdown": str(markdown_path), **report}, ensure_ascii=False, indent=2))
-    return 0 if report["overall_status"] == "READY_FOR_MATCHID_EXPORT" else 2
+    return 0 if report["overall_status"] == "READY_FOR_SELF_VFM" else 2
 
 
 if __name__ == "__main__":

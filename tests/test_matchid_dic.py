@@ -495,7 +495,8 @@ class MatchIDDicTests(unittest.TestCase):
 
             self.assertTrue(report["python_dependencies_ok"])
             self.assertEqual(report["matchid"]["status"], "NOT_DETECTED")
-            self.assertEqual(report["overall_status"], "EXPORT_REQUIRES_LOCAL_MATCHID")
+            self.assertEqual(report["overall_status"], "READY_FOR_SELF_VFM")
+            self.assertEqual(report["matchid_export_status"], "OPTIONAL_MATCHID_UNAVAILABLE")
 
     def test_matchid_preparation_instructions_keep_validated_mapping_as_completed(self):
         with tempfile.TemporaryDirectory() as temporary_directory:

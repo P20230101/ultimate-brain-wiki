@@ -105,5 +105,6 @@
     "status": "AVAILABLE",
     "path": "D:\\DIC\\MATCH_DIC\\2019\\MatchID 2D\\MatchID.exe"
   },
-  "overall_status": "READY_FOR_MATCHID_EXPORT"
+  "matchid_export_status": "READY_FOR_MATCHID_EXPORT",
+  "overall_status": "READY_FOR_SELF_VFM"
 }

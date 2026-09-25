@@ -228,6 +228,11 @@ def _align_frame_arrays(
     }
 
 
+def _machine_axis_strain_arrays(points: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
+    """Map rotated-DIC normal strains to machine X/Y before virtual-work integration."""
+    return points | {"exx": points["eyy"], "eyy": points["exx"]}
+
+
 def _align_frame_points(
     reference: list[dict[str, float]],
     current: list[dict[str, float]],
@@ -322,6 +327,30 @@ def _geometry_quality(
         "roi_area_mm2": float(geometry["area_mm2"]),
         "bounding_area_mm2": float(geometry["bounding_area_mm2"]),
     }
+
+
+def _effective_dicom_geometry(points: list[dict[str, float]], job_geometry: dict[str, object]) -> dict[str, object]:
+    """Return an independent rectangle covering the supplied DIC point domain."""
+    x_values = [float(point["x"]) for point in points]
+    y_values = [float(point["y"]) for point in points]
+    x_min, x_max = min(x_values), max(x_values)
+    y_min, y_max = min(y_values), max(y_values)
+    length_x = x_max - x_min
+    length_y = y_max - y_min
+    area = length_x * length_y
+    effective = dict(job_geometry)
+    effective.update(
+        {
+            "roi_bounds_mm": (x_min, x_max, y_min, y_max),
+            "roi_polygon_mm": [(x_min, y_min), (x_max, y_min), (x_max, y_max), (x_min, y_max)],
+            "roi_is_axis_aligned_rectangle": True,
+            "area_mm2": area,
+            "bounding_area_mm2": area,
+            "length_x_mm": length_x,
+            "length_y_mm": length_y,
+        }
+    )
+    return effective
 
 
 def _write_csv(path: Path, rows: list[dict], fields: list[str]) -> None:
@@ -499,14 +528,22 @@ def _plot_experiment(
     plt.close(fig)
 
 
-def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
+def process_experiment(
+    entry: dict,
+    batch: dict,
+    self_config: dict,
+    *,
+    geometry_override: dict[str, object] | None = None,
+    result_directory: Path | None = None,
+    analysis_label: str | None = None,
+) -> dict:
     experiment_id = entry["experiment_id"]
     loading_mode = entry.get("loading_mode", "")
     output_root = Path(batch["output_root"])
     preparation_dir = output_root / "Agents" / "PA12实验数据处理" / "MatchID_VFM准备" / experiment_id
     index_path = preparation_dir / f"{experiment_id}_DIC全场—力索引.csv"
     merged_dir = preparation_dir / "merged"
-    result_dir = output_root / self_config["output_directory"] / "实验结果" / experiment_id
+    result_dir = result_directory or (output_root / self_config["output_directory"] / "实验结果" / experiment_id)
     if entry.get("loading_mode") not in self_config.get("eligible_loading_modes", []):
         return {
             "实验编号": experiment_id,
@@ -519,7 +556,7 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
         return {"实验编号": experiment_id, "状态": "阻断：缺少 DIC—力合并输入"}
 
     index_rows = _read_index(index_path)
-    geometry = _geometry(Path(entry["dic_job_file"]))
+    geometry = geometry_override or _geometry(Path(entry["dic_job_file"]))
     geometry_quality = _geometry_quality(loading_mode, geometry, self_config)
     thickness = float(self_config["geometry"]["roi_thickness_mm"])
     nu = float(self_config["nu"])
@@ -569,7 +606,7 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
         )
         roi_polygon = None if geometry["roi_is_axis_aligned_rectangle"] else geometry["roi_polygon_mm"]
         pointwise = integrate_plane_stress_virtual_work_coefficients(
-            points=points,
+            points=_machine_axis_strain_arrays(points),
             nu=nu,
             thickness_mm=thickness,
             length_x_mm=axes["machine_x_virtual_length_mm"],
@@ -823,6 +860,9 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
     result = {
         "实验编号": experiment_id,
         "状态": (
+            "SELF_VFM_SENSITIVITY_ONLY"
+            if analysis_label is not None
+            else
             "SELF_VFM_CANDIDATE"
             if (
                 modulus is not None
@@ -837,6 +877,7 @@ def process_experiment(entry: dict, batch: dict, self_config: dict) -> dict:
             else "SELF_VFM_PARTIAL"
         ),
         "方法": {
+            "分析口径": analysis_label or "完整 Job ROI 主结果",
             "虚场": "旋转后X（顶部/底部）：u*=0, v*=y/Ly；Y（左右）：u*=x/Lx, v*=0",
             "边界力": "用户确认的外围机器力直接作为ROI边界合力",
             "正式积分": "ROI内按当前帧坐标网格的相邻完整单元拆分为两个三角形逐点积分；缺失单元不补足，面积比作为质量门槛",

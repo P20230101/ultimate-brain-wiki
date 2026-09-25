@@ -10,7 +10,9 @@ from tools.run_pa12_self_vfm import (
     _align_frame_arrays,
     _align_frame_points,
     _geometry,
+    _effective_dicom_geometry,
     _geometry_quality,
+    _machine_axis_strain_arrays,
     _read_frame_points,
     _usable_modulus,
 )
@@ -29,6 +31,43 @@ from tools.pa12_self_vfm import (
 
 
 class Pa12SelfVfmTests(unittest.TestCase):
+    def test_pointwise_coefficients_use_rotated_machine_axis_strains(self):
+        points = {
+            "x": np.array([0.0, 2.0, 2.0, 0.0]),
+            "y": np.array([0.0, 0.0, 1.0, 1.0]),
+            "exx": np.full(4, 0.01),
+            "eyy": np.full(4, 0.03),
+        }
+
+        result = integrate_plane_stress_virtual_work_coefficients(
+            points=_machine_axis_strain_arrays(points),
+            nu=0.25,
+            thickness_mm=1.0,
+            length_x_mm=1.0,
+            length_y_mm=2.0,
+            roi_bounds=(0.0, 2.0, 0.0, 1.0),
+        )
+
+        expected_machine_x = 2.0 * (0.03 + 0.25 * 0.01) / (1.0 - 0.25**2)
+        expected_machine_y = 2.0 * (0.01 + 0.25 * 0.03) / (2.0 * (1.0 - 0.25**2))
+        self.assertAlmostEqual(result["coefficient_x"], expected_machine_x)
+        self.assertAlmostEqual(result["coefficient_y"], expected_machine_y)
+
+    def test_effective_dicom_geometry_uses_point_bbox_without_changing_job_geometry(self):
+        job_geometry = {
+            "roi_bounds_mm": (0.0, 0.0, 10.0, 10.0),
+            "area_mm2": 100.0,
+            "length_x_mm": 10.0,
+            "length_y_mm": 10.0,
+        }
+        effective = _effective_dicom_geometry(
+            [{"x": 2.0, "y": 3.0}, {"x": 8.0, "y": 9.0}],
+            job_geometry,
+        )
+        self.assertEqual(effective["roi_bounds_mm"], (2.0, 8.0, 3.0, 9.0))
+        self.assertAlmostEqual(effective["area_mm2"], 36.0)
+        self.assertEqual(job_geometry["area_mm2"], 100.0)
+        self.assertTrue(effective["roi_is_axis_aligned_rectangle"])
     def test_nonpositive_elastic_fit_is_not_used_for_plastic_strain(self):
         self.assertIsNone(_usable_modulus({"modulus_mpa": -12.0}))
         self.assertIsNone(_usable_modulus({"modulus_mpa": 0.0}))
