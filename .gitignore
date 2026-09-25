@@ -19,6 +19,8 @@ _s24_force_pos.png
 _stress_montage.png
 abaqus.rpy
 abaqus.rpy.*
+abaqus*.rec
+abaqus*.log
 
 # 本地 GUI/构建过程的临时产物。
 .cruciform-db-build*/
