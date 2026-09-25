@@ -3,8 +3,28 @@
   "generated_date": "2026-09-25",
   "vault": "D:/2026.9.21_finally",
   "raw_source_root": "D:/C盘迁移/Desktop/yuan",
+  "execution_goal_v2": {
+    "status": "STAGE_A_COMPLETE_REVIEW_REQUIRED",
+    "primary_method": "自建 VFM；MatchID 资料作为格式、方向、边界和 GUI 历史审计",
+    "success_definition": "完成可复现的照片-DIC-Press-VFM链；四组等双轴先通过ROI覆盖、同步、虚功残差和参数稳定性门槛，再发布候选参数；单轴须先补齐独立几何和外功证据",
+    "current_task": "复核四组等双轴 ROI 实际有效场覆盖、内外虚功残差和参数稳定性",
+    "quality_review": {
+      "S15_XY_0.2": {"stage1_rmse_x_N": 6543.63221, "stage1_rmse_y_N": 6428.478152, "cumulative_E_range_MPa": [-8529.023, 6993.93], "status": "REVIEW_REQUIRED"},
+      "S16_XY_0.2": {"stage1_rmse_x_N": 4755.972337, "stage1_rmse_y_N": 5049.693521, "cumulative_E_range_MPa": [3405.144, 9794.541], "status": "REVIEW_REQUIRED"},
+      "S17_XY_20": {"stage1_rmse_x_N": 1010.493457, "stage1_rmse_y_N": 1097.64708, "cumulative_E_range_MPa": [4991.171, 5109.209], "status": "REVIEW_REQUIRED"},
+      "S18_XY_2": {"stage1_rmse_x_N": 1097.07451, "stage1_rmse_y_N": 1118.231861, "cumulative_E_range_MPa": [4004.726, 4624.112], "status": "REVIEW_REQUIRED"}
+    },
+    "release_rule": "面积比低于0.95、同步不确定、虚功残差不合格或参数不稳定时保持 REVIEW_REQUIRED，不补点、不补力、不补断裂值",
+    "next_stages": [
+      "ROI与中心1 mm厚度空间叠合复核",
+      "四组等双轴虚功残差和参数稳定性复核",
+      "跨速度/跨实验候选参数比较",
+      "补齐单轴独立几何、厚度、积分域和外功证据",
+      "单轴VFM与最终材料参数验证"
+    ]
+  },
   "user_intent": {
-    "summary": "以 MatchID 自带 VFM 为基准，将同步 DIC 全场与外围机器力、几何和 ROI 边界合力接入分析，并按阶段识别单轴/双轴弹塑性参数。",
+    "summary": "以自建 VFM 为执行主线，将同步 DIC 全场与外围机器力、几何和 ROI 边界合力接入分析；MatchID 资料保留为历史审计，按阶段识别等双轴候选参数并在证据充分后扩展到单轴。",
     "default_equal_biaxial_force": {
       "X": "(X1_Press + X2_Press) / 2",
       "Y": "(Y1_Press + Y2_Press) / 2"
