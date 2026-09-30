@@ -9,9 +9,13 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from shapely import make_valid
+from shapely.geometry import Polygon
+from shapely.validation import explain_validity
 
 if __package__:
     from .matchid_prepare import parse_job_metadata
+    from .pa12_finite_kinematics import matchid_grid_triangles, triangle_polygon_shape_integrals
     from .pa12_self_vfm import (
         equivalent_plastic_strain_plane_stress,
         equivalent_stress_plane_stress,
@@ -27,6 +31,7 @@ if __package__:
     from .pa12_vfm_check import _shape_coordinates
 else:
     from matchid_prepare import parse_job_metadata
+    from pa12_finite_kinematics import matchid_grid_triangles, triangle_polygon_shape_integrals
     from pa12_self_vfm import (
         equivalent_plastic_strain_plane_stress,
         equivalent_stress_plane_stress,
@@ -43,6 +48,11 @@ else:
 
 
 REQUIRED_INDEX_FIELDS = {"照片", "时间/s", "X向力/N", "Y向力/N"}
+INDEX_FIELD_ALIASES = {
+    "时间_s": "时间/s",
+    "X向力_N": "X向力/N",
+    "Y向力_N": "Y向力/N",
+}
 FRAME_FIELDS = [
     "实验编号",
     "照片",
@@ -124,10 +134,17 @@ def _finite(value: str, label: str) -> float:
 def _read_index(path: Path) -> list[dict[str, str]]:
     with _open_csv(path) as handle:
         reader = csv.DictReader(handle)
-        missing = REQUIRED_INDEX_FIELDS - set(reader.fieldnames or [])
+        fieldnames = {
+            INDEX_FIELD_ALIASES.get(name, name)
+            for name in (reader.fieldnames or [])
+        }
+        missing = REQUIRED_INDEX_FIELDS - fieldnames
         if missing:
             raise ValueError(f"{path} 缺少字段：{sorted(missing)}")
-        rows = list(reader)
+        rows = [
+            {INDEX_FIELD_ALIASES.get(key, key): value for key, value in row.items()}
+            for row in reader
+        ]
     if not rows:
         raise ValueError(f"{path} 没有帧记录")
     return rows
@@ -225,6 +242,7 @@ def _align_frame_arrays(
         "matched_point_count": np.array([len(reference_indices)], dtype=int),
         "reference_missing_point_count": np.array([len(reference_order) - len(reference_indices)], dtype=int),
         "current_extra_point_count": np.array([len(current_order) - len(current_indices)], dtype=int),
+        "reference_point_indices": reference_order[reference_indices],
     }
 
 
@@ -252,6 +270,11 @@ def _experiment_axis_mapping(entry: dict, self_config: dict) -> dict[str, str]:
     }
 
 
+def _experiment_thickness_mm(experiment_id: str, self_config: dict) -> float:
+    overrides = self_config.get("roi_thickness_mm_by_experiment", {})
+    return float(overrides.get(experiment_id, self_config["geometry"]["roi_thickness_mm"]))
+
+
 def _align_frame_points(
     reference: list[dict[str, float]],
     current: list[dict[str, float]],
@@ -277,7 +300,7 @@ def _align_frame_points(
     return aligned
 
 
-def _geometry(job_path: Path) -> dict[str, object]:
+def _geometry(job_path: Path, *, repair_method: str | None = None) -> dict[str, object]:
     job = parse_job_metadata(job_path)
     x_pixels, y_pixels = _shape_coordinates(job["shape"])
     conversion = float(job["conversion_mm_per_pixel"])
@@ -286,36 +309,70 @@ def _geometry(job_path: Path) -> dict[str, object]:
     length_x = (max_x - min_x) * conversion
     length_y = (max_y - min_y) * conversion
     polygon_mm = [(x * conversion, y * conversion) for x, y in zip(x_pixels, y_pixels)]
-    polygon_area = 0.5 * abs(
+    raw_shoelace_area = 0.5 * abs(
         sum(
             x1 * y2 - y1 * x2
             for (x1, y1), (x2, y2) in zip(polygon_mm, polygon_mm[1:] + polygon_mm[:1])
         )
     )
-    if polygon_area <= 0.0:
-        raise ValueError(f"{job_path} 的 Job Shape Polygon 面积不是正数")
+    source_polygon = Polygon(polygon_mm)
+    validity_status = "VALID"
+    validity_reason = None
+    applied_repair_method = None
+    polygon_parts = [source_polygon] if source_polygon.is_valid else []
+    if not source_polygon.is_valid:
+        validity_reason = explain_validity(source_polygon)
+        if repair_method is None:
+            validity_status = "REPAIR_REQUIRED"
+        elif repair_method == "make_valid_linework":
+            repaired = make_valid(source_polygon, method="linework")
+            polygon_parts = [
+                component
+                for component in getattr(repaired, "geoms", [repaired])
+                if component.geom_type == "Polygon"
+            ]
+            if any(component.interiors for component in polygon_parts):
+                raise ValueError(f"{job_path} 修复后含孔洞，当前 ROI 积分不支持孔洞几何")
+            validity_status = "REPAIRED"
+            applied_repair_method = repair_method
+        else:
+            raise ValueError(f"{job_path} 未支持的 ROI 修复方法：{repair_method}")
+    roi_polygons_mm = [
+        [(float(x), float(y)) for x, y in list(component.exterior.coords)[:-1]]
+        for component in polygon_parts
+    ]
+    polygon_area = float(sum(component.area for component in polygon_parts))
+    if validity_status != "REPAIR_REQUIRED" and (polygon_area <= 0.0 or not polygon_parts):
+        raise ValueError(f"{job_path} 的 Job Shape Polygon 修复后没有正面积区域")
     rectangle_vertices = {
         (min_x * conversion, min_y * conversion),
         (max_x * conversion, min_y * conversion),
         (max_x * conversion, max_y * conversion),
         (min_x * conversion, max_y * conversion),
     }
-    roi_is_axis_aligned_rectangle = len(polygon_mm) == 4 and all(
+    roi_is_axis_aligned_rectangle = len(roi_polygons_mm) == 1 and len(roi_polygons_mm[0]) == 4 and all(
         any(
             math.isclose(x, expected_x, rel_tol=0.0, abs_tol=1e-9)
             and math.isclose(y, expected_y, rel_tol=0.0, abs_tol=1e-9)
             for expected_x, expected_y in rectangle_vertices
         )
-        for x, y in polygon_mm
+        for x, y in roi_polygons_mm[0]
     )
     return {
         "length_x_mm": length_x,
         "length_y_mm": length_y,
-        "area_mm2": polygon_area,
+        "area_mm2": None if validity_status == "REPAIR_REQUIRED" else polygon_area,
+        "raw_shoelace_area_mm2": raw_shoelace_area,
+        "validity_status": validity_status,
+        "validity_reason": validity_reason,
+        "repair_method": applied_repair_method,
+        "component_count": len(roi_polygons_mm),
         "bounding_area_mm2": length_x * length_y,
         "roi_is_axis_aligned_rectangle": roi_is_axis_aligned_rectangle,
         "conversion_mm_per_pixel": conversion,
+        "dic_grid_spacing_mm": float(job["step_size"]) * conversion,
         "roi_polygon_mm": polygon_mm,
+        "roi_polygons_mm": roi_polygons_mm,
         "roi_bounds_mm": (
             min_x * conversion,
             max_x * conversion,
@@ -324,6 +381,9 @@ def _geometry(job_path: Path) -> dict[str, object]:
         ),
         "roi_bounds_px": f"x={min_x:g}–{max_x:g}, y={min_y:g}–{max_y:g} px",
         "reference_image": Path(job["reference_image"]).name,
+        "subset_size_px": (
+            None if job["subset_size"] is None else int(job["subset_size"])
+        ),
     }
 
 
@@ -349,22 +409,97 @@ def _geometry_quality(
 
 
 def _effective_dicom_geometry(points: list[dict[str, float]], job_geometry: dict[str, object]) -> dict[str, object]:
-    """Return an independent rectangle covering the supplied DIC point domain."""
+    """Return the DIC point bounds clipped to the Job ROI as a sensitivity domain."""
+    if job_geometry.get("validity_status") == "REPAIR_REQUIRED":
+        raise ValueError("Job ROI Polygon 自交且未授权修复，不能生成 DIC 子域")
     x_values = [float(point["x"]) for point in points]
     y_values = [float(point["y"]) for point in points]
     x_min, x_max = min(x_values), max(x_values)
     y_min, y_max = min(y_values), max(y_values)
     length_x = x_max - x_min
     length_y = y_max - y_min
-    area = length_x * length_y
+    clipped_polygons = []
+    for source_polygon in job_geometry["roi_polygons_mm"]:
+        polygon = [tuple(map(float, point)) for point in source_polygon]
+        for axis, limit, keep_greater in (
+            (0, x_min, True),
+            (0, x_max, False),
+            (1, y_min, True),
+            (1, y_max, False),
+        ):
+            if not polygon:
+                break
+            clipped = []
+            previous = polygon[-1]
+            previous_inside = previous[axis] >= limit if keep_greater else previous[axis] <= limit
+            for current in polygon:
+                current_inside = current[axis] >= limit if keep_greater else current[axis] <= limit
+                if current_inside != previous_inside:
+                    fraction = (limit - previous[axis]) / (current[axis] - previous[axis])
+                    clipped.append(
+                        (
+                            previous[0] + fraction * (current[0] - previous[0]),
+                            previous[1] + fraction * (current[1] - previous[1]),
+                        )
+                    )
+                if current_inside:
+                    clipped.append(current)
+                previous = current
+                previous_inside = current_inside
+            polygon = []
+            for vertex in clipped:
+                if not polygon or not (
+                    math.isclose(vertex[0], polygon[-1][0], rel_tol=0.0, abs_tol=1e-12)
+                    and math.isclose(vertex[1], polygon[-1][1], rel_tol=0.0, abs_tol=1e-12)
+                ):
+                    polygon.append(vertex)
+            if len(polygon) > 1 and (
+                math.isclose(polygon[0][0], polygon[-1][0], rel_tol=0.0, abs_tol=1e-12)
+                and math.isclose(polygon[0][1], polygon[-1][1], rel_tol=0.0, abs_tol=1e-12)
+            ):
+                polygon.pop()
+        if len(polygon) >= 3:
+            clipped_area = 0.5 * abs(
+                sum(
+                    x1 * y2 - y1 * x2
+                    for (x1, y1), (x2, y2) in zip(polygon, polygon[1:] + polygon[:1])
+                )
+            )
+            if clipped_area > 0.0:
+                clipped_polygons.append(polygon)
+    if not clipped_polygons:
+        raise ValueError("DIC subset 外接矩形与 Job ROI 没有可积分的交叠区域")
+    area = sum(
+        0.5 * abs(
+            sum(
+                x1 * y2 - y1 * x2
+                for (x1, y1), (x2, y2) in zip(polygon, polygon[1:] + polygon[:1])
+            )
+        )
+        for polygon in clipped_polygons
+    )
+    rectangle_vertices = {
+        (x_min, y_min),
+        (x_max, y_min),
+        (x_max, y_max),
+        (x_min, y_max),
+    }
+    roi_is_rectangle = len(clipped_polygons) == 1 and len(clipped_polygons[0]) == 4 and all(
+        any(
+            math.isclose(x, expected_x, rel_tol=0.0, abs_tol=1e-12)
+            and math.isclose(y, expected_y, rel_tol=0.0, abs_tol=1e-12)
+            for expected_x, expected_y in rectangle_vertices
+        )
+        for x, y in clipped_polygons[0]
+    )
     effective = dict(job_geometry)
     effective.update(
         {
             "roi_bounds_mm": (x_min, x_max, y_min, y_max),
-            "roi_polygon_mm": [(x_min, y_min), (x_max, y_min), (x_max, y_max), (x_min, y_max)],
-            "roi_is_axis_aligned_rectangle": True,
+            "roi_polygons_mm": clipped_polygons,
+            "roi_is_axis_aligned_rectangle": roi_is_rectangle,
             "area_mm2": area,
-            "bounding_area_mm2": area,
+            "bounding_area_mm2": length_x * length_y,
             "length_x_mm": length_x,
             "length_y_mm": length_y,
         }
@@ -448,6 +583,48 @@ def _configure_plot() -> None:
     plt.rcParams["axes.unicode_minus"] = False
 
 
+def _plot_model_comparison(output_dir: Path, experiment_id: str, model_rows: list[dict]) -> None:
+    model_styles = {
+        "Linear模型应力/MPa": "--",
+        "Ludwik模型应力/MPa": ":",
+        "Swift模型应力/MPa": "-.",
+        "Voce I（通用）模型应力/MPa": "--",
+        "Voce II（通用）模型应力/MPa": "-",
+    }
+    figure_path = output_dir / f"{experiment_id}_模型应力应变比较.png"
+    if not any(row[column] != "" for row in model_rows for column in model_styles):
+        figure_path.unlink(missing_ok=True)
+        return
+
+    _configure_plot()
+    fig, ax = plt.subplots(figsize=(8, 6), constrained_layout=True)
+    ax.scatter(
+        [float(row["等效塑性应变"]) for row in model_rows],
+        [float(row["等效应力/MPa"]) for row in model_rows],
+        s=18,
+        label="DIC/边界等效应力",
+    )
+    for column, style in model_styles.items():
+        model_rows_for_plot = sorted(
+            (row for row in model_rows if row[column] != ""),
+            key=lambda row: float(row["等效塑性应变"]),
+        )
+        if model_rows_for_plot:
+            model_name = column.replace("模型应力/MPa", "")
+            ax.plot(
+                [float(row["等效塑性应变"]) for row in model_rows_for_plot],
+                [float(row[column]) for row in model_rows_for_plot],
+                style,
+                label=f"{model_name}模型",
+            )
+    ax.set_title(f"{experiment_id} 模型应力—应变比较（条件诊断）")
+    ax.set_xlabel("等效塑性应变")
+    ax.set_ylabel("等效应力 / MPa")
+    ax.legend()
+    fig.savefig(figure_path, dpi=160)
+    plt.close(fig)
+
+
 def _plot_experiment(
     output_dir: Path,
     experiment_id: str,
@@ -513,6 +690,7 @@ def _plot_experiment(
     fig.suptitle(f"{experiment_id} 自建 VFM：ROI {geometry['length_x_mm']:.2f}×{geometry['length_y_mm']:.2f} mm，厚度 1 mm")
     fig.savefig(output_dir / f"{experiment_id}_虚功检查.png", dpi=160)
     plt.close(fig)
+    _plot_model_comparison(output_dir, experiment_id, model_rows)
 
     fig, axes = plt.subplots(1, 2, figsize=(13, 5), constrained_layout=True)
     if elastic_progress:
@@ -575,19 +753,40 @@ def process_experiment(
         return {"实验编号": experiment_id, "状态": "阻断：缺少 DIC—力合并输入"}
 
     index_rows = _read_index(index_path)
-    geometry = geometry_override or _geometry(Path(entry["dic_job_file"]))
+    if geometry_override is None:
+        repair_method = self_config["geometry_repairs_by_experiment"].get(experiment_id)
+        geometry = _geometry(Path(entry["dic_job_file"]), repair_method=repair_method)
+    else:
+        geometry = geometry_override
+    if geometry.get("validity_status") == "REPAIR_REQUIRED":
+        blocked_result = {
+            "实验编号": experiment_id,
+            "状态": "阻断：Job ROI 多边形无效，修复方法未获授权",
+            "本次阶段A结果有效": False,
+            "既有阶段A文件状态": "历史产物，不能代表本次输入",
+            "说明": geometry["validity_reason"],
+            "原始鞋带面积_mm2": geometry["raw_shoelace_area_mm2"],
+        }
+        _write_json(result_dir / f"{experiment_id}_结果.json", blocked_result)
+        return blocked_result
     geometry_quality = _geometry_quality(loading_mode, geometry, self_config)
     axis_mapping = _experiment_axis_mapping(entry, self_config)
     axis_mapping_record = (
-        {"status": "CALIBRATED_CRUCIFORM", **axis_mapping}
+        {
+            "status": "CANDIDATE_UNVERIFIED",
+            "evidence": "按双轴处理配置采用 X↔DIC y、Y↔DIC x；未独立确认试样身份、旋转/镜像和物理坐标。",
+            **axis_mapping,
+        }
         if loading_mode == "双轴"
         else self_config["machine_axis_mapping_by_experiment"][experiment_id]
     )
-    thickness = float(self_config["geometry"]["roi_thickness_mm"])
+    thickness = _experiment_thickness_mm(experiment_id, self_config)
     nu = float(self_config["nu"])
     frame_data: list[dict] = []
     baseline_arrays: dict[str, np.ndarray] | None = None
     baseline: dict[str, float] | None = None
+    reference_triangles: np.ndarray | None = None
+    reference_shape_integrals: np.ndarray | None = None
     for row in index_rows:
         photo = row["照片"]
         frame_path = merged_dir / f"{Path(photo).stem}_DIC全场—力.csv"
@@ -598,9 +797,27 @@ def process_experiment(
                 key: float(raw_points[key].mean())
                 for key in ("exx", "eyy", "exy")
             }
+            reference_coordinates = np.column_stack((raw_points["x"], raw_points["y"]))
+            reference_triangles = matchid_grid_triangles(
+                reference_coordinates,
+                spacing_mm=float(geometry["dic_grid_spacing_mm"]),
+            )
+            reference_shape_integrals = np.zeros((len(reference_triangles), 3), dtype=float)
+            for polygon in geometry["roi_polygons_mm"]:
+                reference_shape_integrals += triangle_polygon_shape_integrals(
+                    reference_coordinates,
+                    reference_triangles,
+                    np.asarray(polygon, dtype=float),
+                )
         points_arrays = _align_frame_arrays(baseline_arrays, raw_points)
         points = points_arrays
         point_count = len(points_arrays["x"])
+        reference_to_current = np.full(len(baseline_arrays["x"]), -1, dtype=int)
+        reference_to_current[points_arrays["reference_point_indices"]] = np.arange(point_count)
+        frame_triangles = reference_to_current[reference_triangles]
+        supported = (reference_shape_integrals.sum(axis=1) > 0.0) & np.all(
+            frame_triangles >= 0, axis=1
+        )
         exx = float(points_arrays["exx"].mean())
         eyy = float(points_arrays["eyy"].mean())
         exy = float(points_arrays["exy"].mean())
@@ -629,7 +846,6 @@ def process_experiment(
             length_x_mm=axes["machine_x_virtual_length_mm"],
             length_y_mm=axes["machine_y_virtual_length_mm"],
         )
-        roi_polygon = None if geometry["roi_is_axis_aligned_rectangle"] else geometry["roi_polygon_mm"]
         pointwise = integrate_plane_stress_virtual_work_coefficients(
             points=_machine_axis_strain_arrays(points, **axis_mapping),
             nu=nu,
@@ -637,7 +853,9 @@ def process_experiment(
             length_x_mm=axes["machine_x_virtual_length_mm"],
             length_y_mm=axes["machine_y_virtual_length_mm"],
             roi_bounds=geometry["roi_bounds_mm"],
-            roi_polygon=roi_polygon,
+            roi_polygons=geometry["roi_polygons_mm"],
+            integration_triangles=frame_triangles[supported],
+            triangle_shape_integrals_mm2=reference_shape_integrals[supported],
         )
         frame_data.append(
             {
@@ -909,11 +1127,18 @@ def process_experiment(
             "分析口径": analysis_label or "完整 Job ROI 主结果",
             "虚场": "每个机器加载方向按实验显式映射至DIC x/y；虚场长度沿加载方向，受力边长度取垂直方向",
             "边界力": "用户确认的外围机器力直接作为ROI边界合力",
-            "正式积分": "ROI内按当前帧坐标网格的相邻完整单元拆分为两个三角形逐点积分；缺失单元不补足，面积比作为质量门槛",
+            "正式积分": "依据 Job 的 Step size × Conversion 建立参考网格相邻三角形；逐帧缺失节点对应的三角形不计入，并对当前分析域的多边形交叠区精确积分线性形函数",
             "回归基线": "平均应变乘矩形面积",
             "厚度_mm": thickness,
             "外围整体厚度_mm": float(self_config["geometry"]["overall_thickness_mm"]),
             "nu": nu,
+            "Job ROI几何": {
+                "状态": geometry.get("validity_status", "VALID"),
+                "原始几何问题": geometry.get("validity_reason"),
+                "修复方法": geometry.get("repair_method"),
+                "积分面片数": len(geometry["roi_polygons_mm"]),
+                "原始鞋带面积_mm2": geometry.get("raw_shoelace_area_mm2"),
+            },
             "面积_mm2": geometry["area_mm2"],
             "ROI长度_mm": [geometry["length_x_mm"], geometry["length_y_mm"]],
             "机器轴—DIC映射": axis_mapping_record,
@@ -993,7 +1218,7 @@ def run(batch_config_path: Path, self_config_path: Path) -> dict:
         "- 阶段2固定阶段1 E 和 ν，使用边界合力换算的平面应力与 DIC 应变约化识别 Linear 等向硬化 Y/H。",
         "- 外围整体厚度 3 mm 只作几何记录；虚功和应力使用中心 ROI 厚度 1 mm。",
         "- 这是可复现的自建候选算法；它不读取 MatchID 内部的 Newton/J2 状态，也不把界面中间值写成最终材料参数。",
-        "- 每一帧将坐标集合与参考帧取交集后积分；缺失点或缺失单元不填充。理论 ROI 与实际 DIC 点场的面积比低于 0.95 时，结果只能进入人工复核。",
+        "- 以完整 Job ROI 为主域，按 Job 的 Step size × Conversion 建立参考网格；每帧与参考节点取交集，含缺失节点的单元不补点、不跨接。ROI 多边形裁切按线性形函数精确积分，支持面积比低于 0.95 时只进入人工复核。",
         "",
         "## 结果",
         "",
